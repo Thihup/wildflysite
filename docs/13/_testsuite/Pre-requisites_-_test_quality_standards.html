@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Pre Requisites_ _test_quality_standards | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Pre Requisites_ _test_quality_standards" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Before you add a test" />
+<meta property="og:description" content="Before you add a test" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_testsuite/Pre-requisites_-_test_quality_standards.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_testsuite/Pre-requisites_-_test_quality_standards.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_testsuite/Pre-requisites_-_test_quality_standards.html","headline":"Pre Requisites_ _test_quality_standards","description":"Before you add a test","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="sect1">
+<h2 id="Pre-requisites_-_test_quality_standards">Before you add a test</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Every added test, whether ported or new should follow the same
+guidelines:</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="verify-the-test-belongs-in-wildfly">Verify the test belongs in WildFly</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>AS6 has a lot of tests for things that are discontinued. For example
+the<br>
+legacy JBoss Transaction Manager which was replaced by Arjuna. Also we<br>
+had tests for SPIs that no longer exist. None of these things should
+be<br>
+migrated.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="only-add-correct-and-understandable-tests">Only add CORRECT and UNDERSTANDABLE tests</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If you don&#8217;t understand what a test is doing (perhaps too complex), or<br>
+it&#8217;s going about things in a strange way that might not be correct,
+THEN<br>
+DO NOT PORT IT. Instead we should have a simpler, understandable, and<br>
+correct test. Write a new one, ping the author, or skip it altogether.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="do-not-add-duplicate-tests">Do not add duplicate tests</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Always check that the test you are adding doesn&#8217;t have coverage<br>
+elsewhere (try using "git grep"). As mentioned above we have some<br>
+overlap between 6 and 7. The 7 test version will likely be better.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="dont-name-tests-after-jiras">Don&#8217;t name tests after JIRAs</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A JIRA number is useless without an internet connection, and they are<br>
+hard to read. If I get a test failure thats XDGR-843534578 I have to
+dig<br>
+to figure out the context. It&#8217;s perfectly fine though to link to a
+JIRA<br>
+number in the comments of the test. Also the commit log is always
+available.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="tests-should-contain-javadoc-that-explains-what-is-being-tested">Tests should contain javadoc that explains what is being tested</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This is especially critical if the test is non-trivial</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="prefer-expanding-an-existing-test-over-a-new-test-class">Prefer expanding an EXISTING test over a new test class</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If you are looking at migrating or creating a test with similar<br>
+functionality to an exiting test, it is better to<br>
+expand upon the existing one by adding more test methods, rather than<br>
+creating a whole new test. In general each<br>
+new test class adds at least 300ms to execution time, so as long as it<br>
+makes sense it is better to add it to an<br>
+existing test case.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="organize-tests-by-subsystem">Organize tests by subsystem</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Integration tests should be packaged in subpackages under the relevant<br>
+subsystem (e.g org.jboss.as.test.integration.ejb.async). When a test<br>
+impacts multiple subsystems this is a bit of a judgement call, but in<br>
+general the tests should go into the package of<br>
+the spec that defines the functionality (e.g. CDI based constructor<br>
+injection into an EJB, even though this involves CDI and EJB,<br>
+the CDI spec defines this behaviour)</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="explain-non-obvious-spec-behavior-in-comments">Explain non-obvious spec behavior in comments</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The EE spec is full of odd requirements. If the test is covering<br>
+behavior that is not obvious then please add something like "Verifies
+EE<br>
+X.T.Z - The widget can&#8217;t have a foobar if it is declared like blah"</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="put-integration-test-resources-in-the-source-directory-of-the-test">Put integration test resources in the source directory of the test</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>At the moment there is not real organization of these files. It makes<br>
+sense for most apps to have this separation, however the testsuite is<br>
+different. e.g. most apps will have a single deployment descriptor of
+a<br>
+given type, for the testsuite will have hundreds, and maintaining
+mirroring<br>
+package structures is error prone.<br>
+This also makes the tests easier to understand, as all the artifacts
+in<br>
+the deployment are in one place, and that place tends to be small
+(only<br>
+a handful of files).</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="do-not-hard-code-values-likely-to-need-configuration-urls-ports">Do not hard-code values likely to need configuration (URLs, ports, &#8230;&#8203;)</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>URLs hardcoded to certain address (localhost) or port (like the default
+8080 for web) prevent running the test against different address or with
+IPv6 adress.<br>
+Always use the configurable values provided by Arquillian or as a system
+property.<br>
+If you come across a value which is not configurable but you think it
+should be, file an WildFly {wildflyVersion} jira issue with component "Test suite".<br>
+See
+<a href="https://github.com/arquillian/arquillian/blob/master/examples/junit/src/test/java/com/acme/web/LocalRunServletTestCase.java">@ArquillianResourrce
+usage example</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="follow-best-committing-practices">Follow best committing practices</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Only do changes related to the topic of the jira/pull request.</p>
+</li>
+<li>
+<p>Do not clutter your pull request with e.g. reformatting, fixing typos
+spotted along the way - do another pull request for such.</p>
+</li>
+<li>
+<p>Prefer smaller changes in more pull request over one big pull request
+which are difficult to merge.</p>
+</li>
+<li>
+<p>Keep the code consistent across commits - e.g. when renaming
+something, be sure to update all references to it.</p>
+</li>
+<li>
+<p>Describe your commits properly as they will appear in master&#8217;s linear
+history.</p>
+</li>
+<li>
+<p>If you&#8217;re working on a jira issue, include it&#8217;s ID in the commit
+message(s).</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="do-not-use-blind-timeouts">Do not use blind timeouts</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Do not use Thread.sleep() without checking for the actual condition you
+need to be fulfilled.<br>
+You may use active waiting with a timeout, but prefer using timeouts of
+the API/SPI you test where available.</p>
+</div>
+<div class="paragraph">
+<p>Make the timeouts configurable: For a group of similar test, use a
+configurable timeout value with a default if not set.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="provide-messages-in-assert-and-fail-calls">Provide messages in assert*() and fail() calls</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Definitely, it&#8217;s better to see "File x/y/z.xml not found" instead of:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">junit.framework.AssertionFailedError
+     at junit.framework.Assert.fail(Assert.java:48) [arquillian-service:]
+     at junit.framework.Assert.assertTrue(Assert.java:20) [arquillian-service:]
+     at junit.framework.Assert.assertTrue(Assert.java:27) [arquillian-service:]
+     at org.jboss.as.test.smoke.embedded.parse.ParseAndMarshalModelsTestCase.getOriginalStandaloneXml(ParseAndMarshalModelsTestCase.java:554) [bogus.jar:]</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="provide-configuration-properties-hints-in-exceptions">Provide configuration properties hints in exceptions</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If your test uses some configuration property and it fails possibly due
+to misconfiguration, note the property and it&#8217;s value in the exception:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">File jdbcJar = new File( System.getProperty("jbossas.ts.dir", "."),
+       "integration/src/test/resources/mysql-connector-java-5.1.15.jar");
+    if( !jdbcJar.exists() )
+        throw new IllegalStateException("Can't find " + jdbcJar + " using $\{jbossas.ts.dir} == " + System.getProperty("jbossas.ts.dir") );</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="clean-up">Clean up</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Close sockets, connections, file descriptors;</p>
+</li>
+<li>
+<p>Don&#8217;t put much data to static fields, or clean them in a finaly {&#8230;&#8203;} block.</p>
+</li>
+<li>
+<p>Don&#8217;t alter AS config (unless you are absolutely sure that it will
+reload in a final \{&#8230;&#8203;} block or an @After* method)</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="keep-the-tests-configurable">Keep the tests configurable</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Keep these things in properties, set them at the beginning of the test:
+* Timeouts
+* Paths
+* URLs
+* Numbers (of whatever)</p>
+</div>
+<div class="paragraph">
+<p>They either will be or already are provided in form of system
+properties, or a simple testsuite until API (soon to come).</p>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

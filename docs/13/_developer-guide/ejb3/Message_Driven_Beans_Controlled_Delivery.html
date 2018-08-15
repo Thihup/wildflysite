@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Message Driven Beans Controlled Delivery | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Message Driven Beans Controlled Delivery" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_developer-guide/ejb3/Message_Driven_Beans_Controlled_Delivery.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_developer-guide/ejb3/Message_Driven_Beans_Controlled_Delivery.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_developer-guide/ejb3/Message_Driven_Beans_Controlled_Delivery.html","headline":"Message Driven Beans Controlled Delivery","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>There are three mechanisms in Wildfly that allow controlling if a
+specific MDB is actively receiving or not messages:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>delivery active</p>
+</li>
+<li>
+<p>delivery groups</p>
+</li>
+<li>
+<p>clustered singleton</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>We will see each one of them in the following sections.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="delivery-active">Delivery Active</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Delivery active is simply an attribute associated with the MDB that
+indicates if the MDB is receiving messages or not. If an MDB is not
+currently receiving messages, the messages will be saved in the queue or
+topic for later, according to the rules of the topic/queue.</p>
+</div>
+<div class="paragraph">
+<p>You can configure delivery active using xml or annotations, and you can
+change its value after deployment using the cli.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>jboss-ejb3.xml:</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>In the jboss-ejb3 xml file, configure the value of active as false to
+mark that the MDB will not be receiving messages as soon as it is
+deployed:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.1" encoding="UTF-8"?&gt;
+&lt;jboss:ejb-jar xmlns:jboss="http://www.jboss.com/xml/ns/javaee"
+               xmlns="http://java.sun.com/xml/ns/javaee"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xmlns:d="urn:delivery-active:1.1"
+               xsi:schemaLocation="http://www.jboss.com/xml/ns/javaee http://www.jboss.org/j2ee/schema/jboss-ejb3-2_0.xsd http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/ejb-jar_3_1.xsd"                version="3.1"
+               impl-version="2.0"&gt;
+    &lt;assembly-descriptor&gt;
+        &lt;d:delivery&gt;
+            &lt;ejb-name&gt;HelloWorldQueueMDB&lt;/ejb-name&gt;
+            &lt;d:active&gt;false&lt;/d:active&gt;
+        &lt;/d:delivery&gt;
+    &lt;/assembly-descriptor&gt;
+&lt;/jboss:ejb-jar&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can use a wildcard "*" in the place of ejb-name if you want to apply
+that active value to all MDBs in your application.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>annotation</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Alternatively, you can use the org.jboss.ejb3.annotation.DeliveryActive
+annotation, as in the example below:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@MessageDriven(name = "HelloWorldMDB", activationConfig = {
+ 
+ @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue"),
+ 
+ @ActivationConfigProperty(propertyName = "destination", propertyValue = "queue/HELLOWORLDMDBQueue"),
+ 
+ @ActivationConfigProperty(propertyName = "acknowledgeMode", propertyValue = "Auto-acknowledge") })
+ 
+@DeliveryActive(false)
+ 
+public class HelloWorldMDB implements MessageListener {
+    public void onMessage(Message rcvMessage) {
+      // ...
+    }
+}</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="start-delivery-and-stop-delivery">Start-delivery and Stop-Delivery</h3>
+<div class="paragraph">
+<p>These management operations dynamically change the value of the active
+attribute, enabling or disabling delivery for the MDB. at runtime To use
+them, connect to the Wildfly instance you want to manage, then enter the
+path of the MDB you want to manage delivery for:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9990 /] cd deployment=jboss-helloworld-mdb.war/subsystem=ejb3/message-driven-bean=HelloWorldMDB
+ 
+[standalone@localhost:9990 message-driven-bean=HelloWorldMDB] :stop-delivery
+{"outcome" =&gt; "success"}
+ 
+[standalone@localhost:9990 message-driven-bean=HelloWorldMDB] :start-delivery
+{"outcome" =&gt; "success"}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="delivery-groups">Delivery Groups</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Delivery groups provide a straightforward way to manage delivery for a
+group of MDBs. Every MDB belonging to a delivery group has delivery
+active if and only if that group is active, and has delivery inactive
+whenever the group is not active.</p>
+</div>
+<div class="paragraph">
+<p>You can add a delivery group to the ejb3 subsystem using either the
+subsystem xml or cli. Next, we will see examples of each case. In those
+examples we will add only a single delivery group, but keep in mind that
+you can add as many delivery groups as you need to a Wildfly instance.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>the ejb3 subsystem xml (located in your configuration xml, such as
+standalone.xml)</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;subsystem xmlns="urn:jboss:domain:ejb3:4.0"&gt;
+    ...
+    &lt;mdb&gt;
+        ...
+        &lt;delivery-groups&gt;
+            &lt;delivery-group name="mdb-group-name" active="true"/&gt;
+        &lt;/delivery-groups&gt;
+    &lt;/mdb&gt;
+    ...
+&lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The example above adds a delivery group named "mdb-group-name" (you can
+use whatever name suits you best as the group name). The "true" active
+attribute indicates that all MDBs belonging to that group will have
+delivery active right after deployment. If you mark that attribute as
+false, you are indicating that every MDB belonging to the group will not
+start receiving messages after deployment, a condition that will remain
+until the group becomes active.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>jboss-cli</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>You can add a mdb-delivery-group using the add command as below:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9990 /] ./subsystem=ejb3/mdb-delivery-group=mdb-group-name:add
+{"outcome" =&gt; "success"}</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="reading-and-writing-the-delivery-state-of-a-delivery-group">Reading and Writing the Delivery State of a Delivery Group</h3>
+<div class="paragraph">
+<p>You can check whether delivery is active for a group by reading the
+active attribute, which defaults to true:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9990 /] ./subsystem=ejb3/mdb-delivery-group=mdb-group-name:read-attribute(name=active)
+{ "outcome" =&gt; "success", "result" =&gt; true }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To make the the delivery-group inactive, just write the active attribute
+with a false value:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9990 /] ./subsystem=ejb3/mdb-delivery-group=mdb-group-name:write-attribute(name=active,value=false)
+{"outcome" =&gt; "success"}
+ 
+[standalone@localhost:9990 /] ./subsystem=ejb3/mdb-delivery-group=mdb-group-name:read-attribute(name=active)
+{ "outcome" =&gt; "success", "result" =&gt; false }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To make it active again, write the attribute with a true value:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9990 /] ./subsystem=ejb3/mdb-delivery-group=mdb-group-name:write-attribute(name=active,value=true)
+{"outcome" =&gt; "success"}
+ 
+[standalone@localhost:9990 /] ./subsystem=ejb3/mdb-delivery-group=mdb-group-name:read-attribute(name=active)
+{ "outcome" =&gt; "success", "result" =&gt; true }</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="using-delivery-groups">Using Delivery Groups</h3>
+<div class="paragraph">
+<p>To mark that an MDB belongs to a delivery-group, declare so in the
+jboss-ejb3.xml file:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.1" encoding="UTF-8"?&gt;
+ 
+&lt;jboss:ejb-jar xmlns:jboss="http://www.jboss.com/xml/ns/javaee"
+               xmlns="http://java.sun.com/xml/ns/javaee"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xmlns:d="urn:delivery-active:1.1"
+               xsi:schemaLocation="http://www.jboss.com/xml/ns/javaee http://www.jboss.org/j2ee/schema/jboss-ejb3-2_0.xsd http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/ejb-jar_3_1.xsd"
+               version="3.1"
+               impl-version="2.0"&gt;
+    &lt;assembly-descriptor&gt;
+        &lt;d:delivery&gt;
+            &lt;ejb-name&gt;HelloWorldMDB&lt;/ejb-name&gt;
+            &lt;d:group&gt;mdb-delivery-group&lt;/d:group&gt;
+        &lt;/d:delivery&gt;
+    &lt;/assembly-descriptor&gt;
+&lt;/jboss:ejb-jar&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can also use a wildcard to mark that all MDBs in your application
+belong to a delivery-group. In the following example, we add all MDBs in
+the application to group1, except for HelloWorldMDB, that is added to
+group2:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.1" encoding="UTF-8"?&gt;
+&lt;jboss:ejb-jar xmlns:jboss="http://www.jboss.com/xml/ns/javaee"
+               xmlns="http://java.sun.com/xml/ns/javaee"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xmlns:d="urn:delivery-active:1.1"
+               xsi:schemaLocation="http://www.jboss.com/xml/ns/javaee http://www.jboss.org/j2ee/schema/jboss-ejb3-2_0.xsd http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/ejb-jar_3_1.xsd"
+               version="3.1"
+               impl-version="2.0"&gt;
+    &lt;assembly-descriptor&gt;
+        &lt;d:delivery&gt;
+            &lt;ejb-name&gt;*&lt;/ejb-name&gt;
+            &lt;d:group&gt;group1&lt;/d:group&gt;
+        &lt;/d:delivery&gt;
+        &lt;d:delivery&gt;
+            &lt;ejb-name&gt;HelloWorldMDB&lt;/ejb-name&gt;
+            &lt;d:group&gt;group2&lt;/d:group&gt;
+        &lt;/d:delivery&gt;
+    &lt;/assembly-descriptor&gt;
+&lt;/jboss:ejb-jar&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Another option is to use org.jboss.ejb3.annotation.DeliveryGroup
+annotation on each MDB class belonging to a group:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@MessageDriven(name = "HelloWorldQueueMDB", activationConfig = {
+ @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue"),
+ @ActivationConfigProperty(propertyName = "destination", propertyValue = "queue/HELLOWORLDMDBQueue"),
+ @ActivationConfigProperty(propertyName = "acknowledgeMode", propertyValue = "Auto-acknowledge") })
+ 
+@DeliveryGroup("group2")
+ 
+public class HelloWorldMDB implements MessageListener {
+    ...
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A MDB cannot belong to more than one delivery group. Also, all the
+delivery-groups used by an application must be installed in the Wildfly
+server upon deployment, or the deployment will fail with a message
+stating that the delivery-group is missing.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="clustered-singleton-delivery">Clustered Singleton Delivery</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Delivery can be marked as singleton in a clustered environment. In this
+case, only one node in the cluster will have delivery active for that
+MDB, whereas in all other nodes, delivery will be inactive. This option
+can be used for applications that are deployed in all nodes of the
+cluster. Such applications will be active in all nodes of the cluster,
+except for the MDBs that are marked as clustered singleton. For those
+MDBs, only one cluster node will be processing their messages. In case
+that node stops, another node will have delivery activated, guaranteeing
+that there is always one node processing the messages. This node is what
+we call the MDB clustered singleton master node.</p>
+</div>
+<div class="paragraph">
+<p>Notice that applications using clustered singleton delivery can only be
+deployed in clustered Wildfly servers (i.e., servers that are using the
+ha configuration).</p>
+</div>
+<div class="paragraph">
+<p>To mark delivery as clustered singleton, you can use the jboss-ejb3.xml
+or the @ClusteredSingleton annotation:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>jboss-ejb3.xml:</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.1" encoding="UTF-8"?&gt;
+&lt;jboss:ejb-jar xmlns:jboss="http://www.jboss.com/xml/ns/javaee"
+               xmlns="http://java.sun.com/xml/ns/javaee"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xmlns:c="urn:clustering:1.1"
+               xsi:schemaLocation="http://www.jboss.com/xml/ns/javaee http://www.jboss.org/j2ee/schema/jboss-ejb3-2_0.xsd http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/ejb-jar_3_1.xsd"
+               version="3.1"
+               impl-version="2.0"&gt;
+    &lt;assembly-descriptor&gt;
+        &lt;c:clustering&gt;
+            &lt;ejb-name&gt;HelloWorldMDB&lt;/ejb-name&gt;
+            &lt;c:clustered-singleton&gt;true&lt;/c:clustered-singleton&gt;
+        &lt;/c:clustering&gt;
+    &lt;/assembly-descriptor&gt;
+&lt;/jboss:ejb-jar&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As in the previous jboss-ejb3.xml examples, a wildcard can be used in
+the place of the ejb-name to indicate that all MDBs in the application
+are singleton clustered.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>annotation</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>You can use the org.jboss.ejb3.annotation.ClusteredSingleton annotation
+to mark an MDB as clustered singleton:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@MessageDriven(name = "HelloWorldQueueMDB", activationConfig = {
+ @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue"),
+ @ActivationConfigProperty(propertyName = "destination", propertyValue = "queue/HELLOWORLDMDBQueue"),
+ @ActivationConfigProperty(propertyName = "acknowledgeMode", propertyValue = "Auto-acknowledge") })
+ 
+@ClusteredSingleton
+ 
+public class HelloWorldMDB implements MessageListener { ... }</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="using-multiple-mdb-delivery-control-mechanisms">Using Multiple MDB Delivery Control Mechanisms</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The previous d eliver y control mechanisms can be used together in a
+single MDB. In this case, they work as a set of restrictions for
+delivery to be active in a MDB.</p>
+</div>
+<div class="paragraph">
+<p>For example, if an MDB belongs to a delivery group and is also a
+clustered singleton MDB, the delivery will be active for that MDB only
+if the delivery group is active in the cluster node that was elected as
+the singleton master.</p>
+</div>
+<div class="paragraph">
+<p>Also, if you use jboss-cli to stopDelivery on a MDB that belongs to a
+delivery group, the MDB will stop receiving messages in case that group
+was active. If that group was not active, the MDB will continue in the
+same, inactive state. But, once that group is active, the MDB will not
+receive messages, unless a startDelivery operation is executed to revert
+the previously exectued stopDelivery operation.</p>
+</div>
+<div class="paragraph">
+<p>Invoking stopDelivery on an MDB that is marked as clustered singleton
+will work in a similar way: no visible effect if the current node is not
+the clustered singleton master; but it will stop delivery of messages
+for that MDB if the current node is the clustered singleton master. If
+the current node is not the master, but eventually becomes so, the
+delivery of messages will not be active for that MDB, unless a
+startDelivery operation is invoked.</p>
+</div>
+<div class="paragraph">
+<p>In other words, when more than one delivery control mechanism is used in
+conjunction, they act as a set of restrictions that need all to be true
+in order for the MDB to receive messages:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>delivery-group + stop-delivery</strong>: the delivery group needs to be
+active and the delivery needs to be started in order for that MDB to
+start receiving messages;</p>
+</li>
+<li>
+<p><strong>delivery-group + clustered singleton</strong>: the delivery group needs to be
+active and the current node needs to be the clustered singleton master
+node in order for that MDB to start receiving messages;</p>
+</li>
+<li>
+<p><strong>delivery-group + clustered singleton + stop-delivery</strong>: as above,
+delivery-group active, current node equals the clustered singleton
+master node, plus, start-delivery needs to be invoked on that MDB, only
+with these three factors being true the MDB will start receiving
+messages.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

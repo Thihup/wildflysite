@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Jndi_remote_reference | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Jndi_remote_reference" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Remote JNDI Access" />
+<meta property="og:description" content="Remote JNDI Access" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_developer-guide/JNDI_Remote_Reference.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_developer-guide/JNDI_Remote_Reference.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_developer-guide/JNDI_Remote_Reference.html","headline":"Jndi_remote_reference","description":"Remote JNDI Access","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="sect1">
+<h2 id="JNDI_Remote_Reference">Remote JNDI Access</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>WildFly supports two different types of remote JNDI.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="http-remoting">http-remoting:</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The <code>http-remoting:</code> protocol implementation is provided by JBoss Remote
+Naming project, and uses http upgrade to lookup items from the servers
+local JNDI. To use it, you must have the appropriate jars on the class
+path, if you are maven user can be done simply by adding the following
+to your <code>pom.xml</code> dependencies:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;dependency&gt;
+  &lt;groupId&gt;org.wildfly&lt;/groupId&gt;
+  &lt;artifactId&gt;wildfly-ejb-client-bom&lt;/artifactId&gt;
+  &lt;version&gt;11.0.0.Final&lt;/version&gt;
+  &lt;type&gt;pom&lt;/type&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If you are not using maven a shaded jar that contains all required
+classes<br>
+can be found in the <code>bin/client</code> directory of WildFly&#8217;s distribution.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">final Properties env = new Properties();
+env.put(Context.INITIAL_CONTEXT_FACTORY, "org.jboss.naming.remote.client.InitialContextFactory");
+env.put(Context.PROVIDER_URL, "http-remoting://localhost:8080");
+// the property below is required ONLY if there is no ejb client configuration loaded (such as a
+// jboss-ejb-client.properties in the class path) and the context will be used to lookup EJBs
+env.put("jboss.naming.client.ejb.context", true);
+InitialContext remoteContext = new InitialContext(env);
+RemoteCalculator ejb = (RemoteCalculator) remoteContext.lookup("wildfly-http-remoting-ejb/CalculatorBean!"
+                + RemoteCalculator.class.getName());</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+The http-remoting client assumes JNDI names in remote lookups are
+relative to java:jboss/exported namespace, a lookup of an absolute JNDI
+name will fail.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="ejb">ejb:</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The ejb: namespace implementation is provided by the jboss-ejb-client
+library, and allows the lookup of EJB&#8217;s using their application name,
+module name, ejb name and interface type. To use it, you must have the
+appropriate jars on the class path, if you are maven user can be done
+simply by adding the following to your <code>pom.xml</code> dependencies:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;dependency&gt;
+  &lt;groupId&gt;org.wildfly&lt;/groupId&gt;
+  &lt;artifactId&gt;wildfly-ejb-client-bom&lt;/artifactId&gt;
+  &lt;version&gt;11.0.0.Final&lt;/version&gt;
+  &lt;type&gt;pom&lt;/type&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If you are not using maven a shaded jar that contains all required
+classes<br>
+can be found in the <code>bin/client</code> directory of WildFly&#8217;s distribution.</p>
+</div>
+<div class="paragraph">
+<p>This is a client side JNDI implementation. Instead of looking up an EJB
+on the server the lookup name contains enough information for the client
+side library to generate a proxy with the EJB information. When you
+invoke a method on this proxy it will use the current EJB client context
+to perform the invocation. If the current context does not have a
+connection to a server with the specified EJB deployed then an error
+will occur. Using this protocol it is possible to look up EJB&#8217;s that do
+not actually exist, and no error will be thrown until the proxy is
+actually used. The exception to this is stateful session beans, which
+need to connect to a server when they are created in order to create the
+session bean instance on the server.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">final Properties env = new Properties();
+env.put(Context.URL_PKG_PREFIXES, "org.jboss.ejb.client.naming");
+InitialContext remoteContext = new InitialContext(env);
+MyRemoteInterface myRemote = (MyRemoteInterface) remoteContext.lookup("ejb:myapp/myejbjar/MyEjbName\!com.test.MyRemoteInterface");
+MyStatefulRemoteInterface myStatefulRemote = (MyStatefulRemoteInterface) remoteContext.lookup("ejb:myapp/myejbjar/MyStatefulName\!comp.test.MyStatefulRemoteInterface?stateful");</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The first example is a lookup of a singleton, stateless or EJB 2.x home
+interface. This lookup will not hit the server, instead a proxy will be
+generated for the remote interface specified in the name. The second
+example is for a stateful session bean, in this case the JNDI lookup
+will hit the server, in order to tell the server to create the SFSB
+session.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+For more details on how the server connections are configured, including
+the <strong>required</strong> jboss ejb client setup, please see
+<a href="#EJB_invocations_from_a_remote_client_using_JNDI">EJB invocations from a remote client using JNDI</a>.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

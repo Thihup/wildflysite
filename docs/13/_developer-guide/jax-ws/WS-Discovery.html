@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>WS-Discovery | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="WS-Discovery" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_developer-guide/jax-ws/WS-Discovery.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_developer-guide/jax-ws/WS-Discovery.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_developer-guide/jax-ws/WS-Discovery.html","headline":"WS-Discovery","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Apache CXF includes support for <em>Web Services Dynamic Discovery</em> (
+<a href="http://docs.oasis-open.org/ws-dd/discovery/1.1/os/wsdd-discovery-1.1-spec-os.html">WS-Discovery</a>),
+which is a protocol to enable dynamic discovery of services available on
+the local network. The protocol implies using a <code>UDP</code> based multicast
+transport to announce new services and probe for existing services. A
+managed mode where a discovery proxy is used to reduce the amount of
+required multicast traffic is also covered by the protocol.</p>
+</div>
+<div class="paragraph">
+<p>JBossWS integrates the <em>WS-Discovery</em>
+<a href="http://cxf.apache.org/docs/ws-discovery.html">functionalities</a> provided
+by Apache CXF into the application server.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="enabling-ws-discovery">Enabling WS-Discovery</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Apache CXF enables <em>WS-Discovery</em> depending on the availability of its
+runtime component; given that&#8217;s always shipped in the application
+server, JBossWS integration requires using the
+<code>cxf.ws-discovery.enabled</code>
+<a href="https://docs.jboss.org/author/display/WFLY8/Advanced+User+Guide#AdvancedUserGuide-Configurationthroughdeploymentdescriptor">property</a>
+usage for enabling <em>WS-Discovery</em> for a given deployment. By default
+<em>WS-Discovery</em> is disabled on the application server. Below is an
+example of <em>jboss-webservices.xml</em> descriptor to be used for enabling
+<em>WS-Discovery</em>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;webservices xmlns="http://www.jboss.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  version="1.2" xsi:schemaLocation="http://www.jboss.com/xml/ns/javaee"&gt;
+ 
+  &lt;property&gt;
+    &lt;name&gt;cxf.ws-discovery.enabled&lt;/name&gt;
+    &lt;value&gt;true&lt;/value&gt;
+  &lt;/property&gt;
+ 
+&lt;/webservices&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>By default, a <em>WS-Discovery</em> service endpoint (SOAP-over-UDP bound) will
+be started the first time a WS-Discovery enabled deployment is processed
+on the application server. Every ws endpoint belonging to <em>WS-Discovery</em>
+enabled deployments will be automatically registered into such a
+<em>WS-Discovery</em> service endpoint ( <code>Hello</code> messages). The service will
+reply to <code>Probe</code> and <code>Resolve</code> messages received on <code>UDP</code> port <code>3702</code>
+(including multicast messages sent to <code>IPv4</code> address <code>239.255.255.250</code>,
+as per
+<a href="http://docs.oasis-open.org/ws-dd/discovery/1.1/os/wsdd-discovery-1.1-spec-os.html#_Toc234231816">specification</a>).
+Endpoints will eventually be automatically unregistered using <code>Bye</code>
+messages upon undeployment.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="probing-services">Probing services</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Apache CXF comes with a <em>WS-Discovery</em> API that can be used to probe /
+resolve services. When running in-container, a JBoss module
+<a href="#JAX_WS_JBoss_Modules_and_WS_applications">dependency</a> to the <code>org.apache.cxf.impl</code> module is to
+be set to have access to <em>WS-Discovery</em> client functionalities.</p>
+</div>
+<div class="paragraph">
+<p>The
+<a href="http://svn.apache.org/viewvc/cxf/tags/cxf-2.7.5/services/ws-discovery/ws-discovery-api/src/main/java/org/apache/cxf/ws/discovery/WSDiscoveryClient.java?revision=1481139&amp;view=markup">org.apache.cxf.ws.discovery.WSDiscoveryClient</a>
+class provides the <em>probe</em> and <em>resolve</em> methods which also accepts
+filters on scopes. Users can rely on them for locating available
+endpoints on the network. Please have a look at the JBossWS testsuite
+which includes a
+<a href="http://anonsvn.jboss.org/repos/jbossws/stack/cxf/tags/jbossws-cxf-4.2.0.Beta1/modules/testsuite/cxf-tests/src/test/java/org/jboss/test/ws/jaxws/samples/wsdd/WSDiscoveryTestCase.java">sample</a>
+on CXF WS-Discovery usage.</p>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

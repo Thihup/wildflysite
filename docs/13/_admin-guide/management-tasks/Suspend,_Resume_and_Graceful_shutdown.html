@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Suspend, Resume and Graceful shutdown | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Suspend, Resume and Graceful shutdown" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_admin-guide/management-tasks/Suspend,_Resume_and_Graceful_shutdown.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_admin-guide/management-tasks/Suspend,_Resume_and_Graceful_shutdown.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_admin-guide/management-tasks/Suspend,_Resume_and_Graceful_shutdown.html","headline":"Suspend, Resume and Graceful shutdown","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="sect1">
+<h2 id="core-concepts">Core Concepts</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>WildFly introduces the ability to suspend and resume servers. This can
+be combined with shutdown to enable the server to gracefully finish
+processing all active requests and then shut down. When a server is
+suspended it will immediately stop accepting new requests, but wait for
+existing requests to complete. A suspended server can be resumed at any
+point, and will begin processing requests immediately. Suspending and
+resuming has no effect on deployment state (e.g. if a server is
+suspended singleton EJB&#8217;s will not be destroyed). As of WildFly 11 it is
+also possible to start a server in suspended mode which means it will
+not accept requests until it has been resumed. Servers will also be
+suspended during the boot process, so no requests will be accepted until
+the startup process is 100% complete.</p>
+</div>
+<div class="paragraph">
+<p>Suspend/Resume has no effect on management operations; management
+operations can still be performed while a server is suspended. If you
+wish to perform a management operation that will affect the operation of
+the server you can suspend the server, perform the operation, and then
+resume the server. This allows all requests to finish, and makes sure
+that no requests are running while the management changes are taking
+place.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>If you perform a management operation while the server is suspended,
+and the response to that operation includes the
+<code>operation-requires-reload</code> or <code>operation-requires-restart</code> response
+headers, then the operation will not take full effect until that
+reload or restart is done. Simply resuming the server will not be
+sufficient to cause the change to take effect.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>When a server is suspending it goes through four different states:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>RUNNING</strong> - The normal state, the server is accepting requests and
+running normally</p>
+</li>
+<li>
+<p><strong>PRE_SUSPEND</strong> - In PRE_SUSPEND the server will notify external parties
+that it is about to suspend, for example mod_cluster will notify the
+load balancer that the deployment is suspending. Requests are still
+accepted in this phase.</p>
+</li>
+<li>
+<p><strong>SUSPENDING</strong> - All new requests are rejected, and the server is
+waiting for all active requests to finish. If there are no active
+requests at suspend time this phase will be skipped.</p>
+</li>
+<li>
+<p><strong>SUSPENDED</strong> - All requests have completed, and the server is
+suspended.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="starting-suspended">Starting Suspended</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In order to start into suspended mode when using a standalone server you
+need to add <strong>--start-mode=suspend</strong> to the command line. It is also
+possible to specify the start-mode in the <strong>reload</strong> operation to cause
+the server to reload into suspended mode (other possible values for
+start-mode are <strong>normal</strong> and <strong>admin-only</strong>).</p>
+</div>
+<div class="paragraph">
+<p>In domain mode servers can be started in suspended mode by passing the
+<strong>suspend=true</strong> parameter to any command that causes a server to start,
+restart or reload (e.g. :start-servers(suspend=true)).</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="the-request-controller-subsystem">The Request Controller Subsystem</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>WildFly introduces a new subsystem called the Request Controller
+Subsystem. This optional subsystem tracks all requests at their entry
+point, which is how the graceful shutdown mechanism knows when all requests
+are done. (It also allows you to provide a global limit on the total
+number of running requests).</p>
+</div>
+<div class="paragraph">
+<p>If this subsystem is not present suspend/resume will be limited. In
+general things that happen in the PRE_SUSPEND phase will work as normal
+(stopping message delivery, notifying the load balancer); however the
+server will not wait for all requests to complete and instead will move
+straight to SUSPENDED mode.</p>
+</div>
+<div class="paragraph">
+<p>There is a small performance penalty associated with the request
+controller subsystem (about on par with enabling statistics), so if you
+do not require the suspend/resume functionality this subsystem can be
+removed to get a small performance boost.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="subsystem-integrations">Subsystem Integrations</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Suspend/Resume is a service provided by the WildFly platform that any
+subsystem may choose to integrate with. Some subsystems integrate
+directly with the suspend controller, while others integrate through the
+request controller subsystem.</p>
+</div>
+<div class="paragraph">
+<p>The following subsystems support graceful shutdown. Note that only
+subsystems that provide an external entry point to the server need
+graceful shutdown support. For example the JAX-RS subsystem does not
+require suspend/resume support as all access to JAX-RS is through the
+web connector.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Undertow</strong> - Undertow will wait for all requests to finish.</p>
+</li>
+<li>
+<p><strong>mod_cluster</strong> - The mod_cluster subsystem will notify the load
+balancer that the server is suspending in the PRE_SUSPEND phase.</p>
+</li>
+<li>
+<p><strong>EJB</strong> - EJB will wait for all remote EJB requests and MDB message
+deliveries to finish. Delivery to MDB&#8217;s is stopped in the PRE_SUSPEND
+phase. EJB timers are suspended, and missed timers will be activated
+when the server is resumed.</p>
+</li>
+<li>
+<p><strong>Batch</strong> - Batch jobs will be stopped at a checkpoint while the server
+is suspending. They will be restarted from that checkpoint when the
+server returns to running mode.</p>
+</li>
+<li>
+<p><strong>EE Concurrency</strong> - The server will wait for all active jobs to finish.
+All jobs that have already been queued will be skipped.</p>
+</li>
+<li>
+<p><strong>Transactions</strong> - The transaction subsystem waits for all running
+transactions to finish while the server is suspending. During that time
+the server refuses to start any new transaction. But any in-flight
+transaction will be serviced - e.g. the server will accept any
+incoming remote call which carries the context of a transaction already
+started at the suspending server.</p>
+</li>
+</ul>
+</div>
+<div class="sect2">
+<h3 id="transactions-and-ejbs">Transactions and EJBs</h3>
+<div class="paragraph">
+<p>When you work with EJBs you have to enable the graceful shutdown
+functionality by setting the attribute <code>enable-graceful-txn-shutdown</code> to
+<code>true</code>. For example, in the ejb3 subsystem section of <code>standalone.xml</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;enable-graceful-txn-shutdown value="false"/&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>By <strong>default</strong> graceful shutdown is <strong>disabled</strong> for the ejb subsystem.
+The reason for this is that the behavior might be unwelcome in cluster
+environments, as the server notifies remote clients that the node is no
+longer available for remote calls only after the transactions are
+finished. During that brief window of time, the client of a cluster may
+send a new request to a node that is shutting down and it will refuse the
+request because it is not related to an existing transaction.
+If this attribute <code>enable-graceful-txn-shutdown</code> is set to <code>false</code>, we
+disable the graceful behavior and EJB clients will not attempt to invoke
+the node when it suspends, regardless of active transactions.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="standalone-mode">Standalone Mode</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Suspend/Resume can be controlled via the following CLI operations
+and commands in standalone mode:</p>
+</div>
+<div class="paragraph">
+<p><code>:suspend(timeout=z)</code></p>
+</div>
+<div class="paragraph">
+<p>Suspends the server. If the timeout is specified it will wait in the
+SUSPENDING phase up to the specified number of seconds for all requests
+to finish. If there is no timeout specified or the value is less than
+zero it will wait indefinitely.</p>
+</div>
+<div class="paragraph">
+<p><code>:resume</code></p>
+</div>
+<div class="paragraph">
+<p>Resumes a previously suspended server. The server should be able to
+begin serving requests immediately.</p>
+</div>
+<div class="paragraph">
+<p><code>:read-attribute(name=suspend-state)</code></p>
+</div>
+<div class="paragraph">
+<p>Returns the current suspend state of the server.</p>
+</div>
+<div class="paragraph">
+<p><code>shutdown --timeout=x</code></p>
+</div>
+<div class="paragraph">
+<p>If a timeout parameter is passed to the shutdown command then a graceful
+shutdown will be performed. The server will be suspended, and will wait
+in SUSPENDING state up to the specified number of seconds for all requests
+to finish before shutting down. A timeout value of less than zero means
+it will wait indefinitely.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="domain-mode">Domain Mode</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Domain mode has similar operations as standalone mode, however they can be
+applied at both the global and server group levels:</p>
+</div>
+<div class="paragraph">
+<p><strong>Whole Domain</strong></p>
+</div>
+<div class="paragraph">
+<p><code>:suspend-servers(timeout=x)</code></p>
+</div>
+<div class="paragraph">
+<p><code>:resume-servers</code></p>
+</div>
+<div class="paragraph">
+<p><code>:stop-servers(timeout=x)</code></p>
+</div>
+<div class="paragraph">
+<p><strong>Server Group</strong></p>
+</div>
+<div class="paragraph">
+<p><code>/server-group=main-server-group:suspend-servers(timeout=x)</code></p>
+</div>
+<div class="paragraph">
+<p><code>/server-group=main-server-group:resume-servers</code></p>
+</div>
+<div class="paragraph">
+<p><code>/server-group=main-server-group:stop-servers(timeout=x)</code></p>
+</div>
+<div class="paragraph">
+<p><strong>Server</strong></p>
+</div>
+<div class="paragraph">
+<p><code>/host=master/server-config=server-one:suspend(timeout=x)</code></p>
+</div>
+<div class="paragraph">
+<p><code>/host=master/server-config=server-one:resume</code></p>
+</div>
+<div class="paragraph">
+<p><code>/host=master/server-config=server-one:stop(timeout=x)</code></p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="graceful-shutdown-from-an-os-signal">Graceful Shutdown via an OS Signal</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If you use an OS signal like <code>TERM</code> to shut down your WildFly standalone server
+process, e.g. via <code>kill -15 &lt;pid&gt;</code>, the WildFly server will shut down gracefully.
+By default, the behavior will be analogous to a CLI <code>shutdown --timeout=0</code> command;
+that is the process will not wait in SUSPENDING state for in-flight requests to
+complete before proceeding to SUSPENDED state and then shutting down. A different
+timeout can be configured by setting the <code>org.wildfly.sigterm.suspend.timeout</code>
+system property. The value of the property should be an integer indicating the maximum
+number of seconds to wait for in-flight requests to complete. A value of <code>-1</code> means
+the server should wait indefinitely.</p>
+</div>
+<div class="paragraph">
+<p>Graceful shutdown via an OS signal will not work if the server JVM is configured
+to disable signal handling (i.e. with the <code>-Xrs</code> argument to java). It also won&#8217;t
+work if the method used to terminate the process doesn&#8217;t result in a signal the
+JVM can respond to (e.g. <code>kill -9</code>).</p>
+</div>
+<div class="paragraph">
+<p>In a managed domain, Process Controller and Host Controller processes will not attempt
+any sort of graceful shutdown in response to a signal. A domain mode server may, but
+the proper way to control the lifecycle of a domain mode server process is via the
+management API and its managing Host Controller, not via direct signals to the server
+process.</p>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

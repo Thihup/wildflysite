@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Canceling Management Operations | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Canceling Management Operations" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_admin-guide/management-tasks/Canceling_Management_Operations.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_admin-guide/management-tasks/Canceling_Management_Operations.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_admin-guide/management-tasks/Canceling_Management_Operations.html","headline":"Canceling Management Operations","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>WildFly includes the ability to use the CLI to cancel management
+requests that are not proceeding normally.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="the-cancel-non-progressing-operation-operation">The cancel-non-progressing-operation operation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The <code>cancel-non-progressing-operation</code> operation instructs the target
+process to find any operation that isn&#8217;t proceeding normally and cancel
+it.</p>
+</div>
+<div class="paragraph">
+<p>On a standalone server:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9990 /] /core-service=management/service=management-operations:cancel-non-progressing-operation
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; "-1155777943"
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The result value is an internal identification number for the operation
+that was cancelled.</p>
+</div>
+<div class="paragraph">
+<p>On a managed domain host controller, the equivalent resource is in the
+host=&lt;hostname&gt; portion of the management resource tree:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[domain@localhost:9990 /] /host=host-a/core-service=management/service=management-operations:cancel-non-progressing-operation
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; "2156877946"
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>An operation can be cancelled on an individual managed domain server as
+well:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[domain@localhost:9990 /] /host=host-a/server=server-one/core-service=management/service=management-operations:cancel-non-progressing-operation
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; "6497786512"
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>An operation is considered to be not proceeding normally if it has been
+executing with the exclusive operation lock held for longer than 15
+seconds. Read-only operations do not acquire the exclusive operation
+lock, so this operation will not cancel read-only operations. Operations
+blocking waiting for another operation to release the exclusive lock
+will also not be cancelled.</p>
+</div>
+<div class="paragraph">
+<p>If there isn&#8217;t any operation that is failing to proceed normally, there
+will be a failure response:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9990 /] /core-service=management/service=management-operations:cancel-non-progressing-operation
+{
+    "outcome" =&gt; "failed",
+    "failure-description" =&gt; "WFLYDM0089: No operation was found that has been holding the operation execution write lock for long than [15] seconds",
+    "rolled-back" =&gt; true
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="the-find-non-progressing-operation-operation">The find-non-progressing-operation operation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To simply learn the id of an operation that isn&#8217;t proceeding normally,
+but not cancel it, use the <code>find-non-progressing-operation</code> operation:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9990 /] /core-service=management/service=management-operations:find-non-progressing-operation
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; "-1155777943"
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If there is no non-progressing operation, the outcome will still be
+<code>success</code> but the result will be <code>undefined</code>.</p>
+</div>
+<div class="paragraph">
+<p>Once the id of the operation is known, the management resource for the
+operation can be examined to learn more about its status.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="examining-the-status-of-an-active-operation">Examining the status of an active operation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>There is a management resource for any currently executing operation
+that can be queried:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9990 /] /core-service=management/service=management-operations/active-operation=-1155777943:read-resource(include-runtime=true)
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; {
+        "access-mechanism" =&gt; "undefined",
+        "address" =&gt; [
+            ("deployment" =&gt; "example")
+        ],
+        "caller-thread" =&gt; "management-handler-thread - 24",
+        "cancelled" =&gt; false,
+        "exclusive-running-time" =&gt; 101918273645L,
+        "execution-status" =&gt; "awaiting-stability",
+        "operation" =&gt; "deploy",
+        "running-time" =&gt; 101918279999L
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The response includes the following attributes:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Field</th>
+<th class="tableblock halign-left valign-top">Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">access-mechanism</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The mechanism used to submit a request to the server.
+NATIVE, JMX, HTTP</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">address</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The address of the resource targeted by the operation. The
+value in the final element of the address will be '&lt;hidden&gt;' if the
+caller is not authorized to address the operation&#8217;s target resource.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">caller-thread</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the thread that is executing the operation.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">cancelled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether the operation has been cancelled.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>exclusive-status</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Amount of time in nanoseconds the operation has
+been executing with the exclusive operation execution lock held, or -1
+if the operation does not hold the exclusive execution lock.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">execution-status</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The current activity of the operation. See below for
+details.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">operation</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the operation, or '&lt;hidden&gt;' if the caller is
+not authorized to address the operation&#8217;s target resource.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">running-time</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Amount of time the operation has been executing, in
+nanoseconds.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>The following are the values for the <code>exclusive-running-time</code> attribute:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Value</th>
+<th class="tableblock halign-left valign-top">Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">executing</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The caller thread is actively executing</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">awaiting-other-operation</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The caller thread is blocking waiting for
+another operation to release the exclusive execution lock</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">awaiting-stability</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The caller thread has made changes to the service
+container and is waiting for the service container to stabilize</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">completing</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The operation is committed and is completing execution</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">rolling-back</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The operation is rolling back</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>All currently executing operations can be viewed in one request using
+the <code>read-children-resources</code> operation:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9990 /] /core-service=management/service=management-operations:read-children-resources(child-type=active-operation)
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; {"-1155777943" =&gt; {
+        "access-mechanism" =&gt; "undefined",
+        "address" =&gt; [
+            ("deployment" =&gt; "example")
+        ],
+        "caller-thread" =&gt; "management-handler-thread - 24",
+        "cancelled" =&gt; false,
+        "exclusive-running-time" =&gt; 101918273645L,
+        "execution-status" =&gt; "awaiting-stability",
+        "operation" =&gt; "deploy",
+        "running-time" =&gt; 101918279999L
+    },
+    {"-1246693202" =&gt; {
+        "access-mechanism" =&gt; "undefined",
+        "address" =&gt; [
+            ("core-service" =&gt; "management"),
+            ("service" =&gt; "management-operations")
+        ],
+        "caller-thread" =&gt; "management-handler-thread - 30",
+        "cancelled" =&gt; false,
+        "exclusive-running-time" =&gt; -1L,
+        "execution-status" =&gt; "executing",
+        "operation" =&gt; "read-children-resources",
+        "running-time" =&gt; 3356000L
+    }}
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="canceling-a-specific-operation">Canceling a specific operation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The <code>cancel-non-progressing-operation</code> operation is a convenience
+operation for identifying and canceling an operation. However, an
+administrator can examine the active-operation resources to identify any
+operation, and then directly cancel it by invoking the <code>cancel</code>
+operation on the resource for the desired operation.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9990 /] /core-service=management/service=management-operations/active-operation=-1155777943:cancel
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; undefined
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="controlling-operation-blocking-time">Controlling operation blocking time</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>As an operation executes, the execution thread may block at various
+points, particularly while waiting for the service container to
+stabilize following any changes. Since an operation may be holding the
+exclusive execution lock while blocking, in WildFly execution behavior
+was changed to ensure that blocking will eventually time out, resulting
+in roll back of the operation.</p>
+</div>
+<div class="paragraph">
+<p>The default blocking timeout is 300 seconds. This is intentionally long,
+as the idea is to only trigger a timeout when something has definitely
+gone wrong with the operation, without any false positives.</p>
+</div>
+<div class="paragraph">
+<p>An administrator can control the blocking timeout for an individual
+operation by using the <code>blocking-timeout</code> operation header. For example,
+if a particular deployment is known to take an extremely long time to
+deploy, the default 300 second timeout could be increased:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9990 /] deploy /tmp/mega.war --headers={blocking-timeout=450}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note the blocking timeout is <strong>not</strong> a guaranteed maximum execution time
+for an operation. If it only a timeout that will be enforced at various
+points during operation execution.</p>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

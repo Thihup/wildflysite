@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>AIO - NIO for messaging journal | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="AIO - NIO for messaging journal" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_admin-guide/subsystem-configuration/Mesaging_AIO_-_NIO_for_messaging_journal.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_admin-guide/subsystem-configuration/Mesaging_AIO_-_NIO_for_messaging_journal.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_admin-guide/subsystem-configuration/Mesaging_AIO_-_NIO_for_messaging_journal.html","headline":"AIO - NIO for messaging journal","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Apache ActiveMQ Artemis (like HornetQ beforehand) ships with a <strong>high
+performance journal</strong>. Since Apache ActiveMQ Artemis handles its own
+persistence, rather than relying on a database or other 3rd party
+persistence engine it is very highly optimised for the specific
+messaging use cases. The majority of the journal is written in Java,
+however we abstract out the interaction with the actual file system to
+allow different pluggable implementations.</p>
+</div>
+<div class="paragraph">
+<p>Apache ActiveMQ Artemis ships with two implementations:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Java NIO.</strong></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The first implementation uses standard Java NIO to interface with the
+file system. This provides extremely good performance and runs on any
+platform where there&#8217;s a Java 6+ runtime.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Linux Asynchronous IO</strong></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The second implementation uses a thin native code wrapper to talk to the
+Linux asynchronous IO library (AIO). With AIO, Apache ActiveMQ Artemis
+will be called back when the data has made it to disk, allowing us to
+avoid explicit syncs altogether and simply send back confirmation of
+completion when AIO informs us that the data has been persisted.</p>
+</div>
+<div class="paragraph">
+<p>Using AIO will typically provide even better performance than using Java
+NIO.</p>
+</div>
+<div class="paragraph">
+<p>The AIO journal is only available when running Linux kernel 2.6 or later
+and after having installed libaio (if it&#8217;s not already installed).</p>
+</div>
+<div class="paragraph">
+<p>Also, please note that AIO will only work with the following file
+systems: ext2, ext3, ext4, jfs, xfs. With other file systems, e.g. NFS
+it may appear to work, but it will fall back to a slower synchronous
+behaviour. Don&#8217;t put the journal on a NFS share!</p>
+</div>
+<div class="paragraph">
+<p><strong>One point that should be added is that AIO doesn&#8217;t work well with
+encrypted partitions, thus you have to move to NIO on those.</strong></p>
+</div>
+<div class="paragraph">
+<p>What are the symptoms of an AIO isssue ?</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="aio-issue-on-wildfly-10">AIO issue on WildFly 10</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If you see the following exception in your WildFly log file / console</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>[org.apache.activemq.artemis.core.server] (ServerService Thread Pool -- 64) AMQ222010: Critical IO Error, shutting down the server. file=AIOSequentialFile:/home/wildfly/wildfly-10.0.0.Final/standalone/data/activemq/journal/activemq-data-2.amq, message=Cannot open file:The Argument is invalid: java.io.IOException: Cannot open file:The Argument is invalid
+ at org.apache.activemq.artemis.jlibaio.LibaioContext.open(Native Method)</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>that means that AIO isn&#8217;t working properly on your system.</p>
+</div>
+<div class="paragraph">
+<p>To use NIO instead execute the following commnd using jboss-cli :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">/subsystem=messaging-activemq/server=default:write-attribute(name=journal-type, value=NIO)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You need to reload or restart your server and you should see the
+following trace in your server console :</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>INFO  [org.apache.activemq.artemis.core.server] (ServerService Thread Pool -- 64) AMQ221013: Using NIO Journal</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="aio-issue-on-wildfly-9">AIO issue on WildFly 9</h2>
+<div class="sectionbody">
+<div class="literalblock">
+<div class="content">
+<pre>[org.hornetq.core.server] (ServerService Thread Pool -- 64) HQ222010: Critical IO Error, shutting down the server. file=AIOSequentialFile:/home/wildfly/wildfly-9.0.2.Final/standalone/data/messagingjournal/hornetq-data-1.hq, message=Can't open file: HornetQException[errorType=NATIVE_ERROR_CANT_OPEN_CLOSE_FILE message=Can't open file]
+ at org.hornetq.core.libaio.Native.init(Native Method)</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>that means that AIO isn&#8217;t working properly on your system.</p>
+</div>
+<div class="paragraph">
+<p>To use NIO instead execute the following commnd using jboss-cli :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">/subsystem=messaging/hornetq-server=default:write-attribute(name=journal-type,value=NIO)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You need to reload or restart your server and you see the following
+trace in your server console :</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>INFO  [org.hornetq.core.server] (ServerService Thread Pool -- 64) HQ221013: Using NIO Journal</pre>
+</div>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

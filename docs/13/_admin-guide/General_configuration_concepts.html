@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>General configuration concepts | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="General configuration concepts" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_admin-guide/General_configuration_concepts.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_admin-guide/General_configuration_concepts.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_admin-guide/General_configuration_concepts.html","headline":"General configuration concepts","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>For both a managed domain or a standalone server, a number of common
+configuration concepts apply:</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="extensions">Extensions</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>An extension is a module that extends the core capabilities of the
+server. The WildFly core is very simple and lightweight; most of the
+capabilities people associate with an application server are provided
+via extensions. An extension is packaged as a module in the <code>modules</code>
+folder. The user indicates that they want a particular extension to be
+available by including an <code>&lt;extension/&gt;</code> element naming its module in
+the <code>domain.xml</code> or <code>standalone.xml</code> file.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;extensions&gt;
+    [...]
+    &lt;extension module="org.jboss.as.transactions"/&gt;
+    &lt;extension module="org.jboss.as.webservices" /&gt;
+    &lt;extension module="org.jboss.as.weld" /&gt;
+    [...]
+    &lt;extension module="org.wildfly.extension.undertow"/&gt;
+&lt;/extensions&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="profiles-and-subsystems">Profiles and Subsystems</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The most significant part of the configuration in <code>domain.xml</code> and
+<code>standalone.xml</code> is the configuration of one (in <code>standalone.xml</code>) or
+more (in <code>domain.xml</code>) "profiles". A profile is a named set of subsystem
+configurations. A subsystem is an added set of capabilities added to the
+core server by an extension (see "Extensions" above). A subsystem
+provides servlet handling capabilities; a subsystem provides an EJB
+container; a subsystem provides JTA, etc. A profile is a named list of
+subsystems, along with the details of each subsystem&#8217;s configuration. A
+profile with a large number of subsystems results in a server with a
+large set of capabilities. A profile with a small, focused set of
+subsystems will have fewer capabilities but a smaller footprint.</p>
+</div>
+<div class="paragraph">
+<p>The content of an individual profile configuration looks largely the
+same in <code>domain.xml</code> and <code>standalone.xml</code>. The only difference is
+<code>standalone.xml</code> is only allowed to have a single profile element (the
+profile the server will run), while <code>domain.xml</code> can have many profiles,
+each of which can be mapped to one or more groups of servers.</p>
+</div>
+<div class="paragraph">
+<p>The contents of individual subsystem configurations look exactly the
+same between <code>domain.xml</code> and <code>standalone.xml</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="paths">Paths</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A logical name for a filesystem path. The <code>domain.xml</code>, <code>host.xml</code> and
+<code>standalone.xml</code> configurations all include a section where paths can be
+declared. Other sections of the configuration can then reference those
+paths by their logical name, rather than having to include the full
+details of the path (which may vary on different machines). For example,
+the logging subsystem configuration includes a reference to the "
+`jboss.server.log.dir`" path that points to the server&#8217;s " `log`"
+directory.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;file relative-to="jboss.server.log.dir" path="server.log"/&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>WildFly automatically provides a number of standard paths without any
+need for the user to configure them in a configuration file:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>jboss.home</code>.dir - the root directory of the WildFly distribution</p>
+</li>
+<li>
+<p><code>user.home</code> - user&#8217;s home directory</p>
+</li>
+<li>
+<p><code>user.dir</code> - user&#8217;s current working directory</p>
+</li>
+<li>
+<p><code>java.home</code> - java installation directory</p>
+</li>
+<li>
+<p><code>jboss.server.base.dir</code> - root directory for an individual server
+instance</p>
+</li>
+<li>
+<p><code>jboss.server.config.dir</code> - directory the server will use for
+configuration file storage</p>
+</li>
+<li>
+<p><code>jboss.server.data.dir</code> - directory the server will use for persistent
+data file storage</p>
+</li>
+<li>
+<p><code>jboss.server.log.dir</code> - directory the server will use for log file
+storage</p>
+</li>
+<li>
+<p><code>jboss.server.temp.dir</code> - directory the server will use for temporary
+file storage</p>
+</li>
+<li>
+<p><code>jboss.controller.temp.dir</code> - directory the server will use for
+temporary file storage</p>
+</li>
+<li>
+<p><code>jboss.domain.servers.dir</code> - directory under which a host controller
+will create the working area for individual server instances (managed
+domain mode only)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Users can add their own paths or override all except the first 5 of the
+above by adding a <code>&lt;path/&gt;</code> element to their configuration file.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;path name="example" path="example" relative-to="jboss.server.data.dir"/&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The attributes are:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>name</code>&#8201;&#8212;&#8201;the name of the path.</p>
+</li>
+<li>
+<p><code>path</code>&#8201;&#8212;&#8201;the actual filesystem path. Treated as an absolute path,
+unless the 'relative-to' attribute is specified, in which case the value
+is treated as relative to that path.</p>
+</li>
+<li>
+<p><code>relative-to</code>&#8201;&#8212;&#8201;(optional) the name of another previously named path,
+or of one of the standard paths provided by the system.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>A <code>&lt;path/&gt;</code> element in a <code>domain.xml</code> need not include anything more
+than the <code>name</code> attribute; i.e. it need not include any information
+indicating what the actual filesystem path is:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;path name="x"/&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Such a configuration simply says, "There is a path named 'x' that other
+parts of the <code>domain.xml</code> configuration can reference. The actual
+filesystem location pointed to by 'x' is host-specific and will be
+specified in each machine&#8217;s <code>host.xml</code> file." If this approach is used,
+there must be a path element in each machine&#8217;s <code>host.xml</code> that specifies
+what the actual filesystem path is:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;path name="x" path="/var/x" /&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A <code>&lt;path/&gt;</code> element in a <code>standalone.xml</code> must include the specification
+of the actual filesystem path.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="interfaces">Interfaces</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A logical name for a network interface/IP address/host name to which
+sockets can be bound. The <code>domain.xml</code>, <code>host.xml</code> and <code>standalone.xml</code>
+configurations all include a section where interfaces can be declared.
+Other sections of the configuration can then reference those interfaces
+by their logical name, rather than having to include the full details of
+the interface (which may vary on different machines). An interface
+configuration includes the logical name of the interface as well as
+information specifying the criteria to use for resolving the actual
+physical address to use. See <a href="#Interfaces_and_ports">Interfaces
+and ports</a> for further details.</p>
+</div>
+<div class="paragraph">
+<p>An <code>&lt;interface/&gt;</code> element in a <code>domain.xml</code> need not include anything
+more than the <code>name</code> attribute; i.e. it need not include any information
+indicating what the actual IP address associated with the name is:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;interface name="internal"/&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Such a configuration simply says, "There is an interface named
+'internal' that other parts of the domain.xml configuration can
+reference. The actual IP address pointed to by 'internal' is
+host-specific and will be specified in each machine&#8217;s host.xml file." If
+this approach is used, there must be an interface element in each
+machine&#8217;s <code>host.xml</code> that specifies the criteria for determining the IP
+address:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;interface name="internal"&gt;
+   &lt;nic name="eth1"/&gt;
+&lt;/interface&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>An <code>&lt;interface/&gt;</code> element in a <code>standalone.xml</code> must include the
+criteria for determining the IP address.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="socket-bindings-and-socket-binding-groups">Socket Bindings and Socket Binding Groups</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A socket binding is a named configuration for a socket.</p>
+</div>
+<div class="paragraph">
+<p>The <code>domain.xml</code> and <code>standalone.xml</code> configurations both include a
+section where named socket configurations can be declared. Other
+sections of the configuration can then reference those sockets by their
+logical name, rather than having to include the full details of the
+socket configuration (which may vary on different machines). See
+<a href="#Interfaces_and_ports">Interfaces and ports</a> for full details.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="system-properties">System Properties</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>System property values can be set in a number of places in <code>domain.xml</code>,
+<code>host.xml</code> and <code>standalone.xml</code>. The values in <code>standalone.xml</code> are set
+as part of the server boot process. Values in <code>domain.xml</code> and
+<code>host.xml</code> are applied to servers when they are launched.</p>
+</div>
+<div class="paragraph">
+<p>When a system property is configured in <code>domain.xml</code> or <code>host.xml</code>, the
+servers it ends up being applied to depends on where it is set. Setting
+a system property in a child element directly under the <code>domain.xml</code>
+root results in the property being set on all servers. Setting it in a
+<code>&lt;system-property/&gt;</code> element inside a <code>&lt;server-group/&gt;</code> element in
+domain.xml results in the property being set on all servers in the
+group. Setting it in a child element directly under the <code>host.xml</code> root
+results in the property being set on all servers controlled by that
+host&#8217;s Host Controller. Finally, setting it in a <code>&lt;system-property/&gt;</code>
+element inside a <code>&lt;server/&gt;</code> element in <code>host.xml</code> result in the
+property being set on that server. The same property can be configured
+in multiple locations, with a value in a <code>&lt;server/&gt;</code> element taking
+precedence over a value specified directly under the <code>host.xml</code> root
+element, the value in a <code>host.xml</code> taking precedence over anything from
+<code>domain.xml</code>, and a value in a <code>&lt;server-group/&gt;</code> element taking
+precedence over a value specified directly under the <code>domain.xml</code> root
+element.</p>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

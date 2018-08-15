@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Singleton_subsystem | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Singleton_subsystem" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Singleton subsystem" />
+<meta property="og:description" content="Singleton subsystem" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_high-availability/ha-singleton/Singleton_subsystem.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_high-availability/ha-singleton/Singleton_subsystem.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_high-availability/ha-singleton/Singleton_subsystem.html","headline":"Singleton_subsystem","description":"Singleton subsystem","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="sect1">
+<h2 id="Singleton_subsystem">Singleton subsystem</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>WildFly 10 introduced a "singleton" subsystem, which defines a set of
+policies that define how an HA singleton should behave. A singleton
+policy can be used to instrument singleton deployments or to create
+singleton MSC services.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="singleton-configuration">Configuration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The
+<a href="https://github.com/wildfly/wildfly/blob/10.0.0.Final/clustering/singleton/extension/src/main/resources/schema/wildfly-singleton_1_0.xsd">default
+subsystem configuration</a> from WildFly&#8217;s ha and full-ha profile looks
+like:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;subsystem xmlns="urn:jboss:domain:singleton:1.0"&gt;
+    &lt;singleton-policies default="default"&gt;
+        &lt;singleton-policy name="default" cache-container="server"&gt;
+            &lt;simple-election-policy/&gt;
+        &lt;/singleton-policy&gt;
+    &lt;/singleton-policies&gt;
+&lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A singleton policy defines:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>A unique name</p>
+</li>
+<li>
+<p>A cache container and cache with which to register singleton provider candidates</p>
+</li>
+<li>
+<p>An election policy</p>
+</li>
+<li>
+<p>A quorum (optional)</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>One can add a new singleton policy via the following management
+operation:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>/subsystem=singleton/singleton-policy=foo:add(cache-container=server)</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="cache-configuration">Cache configuration</h3>
+<div class="paragraph">
+<p>The cache-container and cache attributes of a singleton policy must
+reference a valid cache from the Infinispan subsystem. If no specific
+cache is defined, the default cache of the cache container is assumed.
+This cache is used as a registry of which nodes can provide a given
+service and will typically use a replicated-cache configuration.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="election-policies">Election policies</h3>
+<div class="paragraph">
+<p>WildFly includes two singleton election policy implementations:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>simple</strong><br>
+Elects the provider (a.k.a. master) of a singleton service based on a
+specified position in a circular linked list of eligible nodes sorted by
+descending age. Position=0, the default value, refers to the oldest
+node, 1 is second oldest, etc. ; while position=-1 refers to the
+youngest node, -2 to the second youngest, etc.<br>
+e.g.</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>/subsystem=singleton/singleton-policy=foo/election-policy=simple:add(position=-1)</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p><strong>random</strong><br>
+Elects a random member to be the provider of a singleton service<br>
+e.g.</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>/subsystem=singleton/singleton-policy=foo/election-policy=random:add()</code></pre>
+</div>
+</div>
+</li>
+</ul>
+</div>
+<div class="sect3">
+<h4 id="preferences">Preferences</h4>
+<div class="paragraph">
+<p>Additionally, any singleton election policy may indicate a preference
+for one or more members of a cluster. Preferences may be defined either
+via node name or via outbound socket binding name. Node preferences
+always take precedent over the results of an election policy.<br>
+e.g.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>/subsystem=singleton/singleton-policy=foo/election-policy=simple:list-add(name=name-preferences, value=nodeA)
+/subsystem=singleton/singleton-policy=bar/election-policy=random:list-add(name=socket-binding-preferences, value=nodeA)</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="quorum">Quorum</h3>
+<div class="paragraph">
+<p>Network partitions are particularly problematic for singleton services,
+since they can trigger multiple singleton providers for the same service
+to run at the same time. To defend against this scenario, a singleton
+policy may define a quorum that requires a minimum number of nodes to be
+present before a singleton provider election can take place. A typical
+deployment scenario uses a quorum of N/2 + 1, where N is the anticipated
+cluster size. This value can be updated at runtime, and will immediately
+affect any active singleton services.<br>
+e.g.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>/subsystem=singleton/singleton-policy=foo:write-attribute(name=quorum, value=3)</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="non-ha-environments">Non-HA environments</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The singleton subsystem can be used in a non-HA profile, so long as the
+cache that it references uses a local-cache configuration. In this
+manner, an application leveraging singleton functionality (via the
+singleton API or using a singleton deployment descriptor) will continue
+function as if the server was a sole member of a cluster. For obvious
+reasons, the use of a quorum does not make sense in such a
+configuration.</p>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Using Wildfly as a Load Balancer | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Using Wildfly as a Load Balancer" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_admin-guide/subsystem-configuration/Undertow_using_as_a_Load_Balancer.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_admin-guide/subsystem-configuration/Undertow_using_as_a_Load_Balancer.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_admin-guide/subsystem-configuration/Undertow_using_as_a_Load_Balancer.html","headline":"Using Wildfly as a Load Balancer","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Wildfly 10 adds support for using the Undertow subsystem as a load
+balancer. Wildfly supports two different approaches, you can either
+define a static load balancer, and specify the back end hosts in your
+configuration, or use it as a mod_cluster frontend, and use mod_cluster
+to dynamically update the hosts.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="general-overview">General Overview</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Wildly uses Undertow&#8217;s proxy capabilities to act as a load balancer.
+Undertow will connect to the back end servers using its built in client,
+and proxies requests.</p>
+</div>
+<div class="paragraph">
+<p>The following protocols are supported:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>http</p>
+</li>
+<li>
+<p>ajp</p>
+</li>
+<li>
+<p>http2</p>
+</li>
+<li>
+<p>h2c (clear text HTTP2)<br>
+Of these protocols h2c should give the best performance, if the back end
+servers support it.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The Undertow proxy uses async IO, the only threads that are involved in
+the request is the IO thread that is responsible for the connection. The
+connection to the back end server is made from the same thread, which
+removes the need for any thread safety constructs.<br>
+If both the front and back end servers support server push, and HTTP2 is
+in use then the proxy also supports pushing responses to the client. In
+cases where proxy and backend are capable of server push, but the client
+does not support it the server will send a X-Disable-Push header to let
+the backend know that it should not attempt to push for this request.</p>
+</div>
+<div class="sect2">
+<h3 id="load-balancer-server-profiles">Load balancer server profiles</h3>
+<div class="paragraph">
+<p>WildFly 11 adds load balancer profiles for both standalone and domain modes.</p>
+</div>
+<div class="sect3">
+<h4 id="example-start-standalone-load-balancer">Example: Start standalone load balancer</h4>
+<div class="listingblock">
+<div class="content">
+<pre># configure correct path to WildFly installation
+WILDFLY_HOME=/path/to/wildfly
+# configure correct IP of the node
+MY_IP=192.168.1.1
+
+# run the load balancer profile
+$WILDFLY_HOME/bin/standalone.sh -b $MY_IP -bprivate $MY_IP -c standalone-load-balancer.xml</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It&#8217;s highly recommended to use private/internal network for communication between load balancer and nodes. To do this set the correct IP address to the {{private}} interface ({{-bprivate}} argument).</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="example-start-worker-node">Example: Start worker node</h4>
+<div class="paragraph">
+<p>Run the server with the HA (or Full HA) profile, which has {{mod_cluster}} component included. If the UDP multicast is working in your environment, the workers should work out of the box without any change. If it&#8217;s not the case, then configure the IP address of the load-balancer statically.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre># configure correct path to WildFly installation
+WILDFLY_HOME=/path/to/wildfly
+# configure correct IP of the node
+MY_IP=192.168.1.2
+
+# Configure static load balancer IP address.
+# This is necessary when UDP multicast doesn't work in your environment.
+LOAD_BALANCER_IP=192.168.1.1
+$WILDFLY_HOME/bin/jboss-cli.sh &lt;&lt;EOT
+embed-server -c=standalone-ha.xml
+/subsystem=modcluster/mod-cluster-config=configuration:write-attribute(name=advertise,value=false)
+/socket-binding-group=standard-sockets/remote-destination-outbound-socket-binding=proxy1:add(host=$LOAD_BALANCER_IP,port=8090)
+/subsystem=modcluster/mod-cluster-config=configuration:list-add(name=proxies,value=proxy1)
+EOT
+
+# start the woker node with HA profile
+$WILDFLY_HOME/bin/standalone.sh -c standalone-ha.xml -b $MY_IP -bprivate $MY_IP</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Again, to make it safe, users should configure private/internal IP address into {{MY_IP}} variable.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="using-wildly-as-a-static-load-balancer">Using Wildly as a static load balancer</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To use WildFly as a static load balancer the first step is to create a
+proxy handler in the Undertow subsystem. For the purposes of this
+example we are going to assume that our load balancer is going to load
+balance between two servers, sv1.foo.com and sv2.foo.com, and will be
+using the AJP protocol.</p>
+</div>
+<div class="paragraph">
+<p>The first step is to add a reverse proxy handler to the Undertow
+subsystem:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">/subsystem=undertow/configuration=handler/reverse-proxy=my-handler:add()</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then we need to define outbound socket bindings for remote hosts</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">/socket-binding-group=standard-sockets/remote-destination-outbound-socket-binding=remote-host1/:add(host=sv1.foo.com, port=8009)
+/socket-binding-group=standard-sockets/remote-destination-outbound-socket-binding=remote-host2/:add(host=sv2.foo.com, port=8009)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>and than we add them as hosts to reverse proxy handler</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">/subsystem=undertow/configuration=handler/reverse-proxy=my-handler/host=host1:add(outbound-socket-binding=remote-host1, scheme=ajp, instance-id=myroute, path=/test)
+/subsystem=undertow/configuration=handler/reverse-proxy=my-handler/host=host2:add(outbound-socket-binding=remote-host2, scheme=ajp, instance-id=myroute, path=/test)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now we need to actually add the reverse proxy to a location. I am going
+to assume we are serving the path <code>/app</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">/subsystem=undertow/server=default-server/host=default-host/location=\/app:add(handler=my-handler)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This is all there is to it. If you point your browser to
+<code><a href="http://localhost:8080/app" class="bare">http://localhost:8080/app</a></code> you should be able to see the proxied
+content.</p>
+</div>
+<div class="paragraph">
+<p>The full details of all configuration options available can be found in
+the <a href="https://wildscribe.github.io/WildFly/10.1/subsystem/undertow/index.html">subsystem reference</a>.</p>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

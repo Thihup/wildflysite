@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>JDBC Store for Messaging Journal | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="JDBC Store for Messaging Journal" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_admin-guide/subsystem-configuration/Messaging_JDBC_Store_for_Messaging_Journal.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_admin-guide/subsystem-configuration/Messaging_JDBC_Store_for_Messaging_Journal.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_admin-guide/subsystem-configuration/Messaging_JDBC_Store_for_Messaging_Journal.html","headline":"JDBC Store for Messaging Journal","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>The Artemis server that are integrated to WildFly can be configured to
+use a JDBC store for its messaging journal instead of its file-based
+journal.<br>
+The <code>server resource</code> of the messaging-activemq subsystem needs to
+configure its <code>journal-datasource</code> attribute to be able to use JDBC
+store. If this attribute is not defined, the regular file-base journal
+will be used for the Artemis server.<br>
+This attribute value must correspond to a data source defined in the
+datasource subsystem.</p>
+</div>
+<div class="paragraph">
+<p>For example, if the datasources subsystem defines an <code>ExampleDS</code> data
+source at <code>/subsystem=datasources/data-source=ExampleDS</code>, the Artemis
+server can use it for its JDBC store with the operation:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">/subsystem=messaging-activemq/server=default:write-attribute(name=journal-datasource, value=ExampleDS)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Artemis JDBC store uses SQL commands to create the tables used to
+persist its information.<br>
+These SQL commands may differ depending on the type of database. The SQL
+commands used by the JDBC store are located in the file at:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>$JBOSS_HOME/modules/system/layers/base/org/wildfly/extension/messaging-activemq/main/database/journal-sql.properties</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>By default, "vanilla" SQL commands are used to communicate with the
+database. However some databases requires specific commands to create
+table, update content, etc.</p>
+</div>
+<div class="paragraph">
+<p>The journal-sql.properties can also specify these provider-specific
+commands. You can customize them by adding a suffix to the vanilla SQL
+properties.</p>
+</div>
+<div class="paragraph">
+<p>The suffix is determined based on information from the JDBC driver and
+the connection metadata. If the type of database is not supported by the
+code, you can specify it explicitly with the journal-database property
+on the server resource.</p>
+</div>
+<div class="paragraph">
+<p>Artemis uses different JDBC tables to store its bindings information,
+the persistent messages and the large messages (paging is not supported
+yet).</p>
+</div>
+<div class="paragraph">
+<p>The name of these tables can be configured with the
+<code>journal-bindings-table</code>, <code>journal-messages-table</code>,
+<code>journal-page-store-table, and journal-large-messages-table</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="reference">Reference</h2>
+<div class="sectionbody">
+<div class="sidebarblock">
+<div class="content">
+<div class="ulist">
+<ul>
+<li>
+<p>Artemis JDBC Persistence -
+<a href="http://activemq.apache.org/artemis/docs/1.5.0/persistence.html#configuring-jdbc-persistence" class="bare">http://activemq.apache.org/artemis/docs/1.5.0/persistence.html#configuring-jdbc-persistence</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

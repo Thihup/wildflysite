@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Container interceptors | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Container interceptors" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_developer-guide/ejb3/Container_interceptors.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_developer-guide/ejb3/Container_interceptors.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_developer-guide/ejb3/Container_interceptors.html","headline":"Container interceptors","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div id="preamble">
+<div class="sectionbody">
+<div class="quoteblock abstract">
+<blockquote>
+JBoss AS versions prior to WildFly8 allowed a JBoss specific way to
+plug-in user application specific interceptors on the server side so
+that those interceptors get invoked during an EJB invocation. Such
+interceptors differed from the typical (portable) spec provided Java EE
+interceptors. The Java EE interceptors are expected to run after the
+container has done necessary invocation processing which involves
+security context propagation, transaction management and other such
+duties. As a result, these Java EE interceptors come too late into the
+picture, if the user applications have to intercept the call before
+certain container specific interceptor(s) are run.
+</blockquote>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="typical-ejb-invocation-call-path-on-the-server">Typical EJB invocation call path on the server</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A typical EJB invocation looks like this:</p>
+</div>
+<div class="paragraph">
+<p>Client application</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">MyBeanInterface bean = lookupBean();
+ 
+bean.doSomething();</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The invocation on the bean.doSomething() triggers the following (only
+relevant portion of the flow shown below):</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>WildFly specific interceptor (a.k.a container interceptor) 1</p>
+</li>
+<li>
+<p>WildFly specific interceptor (a.k.a container interceptor) 2</p>
+</li>
+<li>
+<p>&#8230;&#8203;.</p>
+</li>
+<li>
+<p>WildFly specific interceptor (a.k.a container interceptor) N</p>
+</li>
+<li>
+<p>User application specific Java EE interceptor(s) (if any)</p>
+</li>
+<li>
+<p>Invocation on the EJB instance&#8217;s method</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>The WildFly specific interceptors include the security context
+propagation, transaction management and other container provided
+services. In some cases, the " `container interceptors`" (let&#8217;s call
+them that) might even decide break the invocation flow and not let the
+invocation proceed (for example: due to the invoking caller not being
+among the allowed user roles who can invoke the method on the bean).</p>
+</div>
+<div class="paragraph">
+<p>Previous versions of JBoss AS allowed a way to plug-in the user
+application specific interceptors (which relied on JBoss AS specific
+libraries) into this invocation flow so that they do run some
+application specific logic before the control reaches step#5 above. For
+example, AS5 allowed the use of JBoss AOP interceptors to do this.</p>
+</div>
+<div class="paragraph">
+<p>As of WildFly 8, this feature was implemented.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuring-container-interceptors">Configuring container interceptors</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>As you can see from the JIRA <a href="https://issues.jboss.org/browse/AS7-5897" class="bare">https://issues.jboss.org/browse/AS7-5897</a>,
+one of the goals of this feature implementation was to make sure that we
+don&#8217;t introduce any new WildFly specific library dependencies for the
+container interceptors. So we decided to allow the Java EE interceptors
+(which are just POJO classes with lifecycle callback annotations) to be
+used as container interceptors. As such you won&#8217;t need any dependency on
+any WildFly specific libraries. That will allow us to support this
+feature for a longer time in future versions of WildFly.</p>
+</div>
+<div class="paragraph">
+<p>Furthermore, configuring these container interceptors is similar to
+configuring the Java EE interceptors for EJBs. In fact, it uses the same
+xsd elements that are allowed in ejb-jar.xml for 3.1 version of ejb-jar
+deployment descriptor.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+Container interceptors can only be configured via deployment
+descriptors. There&#8217;s no annotation based way to configure container
+interceptors. This was an intentional decision, taken to avoid
+introducing any WildFly specific library dependency for the annotation.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Configuring the container interceptors can be done in jboss-ejb3.xml
+file, which then gets placed under the META-INF folder of the EJB
+deployment, just like the ejb-jar.xml. Here&#8217;s an example of how the
+container interceptor(s) can be configured in jboss-ejb3.xml:</p>
+</div>
+<div class="listingblock">
+<div class="title">jboss-ejb3.xml</div>
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;jboss xmlns="http://www.jboss.com/xml/ns/javaee"
+       xmlns:jee="http://java.sun.com/xml/ns/javaee"
+       xmlns:ci ="urn:container-interceptors:1.0"&gt;
+ 
+    &lt;jee:assembly-descriptor&gt;
+        &lt;ci:container-interceptors&gt;
+            &lt;!-- Default interceptor --&gt;
+            &lt;jee:interceptor-binding&gt;
+                &lt;ejb-name&gt;*&lt;/ejb-name&gt;
+                &lt;interceptor-class&gt;org.jboss.as.test.integration.ejb.container.interceptor.ContainerInterceptorOne&lt;/interceptor-class&gt;
+            &lt;/jee:interceptor-binding&gt;
+            &lt;!-- Class level container-interceptor --&gt;
+            &lt;jee:interceptor-binding&gt;
+                &lt;ejb-name&gt;AnotherFlowTrackingBean&lt;/ejb-name&gt;
+                &lt;interceptor-class&gt;org.jboss.as.test.integration.ejb.container.interceptor.ClassLevelContainerInterceptor&lt;/interceptor-class&gt;
+            &lt;/jee:interceptor-binding&gt;
+            &lt;!-- Method specific container-interceptor --&gt;
+            &lt;jee:interceptor-binding&gt;
+                &lt;ejb-name&gt;AnotherFlowTrackingBean&lt;/ejb-name&gt;
+                &lt;interceptor-class&gt;org.jboss.as.test.integration.ejb.container.interceptor.MethodSpecificContainerInterceptor&lt;/interceptor-class&gt;
+                &lt;method&gt;
+                    &lt;method-name&gt;echoWithMethodSpecificContainerInterceptor&lt;/method-name&gt;
+                &lt;/method&gt;
+            &lt;/jee:interceptor-binding&gt;
+            &lt;!-- container interceptors in a specific order --&gt;
+            &lt;jee:interceptor-binding&gt;
+                &lt;ejb-name&gt;AnotherFlowTrackingBean&lt;/ejb-name&gt;
+                &lt;interceptor-order&gt;
+                    &lt;interceptor-class&gt;org.jboss.as.test.integration.ejb.container.interceptor.ClassLevelContainerInterceptor&lt;/interceptor-class&gt;
+                    &lt;interceptor-class&gt;org.jboss.as.test.integration.ejb.container.interceptor.MethodSpecificContainerInterceptor&lt;/interceptor-class&gt;
+                    &lt;interceptor-class&gt;org.jboss.as.test.integration.ejb.container.interceptor.ContainerInterceptorOne&lt;/interceptor-class&gt;
+                &lt;/interceptor-order&gt;
+                &lt;method&gt;
+                    &lt;method-name&gt;echoInSpecificOrderOfContainerInterceptors&lt;/method-name&gt;
+                &lt;/method&gt;
+            &lt;/jee:interceptor-binding&gt;
+        &lt;/ci:container-interceptors&gt;
+    &lt;/jee:assembly-descriptor&gt;
+&lt;/jboss&gt;</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The usage of urn:container-interceptors:1.0 namespace which allows the
+container-interceptors elements to be configured</p>
+</li>
+<li>
+<p>The container-interceptors element which contain the interceptor
+bindings</p>
+</li>
+<li>
+<p>The interceptor bindings themselves are the same elements as what the
+EJB3.1 xsd allows for standard Java EE interceptors</p>
+</li>
+<li>
+<p>The interceptors can be bound either to all EJBs in the deployment
+(using the the * wildcard) or individual bean level (using the specific
+EJB name) or at specific method level for the EJBs.</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+The xsd for the urn:container-interceptors:1.0 namespace is available
+here
+<a href="https://github.com/jbossas/jboss-as/blob/master/ejb3/src/main/resources/jboss-ejb-container-interceptors_1_0.xsd" class="bare">https://github.com/jbossas/jboss-as/blob/master/ejb3/src/main/resources/jboss-ejb-container-interceptors_1_0.xsd</a>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The interceptor classes themselves are simple POJOs and use the
+<code>@javax.annotation.AroundInvoke</code> to mark the around invoke method which
+will get invoked during the invocation on the bean. Here&#8217;s an example of
+the interceptor:</p>
+</div>
+<div class="listingblock">
+<div class="title">Example of container interceptor</div>
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">public class ClassLevelContainerInterceptor {
+    @AroundInvoke
+    private Object iAmAround(final InvocationContext invocationContext) throws Exception {
+        return this.getClass().getName() + " " + invocationContext.proceed();
+    }
+ 
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="container-interceptor-positioning-in-the-interceptor-chain">Container interceptor positioning in the interceptor chain</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The container interceptors configured for a EJB are guaranteed to be run
+before the WildFly provided security interceptors, transaction
+management interceptors and other such interceptors thus allowing the
+user application specific container interceptors to setup any relevant
+context data before the invocation proceeds.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="semantic-difference-between-container-interceptors-and-java-ee-interceptors-api">Semantic difference between container interceptor(s) and Java EE</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>interceptor(s) API</p>
+</div>
+<div class="paragraph">
+<p>Although the container interceptors are modeled to be similar to the
+Java EE interceptors, there are some differences in the API semantics.
+One such difference is that invoking on
+javax.interceptor.InvocationContext.getTarget() method is illegal for
+container interceptors since these interceptors are invoked way before
+the EJB components are setup or instantiated.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="testcase">Testcase</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This testcase in the WildFly codebase can be used for reference for
+implementing container interceptors in user applications
+<a href="https://github.com/wildfly/wildfly/blob/master/testsuite/integration/basic/src/test/java/org/jboss/as/test/integration/ejb/container/interceptor/ContainerInterceptorsTestCase.java" class="bare">https://github.com/wildfly/wildfly/blob/master/testsuite/integration/basic/src/test/java/org/jboss/as/test/integration/ejb/container/interceptor/ContainerInterceptorsTestCase.java</a></p>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

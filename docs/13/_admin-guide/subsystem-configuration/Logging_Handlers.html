@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Handlers | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Handlers" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_admin-guide/subsystem-configuration/Logging_Handlers.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_admin-guide/subsystem-configuration/Logging_Handlers.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_admin-guide/subsystem-configuration/Logging_Handlers.html","headline":"Handlers","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>WIP</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+This is still a work in progress. Please feel free to edit any mistakes
+you find <span class="icon yellow">[smile o]</span>
+</td>
+</tr>
+</table>
+</div>
+<div class="quoteblock abstract">
+<blockquote>
+Handlers are used to determine what happens with a log message if the
+<a href="Logging_Loggers.html#Logging_Loggers">logger</a> determines the
+message is loggable.
+</blockquote>
+</div>
+<div class="paragraph">
+<p>There are 6 main handlers provided with WildFly and 1 generic handler;</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="#async-handler">async-handler</a></p>
+</li>
+<li>
+<p><a href="#console-handler">console-handler</a></p>
+</li>
+<li>
+<p><a href="#file-handler">file-handler</a></p>
+</li>
+<li>
+<p><a href="#periodic-rotating-file-handler">periodic-rotating-file-handler</a></p>
+</li>
+<li>
+<p><a href="#size-rotating-file-handler">size-rotating-file-handler</a></p>
+</li>
+<li>
+<p><a href="#syslog-handler">syslog-handler</a></p>
+</li>
+<li>
+<p><a href="#enabled">custom-handler</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="async-handler">async-handler</h3>
+<div class="paragraph">
+<p>An <code>async-handler</code> is a handler that asynchronously writes log messages
+to it&#8217;s child handlers. This type of handler is generally used for other
+handlers that take a substantial time to write logged messages.</p>
+</div>
+<div class="sect3">
+<h4 id="attributes">Attributes</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="#enabled">#enabled</a></p>
+</li>
+<li>
+<p><a href="#filter-spec">#filter-spec</a></p>
+</li>
+<li>
+<p><a href="#level">#level</a></p>
+</li>
+<li>
+<p><a href="#overflow-action">#overflow-action</a></p>
+</li>
+<li>
+<p><a href="#queue-length">#queue-length</a></p>
+</li>
+<li>
+<p><a href="#subhandlers">#subhandlers</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="console-handler">console-handler</h3>
+<div class="paragraph">
+<p>A <code>console-handler</code> is a handler that writes log messages to the
+console. Generally this writes to <code>stdout</code>, but can be set to write to
+<code>stderr</code>.</p>
+</div>
+<div class="sect3">
+<h4 id="attributes-1">Attributes</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="#autoflush">#autoflush</a></p>
+</li>
+<li>
+<p><a href="#enabled">#enabled</a></p>
+</li>
+<li>
+<p><a href="#encoding">#encoding</a></p>
+</li>
+<li>
+<p><a href="#filter-spec">#filter-spec</a></p>
+</li>
+<li>
+<p><a href="#formatter">#formatter</a></p>
+</li>
+<li>
+<p><a href="#level">#level</a></p>
+</li>
+<li>
+<p><a href="#named-formatter">#named-formatter</a></p>
+</li>
+<li>
+<p><a href="#target">#target</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="file-handler">file-handler</h3>
+<div class="paragraph">
+<p>A <code>file-handler</code> is a handler that writes log messages to the specified
+file.</p>
+</div>
+<div class="sect3">
+<h4 id="attributes-2">Attributes</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="#autoflush">#autoflush</a></p>
+</li>
+<li>
+<p><a href="#enabled">#enabled</a></p>
+</li>
+<li>
+<p><a href="#encoding">#encoding</a></p>
+</li>
+<li>
+<p><a href="#filter-spec">#filter-spec</a></p>
+</li>
+<li>
+<p><a href="#formatter">#formatter</a></p>
+</li>
+<li>
+<p><a href="#level">#level</a></p>
+</li>
+<li>
+<p><a href="#named-formatter">#named-formatter</a></p>
+</li>
+<li>
+<p><a href="#file">#file</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="periodic-rotating-file-handler">periodic-rotating-file-handler</h3>
+<div class="paragraph">
+<p>A <code>periodic-rotating-file-handler</code> is a handler that writes log messages
+to the specified file. The file rotates on the date pattern specified in
+the <a href="#suffix">#suffix</a> attribute. The suffix must
+be a valid pattern recognized by the
+<a href="http://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html"><code>java.text.SimpleDateFormat</code></a>
+and must not rotate on seconds or milliseconds.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+The rotate happens before the next message is written by the handler.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect3">
+<h4 id="attributes-3">Attributes</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="#autoflush">#autoflush</a></p>
+</li>
+<li>
+<p><a href="#enabled">#enabled</a></p>
+</li>
+<li>
+<p><a href="#encoding">#encoding</a></p>
+</li>
+<li>
+<p><a href="#filter-spec">#filter-spec</a></p>
+</li>
+<li>
+<p><a href="#formatter">#formatter</a></p>
+</li>
+<li>
+<p><a href="#level">#level</a></p>
+</li>
+<li>
+<p><a href="#named-formatter">#named-formatter</a></p>
+</li>
+<li>
+<p><a href="#file">#file</a></p>
+</li>
+<li>
+<p><a href="#suffix">#suffix</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="size-rotating-file-handler">size-rotating-file-handler</h3>
+<div class="paragraph">
+<p>A <code>size-rotating-file-handler</code> is a handler that writes log messages to
+the specified file. The file rotates when the file size is greater than
+the <a href="#rotate-size">#rotate-size</a> attribute. The
+rotated file will be kept and the index appended to the name moving
+previously rotated file indexes up by 1 until the
+<a href="#max-backup-index">#max-backup-index</a> is
+reached. Once the
+<a href="#max-backup-index">#max-backup-index</a> is
+reached, the indexed files will be overwritten.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+The rotate happens before the next message is written by the handler.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect3">
+<h4 id="attributes-4">Attributes</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="#autoflush">#autoflush</a></p>
+</li>
+<li>
+<p><a href="#enabled">#enabled</a></p>
+</li>
+<li>
+<p><a href="#encoding">#encoding</a></p>
+</li>
+<li>
+<p><a href="#filter-spec">#filter-spec</a></p>
+</li>
+<li>
+<p><a href="#formatter">#formatter</a></p>
+</li>
+<li>
+<p><a href="#level">#level</a></p>
+</li>
+<li>
+<p><a href="#named-formatter">#named-formatter</a></p>
+</li>
+<li>
+<p><a href="#file">#file</a></p>
+</li>
+<li>
+<p><a href="#max-backup-index">#max-backup-index</a></p>
+</li>
+<li>
+<p><a href="#rotate-size">#rotate-size</a></p>
+</li>
+<li>
+<p><a href="#rotate-on-boot">#rotate-on-boot</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="syslog-handler">syslog-handler</h3>
+<div class="paragraph">
+<p>A <code>syslog-handler</code> is a handler that writes to a syslog server. The
+handler support <a href="http://www.ietf.org/rfc/rfc3164.txt">RFC3164</a> or
+<a href="http://www.ietf.org/rfc/rfc5424.txt">RFC5424</a> formats.</p>
+</div>
+<div class="sect3">
+<h4 id="attributes-5">Attributes</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="#src-557084_Handlers-port">#port</a></p>
+</li>
+<li>
+<p><a href="#src-557084_Handlers-app-name">#app-name</a></p>
+</li>
+<li>
+<p><a href="#enabled">#enabled</a></p>
+</li>
+<li>
+<p><a href="#level">#level</a></p>
+</li>
+<li>
+<p><a href="#src-557084_Handlers-facility">#facility</a></p>
+</li>
+<li>
+<p><a href="#src-557084_Handlers-server-address">#server-address</a></p>
+</li>
+<li>
+<p><a href="#src-557084_Handlers-hostname">#hostname</a></p>
+</li>
+<li>
+<p><a href="#src-557084_Handlers-syslog-format">#syslog-format</a></p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Tip</div>
+</td>
+<td class="content">
+The syslog-handler is missing some configuration properties that may be
+useful in some scenarios like setting a formatter. Use the
+<code>org.jboss.logmanager.handlers.SyslogHandler</code> in module
+<code>org.jboss.logmanager</code> as a
+<a href="#custom-handler">#custom-handler</a> to exploit
+these benefits. Additional attributes will be added at some point so
+this will no longer be necessary.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="custom-handler">custom-handler</h3>
+
+</div>
+<div class="sect2">
+<h3 id="attributes-6">Attributes</h3>
+<div class="sect3">
+<h4 id="autoflush">autoflush</h4>
+<div class="sidebarblock">
+<div class="content">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Description:</th>
+<th class="tableblock halign-left valign-top">Indicates whether a flush should happen after each write.</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default Value:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Allowed Values:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true or false</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="enabled">enabled</h4>
+<div class="sidebarblock">
+<div class="content">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Description:</th>
+<th class="tableblock halign-left valign-top">If set to true the handler is enabled and functioning as
+normal, if set to false the handler is ignored when processing log
+messages.</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default Value:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Allowed Values:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true or false</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="encoding">encoding</h4>
+<div class="sidebarblock">
+<div class="content">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Description:</th>
+<th class="tableblock halign-left valign-top">The character encoding used by this Handler.</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default Value:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">null</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Allowed Values:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Any valid encoding</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="file">file</h4>
+<div class="sidebarblock">
+<div class="content">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Description:</th>
+<th class="tableblock halign-left valign-top">An object describing the file the handler should write
+to.</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">object</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default Value:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">null</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Allowed Values:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An object optionally containing a relative-to property
+and a path. The path is a required property of the object.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="named-formatter">named-formatter</h4>
+<div class="sidebarblock">
+<div class="content">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Description:</th>
+<th class="tableblock halign-left valign-top">The name of a defined formatter to be used on the
+handler.</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default Value:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">null</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Allowed Values:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TODO add link</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="formatter">formatter</h4>
+<div class="sidebarblock">
+<div class="content">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Description:</th>
+<th class="tableblock halign-left valign-top">Defines a pattern for a pattern formatter.</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default Value:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">%d\{HH:mm:ss,SSS} %-5p [%c] (%t) %s%E%n</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Allowed Values:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TODO add link</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="filter-spec">filter-spec</h4>
+<div class="sidebarblock">
+<div class="content">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Description:</th>
+<th class="tableblock halign-left valign-top">A filter expression value to define a filter.</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default Value:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">null</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Allowed Values:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">See Filter Expression</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="level">level</h4>
+<div class="sidebarblock">
+<div class="content">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Description :</th>
+<th class="tableblock halign-left valign-top">The log level specifying which message levels will be
+logged by this logger. Message levels lower than this value will be
+discarded.</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default Value:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ALL</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Allowed Values:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ALL FINEST FINER TRACE DEBUG FINE CONFIG INFO WARN
+WARNING ERROR SEVERE FATAL OFF</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="max-backup-index">max-backup-index</h4>
+<div class="sidebarblock">
+<div class="content">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Description:</th>
+<th class="tableblock halign-left valign-top">The maximum number of rotated files to keep.</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">integer</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default Value:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Allowed Values:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">any integer greater than 0</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="overflow-action">overflow-action</h4>
+<div class="sidebarblock">
+<div class="content">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Description:</th>
+<th class="tableblock halign-left valign-top">Specify what action to take when the overflowing.</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default Value:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">BLOCK</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Allowed Values:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">BLOCK or DISCARD</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="queue-length">queue-length</h4>
+<div class="sidebarblock">
+<div class="content">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Description:</th>
+<th class="tableblock halign-left valign-top">The queue length to use before flushing writing</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">integer</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default Value:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Allowed Values:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">any positive integer</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="rotate-on-boot">rotate-on-boot</h4>
+<div class="sidebarblock">
+<div class="content">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Description:</th>
+<th class="tableblock halign-left valign-top">Indicates whether or not the file should be rotated each
+time the #file attribute is changed. If set to true will rotate on each
+boot of the server.</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default Value:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Allowed Values:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true or false</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="rotate-size">rotate-size</h4>
+<div class="sidebarblock">
+<div class="content">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Description:</th>
+<th class="tableblock halign-left valign-top">The size at which the file should be rotated.</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default Value:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2m</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Allowed Values:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Any positive integer with a size type appended to the
+end. Valid types are b for bytes, k for kilobytes, m for megabytes, g
+for gigabytes or t for terabytes. Type character is not case sensitive.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="subhandlers">subhandlers</h4>
+<div class="sidebarblock">
+<div class="content">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Description:</th>
+<th class="tableblock halign-left valign-top">The handlers to associate with the async handler</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">list of strings</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default Value:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">null</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Allowed Values:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An array of valid handler names</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="suffix">suffix</h4>
+<div class="sidebarblock">
+<div class="content">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Description:</th>
+<th class="tableblock halign-left valign-top">The pattern used to determine when the file should be
+rotated.</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default Value:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">null</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Allowed Values:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Any valid java.text.SimpleDateFormat pattern.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="target">target</h4>
+<div class="sidebarblock">
+<div class="content">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Description:</th>
+<th class="tableblock halign-left valign-top">Defines the target of the console handler.</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default Value:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">System.out</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Allowed Values:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">System.out or System.err</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Deployment Scanner configuration | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Deployment Scanner configuration" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_admin-guide/subsystem-configuration/Deployment_Scanner.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_admin-guide/subsystem-configuration/Deployment_Scanner.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_admin-guide/subsystem-configuration/Deployment_Scanner.html","headline":"Deployment Scanner configuration","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="paragraph">
+<p>The deployment scanner is only used in standalone mode. Its job is to
+monitor a directory for new files and to deploy those files. It can be
+found in <code>standalone.xml</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;subsystem xmlns="urn:jboss:domain:deployment-scanner:2.0"&gt;
+   &lt;deployment-scanner scan-interval="5000"
+      relative-to="jboss.server.base.dir" path="deployments" /&gt;
+&lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can define more <code>deployment-scanner</code> entries to scan for deployments
+from more locations. The configuration showed will scan the
+<code>JBOSS_HOME/standalone/deployments</code> directory every five seconds. The
+runtime model is shown below, and uses default values for attributes not
+specified in the xml:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9999 /] /subsystem=deployment-scanner:read-resource(recursive=true)
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; {"scanner" =&gt; {"default" =&gt; {
+        "auto-deploy-exploded" =&gt; false,
+        "auto-deploy-zipped" =&gt; true,
+        "deployment-timeout" =&gt; 60L,
+        "name" =&gt; "default",
+        "path" =&gt; "deployments",
+        "relative-to" =&gt; "jboss.server.base.dir",
+        "scan-enabled" =&gt; true,
+        "scan-interval" =&gt; 5000
+    }}}
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The attributes are</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">STRING</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the scanner. default is used if not specified</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">path</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">STRING</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The actual filesystem path to be scanned. Treated as an
+absolute path, unless the 'relative-to' attribute is specified, in which
+case the value is treated as relative to that path.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">relative-to</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">STRING</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Reference to a filesystem path defined in the
+"paths" section of the server configuration, or one of the system
+properties specified on startup. In the example above
+jboss.server.base.dir resolves to JBOSS_HOME/standalone</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">scan-enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">BOOLEAN</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If true scanning is enabled</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">scan-interval</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">INT</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Periodic interval, in milliseconds, at which the
+repository should be scanned for changes. A value of less than 1
+indicates the repository should only be scanned at initial startup.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">auto-deploy-zipped</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">BOOLEAN</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Controls whether zipped deployment content
+should be automatically deployed by the scanner without requiring the
+user to add a .dodeploy marker file.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">auto-deploy-exploded</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">BOOLEAN</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Controls whether exploded deployment
+content should be automatically deployed by the scanner without
+requiring the user to add a .dodeploy marker file. Setting this to
+'true' is not recommended for anything but basic development scenarios,
+as there is no way to ensure that deployment will not occur in the
+middle of changes to the content.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">auto-deploy-xml</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">BOOLEAN</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Controls whether XML content should be
+automatically deployed by the scanner without requiring a .dodeploy
+marker file.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">deployment-timeout</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">LONG</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Timeout, in seconds, a deployment is allows
+to execute before being canceled. The default is 60 seconds.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Deployment scanners can be added by modifying <code>standalone.xml</code> before
+starting up the server or they can be added and removed at runtime using
+the CLI</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9990 /] /subsystem=deployment-scanner/scanner=new:add(scan-interval=10000,relative-to="jboss.server.base.dir",path="other-deployments")
+{"outcome" =&gt; "success"}
+[standalone@localhost:9990 /] /subsystem=deployment-scanner/scanner=new:remove
+{"outcome" =&gt; "success"}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can also change the attributes at runtime, so for example to turn
+off scanning you can do</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9990 /] /subsystem=deployment-scanner/scanner=default:write-attribute(name="scan-enabled",value=false)
+{"outcome" =&gt; "success"}
+[standalone@localhost:9990 /] /subsystem=deployment-scanner:read-resource(recursive=true)
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; {"scanner" =&gt; {"default" =&gt; {
+        "auto-deploy-exploded" =&gt; false,
+        "auto-deploy-zipped" =&gt; true,
+        "deployment-timeout" =&gt; 60L,
+        "name" =&gt; "default",
+        "path" =&gt; "deployments",
+        "relative-to" =&gt; "jboss.server.base.dir",
+        "scan-enabled" =&gt; false,
+        "scan-interval" =&gt; 5000
+    }}}
+}</code></pre>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

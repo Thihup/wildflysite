@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>EJB3 Clustered Database Timers | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="EJB3 Clustered Database Timers" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_developer-guide/ejb3/EJB3_Clustered_Database_Timers.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_developer-guide/ejb3/EJB3_Clustered_Database_Timers.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_developer-guide/ejb3/EJB3_Clustered_Database_Timers.html","headline":"EJB3 Clustered Database Timers","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div id="preamble">
+<div class="sectionbody">
+<div class="quoteblock abstract">
+<blockquote>
+Wildfly now supports clustered database backed timers. The clustering
+support is provided through the database, and as a result it is not
+intended to be a super high performance solution that supports thousands
+of timers going off a second, however properly tuned it should provide
+sufficient performance for most use cases.
+</blockquote>
+</div>
+<div class="paragraph">
+<p>Note that database timers can also be used in non-clustered mode.</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Warning</div>
+</td>
+<td class="content">
+Note that for this to work correctly the underlying database must
+support the READ_COMMITTED or SERIALIZABLE isolation mode and the
+datasource must be configured accordingly
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="setup">Setup</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In order to use clustered timers it is necessary to add a database
+backed timer store. This can be done from the CLI with the following
+command:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">/subsystem=ejb3/service=timer-service/database-data-store=my-clustered-store:add(allow-execution=true, datasource-jndi-name='java:/MyDatasource', refresh-interval=60000, database='postgresql', partition='mypartition')</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>An explanation of the parameters is below:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>allow-execution</strong> - If this node is allowed to execute timers. If this
+is false then timers added on this node will be added to the database
+for another node to execute. This allows you to limit timer execution to
+a few nodes in a cluster, which can greatly reduce database load for
+large clusters.</p>
+</li>
+<li>
+<p><strong>datasource-jndi-name</strong> - The datasource to use</p>
+</li>
+<li>
+<p><strong>refresh-interval</strong> - The refresh interval in milliseconds. This is the
+period of time that must elapse before this node will check the database
+for new timers added by other nodes. A smaller value means that timers
+will be picked up more quickly, however it will result in more load on
+the database. This is most important to tune if you are adding timers
+that will expire quickly. If the node that added the timer cannot
+execute it (e.g. because it has failed or because allow-execution is
+false), this timer may not be executed until a node has refreshed.</p>
+</li>
+<li>
+<p><strong>database</strong> - Define the type of database that is in use. Some SQL
+statements are customised by database, and this tells the data store
+which version of the SQL to use.<br>
+Without this attribute the server try to detected the type
+automatically, current supported types are <em>postgresql, mysql, oracle,
+db2, hsql</em> and <em>h2</em>.<br>
+Note that this SQL resides in the file
+<em>modules/system/layers/base/org/jboss/as/ejb3/main/timers/timer-sql.properties</em><br>
+And as such is it possible to modify the SQL that is executed or add
+support for new databases by adding new DB specific SQL to this file (if
+you do add support for a new database it would be greatly appreciated if
+you could contribute the SQL back to the project).</p>
+</li>
+<li>
+<p><strong>partition</strong> - A node will only see timers from other nodes that have
+the same partition name. This allows you to break a large cluster up
+into several smaller clusters, which should improve performance. e.g.
+instead of having a cluster of 100 nodes, where all hundred are trying
+to execute and refresh the same timers, you can create 20 clusters of 5
+nodes by giving ever group of 5 a different partition name.</p>
+</li>
+</ul>
+</div>
+<div class="sect2">
+<h3 id="non-clustered-timers">Non clustered timers</h3>
+<div class="paragraph">
+<p>Note that you can still use the database data store for non-clustered
+timers, in which case set the refresh interval to zero and make sure
+that every node has a unique partition name (or uses a different
+database).</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="using-clustered-timers-in-a-deployment">Using clustered timers in a deployment</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>It is possible to use the data store as default for all applications by
+changing the default-data-store within the ejb3 subsystem:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">    &lt;timer-service thread-pool-name="timer" default-data-store="clustered-store"&gt;
+        &lt;data-stores&gt;
+            &lt;database-data-store name="clustered-store" datasource-jndi-name="java:jboss/datasources/ExampleDS" partition="timer"/&gt;
+        &lt;/data-stores&gt;
+    &lt;/timer-service&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Another option is to use a separate data store for specific
+applications, all that is required is to set the timer data store name
+in jboss-ejb3.xml:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.1" encoding="UTF-8"?&gt;
+&lt;jboss:ejb-jar xmlns:jboss="http://www.jboss.com/xml/ns/javaee"
+               xmlns="http://java.sun.com/xml/ns/javaee"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xmlns:timer="urn:timer-service:1.0"
+               xsi:schemaLocation="http://www.jboss.com/xml/ns/javaee http://www.jboss.org/j2ee/schema/jboss-ejb3-2_0.xsd
+                     http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/ejb-jar_3_1.xsd"
+               version="3.1"
+               impl-version="2.0"&gt;
+    &lt;assembly-descriptor&gt;
+            &lt;timer:timer&gt;
+                &lt;ejb-name&gt;*&lt;/ejb-name&gt;
+                &lt;timer:persistence-store-name&gt;my-clustered-store&lt;/timer:persistence-store-name&gt;
+            &lt;/timer:timer&gt;
+        &lt;/assembly-descriptor&gt;
+&lt;/jboss:ejb-jar&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="technical-details">Technical details</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Internally every node that is allowed to execute timers schedules a
+timeout for every timer is knows about. When this timeout expires then
+this node attempts to 'lock' the timer, by updating its state to
+running. The query this executes looks like:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">UPDATE JBOSS_EJB_TIMER SET TIMER_STATE=? WHERE ID=? AND TIMER_STATE&lt;&gt;? AND NEXT_DATE=?;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Due to the use of a transaction and READ_COMMITTED or SERIALIZABLE
+isolation mode only one node will succeed in updating the row, and this
+is the node that the timer will run on.</p>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

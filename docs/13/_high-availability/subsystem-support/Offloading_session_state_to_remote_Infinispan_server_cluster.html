@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Offloading_session_state_to_remote_infinispan_server_cluster | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Offloading_session_state_to_remote_infinispan_server_cluster" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Offloading session state to remote Infinispan Server cluster" />
+<meta property="og:description" content="Offloading session state to remote Infinispan Server cluster" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_high-availability/subsystem-support/Offloading_session_state_to_remote_Infinispan_server_cluster.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_high-availability/subsystem-support/Offloading_session_state_to_remote_Infinispan_server_cluster.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_high-availability/subsystem-support/Offloading_session_state_to_remote_Infinispan_server_cluster.html","headline":"Offloading_session_state_to_remote_infinispan_server_cluster","description":"Offloading session state to remote Infinispan Server cluster","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="sect1">
+<h2 id="offloading_hotrod_store">Offloading session state to remote Infinispan Server cluster</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>While Infinispan project is used as a library internally by WildFly to provide data distribution, Infinispan project is also distributed in a standalone server mode.
+The Infinispan Server cluster operates as a language-independent service accessed remotely over a number of protocols (HotRod, REST, etc).</p>
+</div>
+<div class="paragraph">
+<p>HotRod is Infinispan&#8217;s custom optimized binary protocol which was designed to:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>enable faster client/server interactions compared to other existing text-based protocols,</p>
+</li>
+<li>
+<p>allow clients to make more intelligent decisions with regards to load-balancing, failover,</p>
+</li>
+<li>
+<p>and provide advanced cache operations.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>To learn more about the HotRod protocol itself and how to setup and run Infinispan Server,
+refer to <a href="http://infinispan.org/documentation/">Infinispan documentation</a> for the appropriate version.</p>
+</div>
+<div class="paragraph">
+<p>WildFly 13 introduced a custom optimized cache store based on HotRod protocol
+and integrating with security features provided by WildFly&#8217;s Elytron subsystem.</p>
+</div>
+<div class="sect2">
+<h3 id="remote_cache_container">Configuring remote cache container</h3>
+<div class="paragraph">
+<p>To configure <code>remote-cache-container</code> ensure you have a list of available Infinispan Server nodes.
+The following example CLI script first adds socket bindings to two known Infinispan Server nodes,
+followed by configuration of the cluster.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>batch
+/socket-binding-group=standard-sockets/remote-destination-outbound-socket-binding=infinispan-server-1:add(host=server1.example.com,port=11622)
+/socket-binding-group=standard-sockets/remote-destination-outbound-socket-binding=infinispan-server-2:add(host=server2.example.com,port=11722)
+/subsystem=infinispan/remote-cache-container=web-sessions:add(default-remote-cluster=infinispan-server-cluster)
+/subsystem=infinispan/remote-cache-container=web-sessions/remote-cluster=infinispan-server-cluster:add(socket-bindings=[infinispan-server-1,infinispan-server-2])
+run-batch</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Upon reload, this will register necessary services for the client.
+A HotRod client can be injected directly into Java EE applications using the <code>@Resource</code> annotation.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@Resource(lookup = "java:jboss/infinispan/remote-container/web-sessions")
+private org.infinispan.client.hotrod.RemoteCacheContainer client;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="hotrod_store">Configuring HotRod store</h3>
+<div class="paragraph">
+<p>The HotRod store uses one dedicated remote cache for each cache created by the server.
+For Infinispan Server versions supporting protocol version 2.7 and above (Infinispan Server version 9.2)
+a persistent remote cache will be automatically created based on default configuration.
+The recommended configuration for the remote cache where session data will be offloaded is transactional distribution mode cache with pessimistic locking.
+When using Infinispan Server version prior to 9.2, the caches need to be configured manually on the server where cache names correspond to the deployment file names (e.g. <code>test.war</code>).</p>
+</div>
+<div class="paragraph">
+<p>Once <code>remote-cache-container</code> is configured a <code>hotrod</code> store can be configured replacing any existing store.
+The following CLI script demonstrates a typical use case for offloading sessions is in conjunction with the <code>invalidation-cache</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>batch
+/subsystem=infinispan/cache-container=web/invalidation-cache=hotrod-persistence:add()
+/subsystem=infinispan/cache-container=web/invalidation-cache=hotrod-persistence/store=hotrod:add(remote-cache-container=web-sessions,fetch-state=false,purge=false,passivation=false,shared=true)
+/subsystem=infinispan/cache-container=web/invalidation-cache=hotrod-persistence/component=transaction:add(mode=BATCH)
+/subsystem=infinispan/cache-container=web/invalidation-cache=hotrod-persistence/component=locking:add(isolation=REPEATABLE_READ)
+/subsystem=infinispan/cache-container=web:write-attribute(name=default-cache,value=hotrod-persistence)
+run-batch</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The script configures a new invalidation cache.
+Session data is then maintained in the cache for performance and also written to the store for resilience.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="hotrod_store_security">Security</h3>
+<div class="paragraph">
+<p>Securing the store is just a matter of configuring the <code>remote-cache-container</code> with SSL context.
+Please follow the Elytron security guide on how to configure new SSL context
+and <a href="http://infinispan.org/documentation/">Infinispan documentation</a> on how to secure Infinispan Server instances.</p>
+</div>
+<div class="paragraph">
+<p>Once the SSL Context is configured, use the following CLI script to configure <code>remote-cache-container</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>/subsystem=infinispan/remote-cache-container=web-sessions/component=security:write-attribute(name=ssl-context,value=hotrod-ssl-context)</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Composite Stores Migration | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Composite Stores Migration" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_elytron/migrate/Composite_Stores_Migration.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_elytron/migrate/Composite_Stores_Migration.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_elytron/migrate/Composite_Stores_Migration.html","headline":"Composite Stores Migration","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>When using either PicketBox or the legacy security realms it is possible to define a configuration where authentication is performed against one identity store whilst the information used for authorization is loaded from a different store, when using WildFly Elytron this can be achieved by using an aggregate security realm.</p>
+</div>
+<div class="paragraph">
+<p>The example here makes use of a properties file for authentication and then searches LDAP to load group / role information. Both of these are based on the previous examples within this document so the environmental information is not repeated here.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="picketbox-based-configuration">PicketBox Based Configuration</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">./subsystem=security/security-domain=application-security:add
+./subsystem=security/security-domain=application-security/authentication=classic:add(login-modules=[ \
+{code=UsersRoles, flag=Required, module-options={ \
+password-stacking=useFirstPass, \
+usersProperties=file://${jboss.server.config.dir}/example-users.properties, \
+rolesProperties=file://${jboss.server.config.dir}/example-roles.properties}} \
+{code=LdapExtended, flag=Required, module-options={ \
+password-stacking=useFirstPass, \
+java.naming.factory.initial=com.sun.jndi.ldap.LdapCtxFactory, \
+java.naming.provider.url=ldap://localhost:10389, \
+java.naming.security.authentication=simple, \
+bindDN="uid=admin,ou=system", \
+bindCredential=secret, \
+baseCtxDN="ou=users,dc=group-to-principal,dc=wildfly,dc=org", \
+baseFilter="(uid={0})", \
+rolesCtxDN="ou=groups,dc=group-to-principal,dc=wildfly,dc=org",\
+roleFilter="(uniqueMember={1})", \
+roleAttributeID="uid" \
+}}])</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This results in the following domain definition</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;security-domain name="application-security"&gt;
+  &lt;authentication&gt;
+    &lt;login-module code="UsersRoles" flag="required"&gt;
+      &lt;module-option name="password-stacking" value="useFirstPass"/&gt;
+      &lt;module-option name="usersProperties" value="file://${jboss.server.config.dir}/example-users.properties"/&gt;
+      &lt;module-option name="rolesProperties" value="file://${jboss.server.config.dir}/example-roles.properties"/&gt;
+    &lt;/login-module&gt;
+    &lt;login-module code="LdapExtended" flag="required"&gt;
+      &lt;module-option name="password-stacking" value="useFirstPass"/&gt;
+      &lt;module-option name="java.naming.factory.initial" value="com.sun.jndi.ldap.LdapCtxFactory"/&gt;
+      &lt;module-option name="java.naming.provider.url" value="ldap://localhost:10389"/&gt;
+      &lt;module-option name="java.naming.security.authentication" value="simple"/&gt;
+      &lt;module-option name="bindDN" value="uid=admin,ou=system"/&gt;
+      &lt;module-option name="bindCredential" value="secret"/&gt;
+      &lt;module-option name="baseCtxDN" value="ou=users,dc=group-to-principal,dc=wildfly,dc=org"/&gt;
+      &lt;module-option name="baseFilter" value="(uid={0})"/&gt;
+      &lt;module-option name="rolesCtxDN" value="ou=groups,dc=group-to-principal,dc=wildfly,dc=org"/&gt;
+      &lt;module-option name="roleFilter" value="(uniqueMember={1})"/&gt;
+      &lt;module-option name="roleAttributeID" value="uid"/&gt;
+    &lt;/login-module&gt;
+  &lt;/authentication&gt;
+&lt;/security-domain&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>During an authentication attempt the 'UsersRoles' login module will first be called to perform authentication based on the supplied credential, then the 'LdapExtLoginModule' will be called which will proceed to query LDAP to load the roles for the identity.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">./core-service=management/ldap-connection=MyLdapConnection:add(url="ldap://localhost:10389", search-dn="uid=admin,ou=system", search-credential="secret")
+
+./core-service=management/security-realm=ApplicationSecurity:add
+./core-service=management/security-realm=ApplicationSecurity/authentication=properties:add(path=example-users.properties, relative-to=jboss.server.config.dir, plain-text=true)
+
+batch
+./core-service=management/security-realm=ApplicationSecurity/authorization=ldap:add(connection=MyLdapConnection)
+./core-service=management/security-realm=ApplicationSecurity/authorization=ldap/username-to-dn=username-filter:add(attribute=uid, base-dn="ou=users,dc=group-to-principal,dc=wildfly,dc=org")
+./core-service=management/security-realm=ApplicationSecurity/authorization=ldap/group-search=group-to-principal:add(base-dn="ou=groups,dc=group-to-principal,dc=wildfly,dc=org", iterative=true, prefer-original-connection=true, principal-attribute=uniqueMember, search-by=DISTINGUISHED_NAME, group-name=SIMPLE, group-name-attribute=uid)
+run-batch</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This results in the following realm definition:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;security-realm name="ApplicationSecurity"&gt;
+  &lt;authentication&gt;
+    &lt;properties path="example-users.properties" relative-to="jboss.server.config.dir" plain-text="true"/&gt;
+  &lt;/authentication&gt;
+  &lt;authorization&gt;
+    &lt;ldap connection="MyLdapConnection"&gt;
+      &lt;username-to-dn&gt;
+        &lt;username-filter base-dn="ou=users,dc=group-to-principal,dc=wildfly,dc=org" attribute="uid"/&gt;
+      &lt;/username-to-dn&gt;
+      &lt;group-search group-name="SIMPLE" iterative="true" group-name-attribute="uid"&gt;
+        &lt;group-to-principal search-by="DISTINGUISHED_NAME" base-dn="ou=groups,dc=group-to-principal,dc=wildfly,dc=org" prefer-original-connection="true"&gt;
+          &lt;membership-filter principal-attribute="uniqueMember"/&gt;
+        &lt;/group-to-principal&gt;
+      &lt;/group-search&gt;
+    &lt;/ldap&gt;
+  &lt;/authorization&gt;
+&lt;/security-realm&gt;
+
+&lt;outbound-connections&gt;
+  &lt;ldap name="MyLdapConnection" url="ldap://localhost:10389" search-dn="uid=admin,ou=system" search-credential="secret"/&gt;
+&lt;/outbound-connections&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As with the PicketBox example, authentication is first performed using the properties file - then group searching is performed against LDAP.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="migrated-wildfly-elytron-configuration">Migrated WildFly Elytron Configuration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The equivalent WildFly Elytron configuration can be defined with the following commands:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">./subsystem=elytron/dir-context=ldap-connection:add(url=ldap://localhost:10389, principal="uid=admin,ou=system", credential-reference={clear-text=secret})
+
+./subsystem=elytron/ldap-realm=ldap-realm:add(dir-context=ldap-connection, \
+direct-verification=true, \
+identity-mapping={search-base-dn="ou=users,dc=group-to-principal,dc=wildfly,dc=org", \
+rdn-identifier="uid", \
+attribute-mapping=[{filter-base-dn="ou=groups,dc=group-to-principal,dc=wildfly,dc=org",filter="(uniqueMember={1})",from="uid",to="Roles"}]})
+
+./subsystem=elytron/properties-realm=application-properties:add(users-properties={path=example-users.properties, relative-to=jboss.server.config.dir, plain-text=true, digest-realm-name="Application Security"}, groups-properties={path=example-roles.properties, relative-to=jboss.server.config.dir}, groups-attribute=Roles)
+
+./subsystem=elytron/aggregate-realm=combined-realm:add(authentication-realm=application-properties, authorization-realm=ldap-realm)
+
+./subsystem=elytron/security-domain=application-security:add(realms=[{realm=combined-realm}], default-realm=combined-realm, permission-mapper=default-permission-mapper)
+./subsystem=elytron/http-authentication-factory=application-security-http:add(http-server-mechanism-factory=global, security-domain=application-security, mechanism-configurations=[{mechanism-name=BASIC}])</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This results in the following realm definition:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;subsystem xmlns="urn:wildfly:elytron:1.1" final-providers="combined-providers" disallowed-providers="OracleUcrypto"&gt;
+  ...
+  &lt;security-domains&gt;
+    ...
+    &lt;security-domain name="application-security" default-realm="combined-realm" permission-mapper="default-permission-mapper"&gt;
+      &lt;realm name="combined-realm"/&gt;
+    &lt;/security-domain&gt;
+  &lt;/security-domains&gt;
+  &lt;security-realms&gt;
+    &lt;aggregate-realm name="combined-realm" authentication-realm="application-properties" authorization-realm="ldap-realm"/&gt;
+      ...
+      &lt;properties-realm name="application-properties" groups-attribute="Roles"&gt;
+        &lt;users-properties path="example-users.properties" relative-to="jboss.server.config.dir" digest-realm-name="Application Security" plain-text="true"/&gt;
+        &lt;groups-properties path="example-roles.properties" relative-to="jboss.server.config.dir"/&gt;
+      &lt;/properties-realm&gt;
+      &lt;ldap-realm name="ldap-realm" dir-context="ldap-connection" direct-verification="true"&gt;
+        &lt;identity-mapping rdn-identifier="uid" search-base-dn="ou=users,dc=group-to-principal,dc=wildfly,dc=org"&gt;
+          &lt;attribute-mapping&gt;
+            &lt;attribute from="uid" to="Roles" filter="(uniqueMember={1})" filter-base-dn="ou=groups,dc=group-to-principal,dc=wildfly,dc=org"/&gt;
+          &lt;/attribute-mapping&gt;
+        &lt;/identity-mapping&gt;
+      &lt;/ldap-realm&gt;
+  &lt;/security-realms&gt;
+  ...
+  &lt;http&gt;
+    ...
+    &lt;http-authentication-factory name="application-security-http" http-server-mechanism-factory="global" security-domain="application-security"&gt;
+      &lt;mechanism-configuration&gt;
+        &lt;mechanism mechanism-name="BASIC"/&gt;
+      &lt;/mechanism-configuration&gt;
+    &lt;/http-authentication-factory&gt;
+    ...
+  &lt;/http&gt;
+  ...
+  &lt;dir-contexts&gt;
+    &lt;dir-context name="ldap-connection" url="ldap://localhost:10389" principal="uid=admin,ou=system"&gt;
+      &lt;credential-reference clear-text="secret"/&gt;
+    &lt;/dir-context&gt;
+  &lt;/dir-contexts&gt;
+&lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Within the WildFly Elytron example a new security realm 'aggregate-realm' has been defined, this definition specifies which of the defined security realms should be used for the authentication step and which of the security realms should be used for the loading of the identity used for subsequent authorization decisions.</p>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

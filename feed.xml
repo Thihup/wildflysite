@@ -1,0 +1,1981 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.3">Jekyll</generator><link href="http://localhost:4000/wildflysite/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/wildflysite/" rel="alternate" type="text/html" /><updated>2018-08-15T14:07:44-06:00</updated><id>http://localhost:4000/wildflysite/</id><title type="html">Wildfly</title><entry><title type="html">Whats New In Hal</title><link href="http://localhost:4000/wildflysite/blog/2018-06-01-Whats-New-In-HAL/" rel="alternate" type="text/html" title="Whats New In Hal" /><published>2018-06-01T12:00:00-06:00</published><updated>2018-06-01T12:00:00-06:00</updated><id>http://localhost:4000/wildflysite/blog/Whats-New-In-HAL</id><content type="html" xml:base="http://localhost:4000/wildflysite/blog/2018-06-01-Whats-New-In-HAL/">&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;whats-new-in-wildfly-management-console&quot;&gt;What&amp;#8217;s New in WildFly Management Console&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;hpehl
+2018-06-01&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;&lt;a href=&quot;{base_url}/news/2018/05/30/WildFly13-Final-Released/&quot;&gt;WildFly 13&lt;/a&gt; comes with a management console (HAL) which has been rewritten from scratch. HAL still uses a similar technical stack (GWT) and user experience, but now fully adopts &lt;a href=&quot;https://www.patternfly.org/&quot;&gt;PatternFly&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;More important we enhanced the existing features and added support for many new subsystems and attributes. The following sections show some highlights of the latest version. For more details about the new features see the release notes for &lt;a href=&quot;https://hal.github.io/releases/3.0.0.final/&quot;&gt;HAL 3.0.0.Final&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;finder&quot;&gt;Finder&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The column based navigation (finder) has been greatly improved. You can now use the cursor keys for navigation inside and across columns. To open an application view press ↵ (enter), to go back press ⌫ (backspace). Items in one column are now ordered alphabetically by default. You can pin frequently used items to stay at the top. Most columns offer a filter which can be used to quickly find the items you&amp;#8217;re looking for. Finally the previews have been enriched and provide detailed documentation or the main attributes of the selected item. If appropriate the previews contain action links for the most common tasks.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/wildflysite/assets/img/posts/hal/finder.png&quot; alt=&quot;Finder&quot;&gt;
+&lt;/div&gt;
+&lt;div class=&quot;title&quot;&gt;Figure 1. Finder&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;applications&quot;&gt;Applications&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Applications provide a new breadcrumb at the top to quickly switch between items of the same kind. More complex applications can include a vertical navigation. Finally most applications can be easily opened in an external window and provide an expert mode which uses the generic model browser.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/wildflysite/assets/img/posts/hal/application.png&quot; alt=&quot;Applications&quot;&gt;
+&lt;/div&gt;
+&lt;div class=&quot;title&quot;&gt;Figure 2. Applications&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;deployments&quot;&gt;Deployments&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Many new features have been added to the deployment section:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Use drag and drop to deploy artifacts&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Content browser with preview for text and images&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Create exploded deployments&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;CRUD support for exploded deployments:&lt;/p&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Add empty files&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Upload content&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Modify content&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Remove content&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Download complete deployments or deployment content&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/wildflysite/assets/img/posts/hal/deployment.png&quot; alt=&quot;Deployments&quot;&gt;
+&lt;/div&gt;
+&lt;div class=&quot;title&quot;&gt;Figure 3. Deployments&lt;/div&gt;
+&lt;/div&gt;
+&lt;hr&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/wildflysite/assets/img/posts/hal/deployment-model.png&quot; alt=&quot;Deployment Model&quot;&gt;
+&lt;/div&gt;
+&lt;div class=&quot;title&quot;&gt;Figure 4. Deployment Model&lt;/div&gt;
+&lt;/div&gt;
+&lt;hr&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/wildflysite/assets/img/posts/hal/deployment-content.png&quot; alt=&quot;Content Browser&quot;&gt;
+&lt;/div&gt;
+&lt;div class=&quot;title&quot;&gt;Figure 5. Content Browser&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;topology&quot;&gt;Topology&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The topology view has been reintroduced to the management console. It was removed in the last versions due to performance issues with large domains. But thanks to new management operations, we were able to add this useful tool again.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/wildflysite/assets/img/posts/hal/topology.png&quot; alt=&quot;Topology&quot;&gt;
+&lt;/div&gt;
+&lt;div class=&quot;title&quot;&gt;Figure 6. Topology&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;runtime&quot;&gt;Runtime&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The lifecycle operations for hosts, server groups and servers have been improved. New operations are available for hosts and disconnected hosts are now shown in the finder columns. For servers you can specify custom URLs which is extremely useful when running WildFly inside a docker container.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/wildflysite/assets/img/posts/hal/runtime.png&quot; alt=&quot;Runtime&quot;&gt;
+&lt;/div&gt;
+&lt;div class=&quot;title&quot;&gt;Figure 7. Runtime&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;monitor&quot;&gt;Monitor&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The existing screens have been improved and many new subsystems have been added to the monitoring section. Some of the new and enhanced subsystems are:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Batch&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;EJB&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;IO&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;JAX-RS&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Messaging&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Web (Undertow)&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/wildflysite/assets/img/posts/hal/monitor-server.png&quot; alt=&quot;Monitor Server&quot;&gt;
+&lt;/div&gt;
+&lt;div class=&quot;title&quot;&gt;Figure 8. Monitor Server&lt;/div&gt;
+&lt;/div&gt;
+&lt;hr&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/wildflysite/assets/img/posts/hal/monitor-ejb.png&quot; alt=&quot;EJB Subsystem&quot;&gt;
+&lt;/div&gt;
+&lt;div class=&quot;title&quot;&gt;Figure 9. EJB Subsystem&lt;/div&gt;
+&lt;/div&gt;
+&lt;hr&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/wildflysite/assets/img/posts/hal/monitor-jaxrs.png&quot; alt=&quot;JAX-RS Resources&quot;&gt;
+&lt;/div&gt;
+&lt;div class=&quot;title&quot;&gt;Figure 10. JAX-RS Resources&lt;/div&gt;
+&lt;/div&gt;
+&lt;hr&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/wildflysite/assets/img/posts/hal/monitor-undertow.png&quot; alt=&quot;Undertow Listener Statistics&quot;&gt;
+&lt;/div&gt;
+&lt;div class=&quot;title&quot;&gt;Figure 11. Undertow Listener Statistics&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;get-involved&quot;&gt;Get Involved&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;If you want to learn more about HAL, head over to &lt;a href=&quot;https://hal.github.io/&quot; class=&quot;bare&quot;&gt;https://hal.github.io/&lt;/a&gt;. The new website contains both end user and technical documentation. Read about HAL&amp;#8217;s architecture, building blocks and how you can build, run and debug the console. HAL is an open source project and we love to receive &lt;a href=&quot;https://hal.github.io/contribute/&quot;&gt;contributions&lt;/a&gt; from our community — you!&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</content><author><name>hpehl</name></author><category term="wildfly" /><category term="hal" /><summary type="html">What&amp;#8217;s New in WildFly Management Console hpehl 2018-06-01</summary></entry><entry><title type="html">Wildfly13 Final Released</title><link href="http://localhost:4000/wildflysite/blog/2018-05-30-WildFly13-Final-Released/" rel="alternate" type="text/html" title="Wildfly13 Final Released" /><published>2018-05-30T21:00:00-06:00</published><updated>2018-05-30T21:00:00-06:00</updated><id>http://localhost:4000/wildflysite/blog/WildFly13-Final-Released</id><content type="html" xml:base="http://localhost:4000/wildflysite/blog/2018-05-30-WildFly13-Final-Released/">&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;wildfly-13-bakers-dozen-is-released&quot;&gt;WildFly 13 &quot;Baker&amp;#8217;s Dozen&quot; is released!&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;jgreene
+2018-05-30&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;WildFly 13 Final is now available &lt;a href=&quot;{base_url}/downloads&quot;&gt;for download&lt;/a&gt;!&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;ee8-capabilities-new-release-model&quot;&gt;EE8 Capabilities &amp;amp; New Release Model&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;This is our second release following our &lt;a href=&quot;http://lists.jboss.org/pipermail/wildfly-dev/2017-December/006250.html&quot;&gt;new quarterly delivery model&lt;/a&gt;. A central theme of this plan, is to deliver EE8 functionality in fully completed incremental chunks, as opposed to waiting for everything to finish in a big bang relase. WildFly 13 largely accomplishes this goal, by achieving EE8 feature completeness. WildFly 14 will focus on achieving formal certification, and converting over to a sole EE8 execution model. Since Java EE8 is fully backwards compatible, EE7 deployments will still function ast they do today.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;An overview of all changes for the EE8 execution mode are as follows:&lt;/p&gt;
+&lt;/div&gt;
+&lt;table class=&quot;tableblock frame-all grid-all stretch&quot;&gt;
+&lt;colgroup&gt;
+&lt;col style=&quot;width: 20%;&quot;&gt;
+&lt;col style=&quot;width: 20%;&quot;&gt;
+&lt;col style=&quot;width: 20%;&quot;&gt;
+&lt;col style=&quot;width: 20%;&quot;&gt;
+&lt;col style=&quot;width: 20%;&quot;&gt;
+&lt;/colgroup&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th class=&quot;tableblock halign-left valign-top&quot;&gt;Name&lt;/th&gt;
+&lt;th class=&quot;tableblock halign-left valign-top&quot;&gt;From Version&lt;/th&gt;
+&lt;th class=&quot;tableblock halign-left valign-top&quot;&gt;From JSR&lt;/th&gt;
+&lt;th class=&quot;tableblock halign-left valign-top&quot;&gt;To Version&lt;/th&gt;
+&lt;th class=&quot;tableblock halign-left valign-top&quot;&gt;To JSR&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Java Servlet&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;3.1&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;JSR-340&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;4.0&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;a href=&quot;https://jcp.org/en/jsr/detail?id=370&quot;&gt;JSR-369&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Contexts and Dependency Injection for Java&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;1.2&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;JSR-346&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;2.0&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;a href=&quot;https://jcp.org/en/jsr/detail?id=365&quot;&gt;JSR-365&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Bean Validation&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;1.1&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;JSR-349&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;2.0&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;a href=&quot;https://jcp.org/en/jsr/detail?id=380&quot;&gt;JSR-380&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;JavaServer Faces&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;2.2&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;JSR-344&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;2.3&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;a href=&quot;https://jcp.org/en/jsr/detail?id=372&quot;&gt;JSR-372&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;JavaMail&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;1.5&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;JSR-919&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;1.6&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;a href=&quot;https://jcp.org/en/jsr/detail?id=919&quot;&gt;JSR-919&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Java API for RESTFul Web Services&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;2.0&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;JSR-339&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;2.1&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;a href=&quot;https://jcp.org/en/jsr/detail?id=370&quot;&gt;JSR-370&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Java API for JSON Processing&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;1.0&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;JSR-353&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;1.1&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;a href=&quot;https://jcp.org/en/jsr/detail?id=374&quot;&gt;JSR-374&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Java API for JSON Binding&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;-&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;-&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;1.0&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;a href=&quot;https://jcp.org/en/jsr/detail?id=367&quot;&gt;JSR-367&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Common Annotations for the Java Platform&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;1.2&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;JSR-250&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;1.3&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;a href=&quot;http://download.oracle.com/otndocs/jcp/common_annotations-1_3-mrel3-spec/&quot;&gt;JSR-250&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Java EE Security&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;-&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;-&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;1.0&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;a href=&quot;https://jcp.org/en/jsr/detail?id=375&quot;&gt;JSR-375&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Java Persistence&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;2.1&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;JSR-338&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;2.2&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;a href=&quot;https://jcp.org/en/jsr/detail?id=338&quot;&gt;JSR-338&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;By default WildFly 13 launches in EE7 mode. In order to use these new capabilities you have to enable EE8 preview mode. This can be accomplished by passing the &lt;code&gt;ee8.preview.mode&lt;/code&gt; property during startup:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;./standalone.sh -Dee8.preview.mode=true&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Alternatively, this can be achieved by launching the server using the new &lt;code&gt;standalone-ee8.xml&lt;/code&gt; configuration, which simply includes the property in the config.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;./standalone.sh -c standalone-ee8.xml&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The CLI can also be used to modify the existing configuration to add this property. For example:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;embed-server --admin-only=true
+/system-property=ee8.preview.mode:add(value=true)
+stop-embedded-server&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;other-notable-items&quot;&gt;Other Notable Items&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;WildFly 13 is now internally built using project Galleon, a new provisioning model for WildFly we plan to roll out in coming releases&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Java 10 compatibilty has been improved&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;A major upgrade to the WildFly administration console (HAL version 3)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Infinispan has been updated to 9.2&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Hibernate ORM has been updated to 5.3 when running in EE8 mode&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;jira-release-notes&quot;&gt;Jira Release Notes&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The full list of issues resolved is available &lt;a href=&quot;https://issues.jboss.org/secure/ReleaseNote.jspa?projectId=12313721&amp;amp;version=12335641&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</content><author><name>jgreene</name></author><category term="announcement" /><category term="release" /><summary type="html">WildFly 13 &quot;Baker&amp;#8217;s Dozen&quot; is released! jgreene 2018-05-30</summary></entry><entry><title type="html">WildFly 12 Final is now available!</title><link href="http://localhost:4000/wildflysite/blog/2018-02-28-WildFly12-Final-Released/" rel="alternate" type="text/html" title="WildFly 12 Final is now available!" /><published>2018-02-28T22:00:00-07:00</published><updated>2018-02-28T22:00:00-07:00</updated><id>http://localhost:4000/wildflysite/blog/WildFly12-Final-Released</id><content type="html" xml:base="http://localhost:4000/wildflysite/blog/2018-02-28-WildFly12-Final-Released/">&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;wildfly-12-final-is-now-available&quot;&gt;WildFly 12 Final is now available!&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;jgreene
+2018-02-28&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;WildFly 12 Final is now available &lt;a href=&quot;{base_url}/downloads&quot;&gt;for download&lt;/a&gt;!&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;ee8-capabilities-new-release-model&quot;&gt;EE8 Capabilities &amp;amp; New Release Model&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;This is our first release following our &lt;a href=&quot;http://lists.jboss.org/pipermail/wildfly-dev/2017-December/006250.html&quot;&gt;new quarterly delivery model&lt;/a&gt;. As part of this plan, we are delivering EE8 functionality in fully completed incremental chunks, as opposed to waiting for everything to finish in a big bang reelase. WildFly 12 makes significant progress on this front, adding support for the majority of the new standards:&lt;/p&gt;
+&lt;/div&gt;
+&lt;table class=&quot;tableblock frame-all grid-all stretch&quot;&gt;
+&lt;colgroup&gt;
+&lt;col style=&quot;width: 20%;&quot;&gt;
+&lt;col style=&quot;width: 20%;&quot;&gt;
+&lt;col style=&quot;width: 20%;&quot;&gt;
+&lt;col style=&quot;width: 20%;&quot;&gt;
+&lt;col style=&quot;width: 20%;&quot;&gt;
+&lt;/colgroup&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th class=&quot;tableblock halign-left valign-top&quot;&gt;Name&lt;/th&gt;
+&lt;th class=&quot;tableblock halign-left valign-top&quot;&gt;From Version&lt;/th&gt;
+&lt;th class=&quot;tableblock halign-left valign-top&quot;&gt;From JSR&lt;/th&gt;
+&lt;th class=&quot;tableblock halign-left valign-top&quot;&gt;To Version&lt;/th&gt;
+&lt;th class=&quot;tableblock halign-left valign-top&quot;&gt;To JSR&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Java Servlet&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;3.1&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;JSR-340&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;4.0&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;a href=&quot;https://jcp.org/en/jsr/detail?id=370&quot;&gt;JSR-369&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Contexts and Dependency Injection for Java&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;1.2&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;JSR-346&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;2.0&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;a href=&quot;https://jcp.org/en/jsr/detail?id=365&quot;&gt;JSR-365&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Bean Validation&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;1.1&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;JSR-349&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;2.0&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;a href=&quot;https://jcp.org/en/jsr/detail?id=380&quot;&gt;JSR-380&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;JavaServer Faces&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;2.2&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;JSR-344&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;2.3&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;a href=&quot;https://jcp.org/en/jsr/detail?id=372&quot;&gt;JSR-372&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;JavaMail&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;1.5&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;JSR-919&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;1.6&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;a href=&quot;https://jcp.org/en/jsr/detail?id=919&quot;&gt;JSR-919&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Java API for RESTFul Web Services&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;2.0&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;JSR-339&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;2.1&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;a href=&quot;https://jcp.org/en/jsr/detail?id=370&quot;&gt;JSR-370&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Java API for JSON Processing&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;1.0&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;JSR-353&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;1.1&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;a href=&quot;https://jcp.org/en/jsr/detail?id=374&quot;&gt;JSR-374&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Java API for JSON Binding&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;-&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;-&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;1.0&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;a href=&quot;https://jcp.org/en/jsr/detail?id=367&quot;&gt;JSR-367&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Common Annotations for the Java Platform&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;1.2&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;JSR-250&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;1.3&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;a href=&quot;http://download.oracle.com/otndocs/jcp/common_annotations-1_3-mrel3-spec/&quot;&gt;JSR-250&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;By default WildFly 12 launches in EE7 mode. In order to use these new capabilities you have to enable EE8 preview mode. This can be accomplished by passing the &lt;code&gt;ee8.preview.mode&lt;/code&gt; property during startup:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;./standalone.sh -Dee8.preview.mode=true&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Alternatively, this can be achieved by launching the server using the new &lt;code&gt;standalone-ee8.xml&lt;/code&gt; configuration, which simply includes the property in the config.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;./standalone.sh -c standalone-ee8.xml&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The CLI can also be used to modify the existing configuration to add this property. For example:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;embed-server --admin-only=true
+/system-property=ee8.preview.mode:add(value=true)
+stop-embedded-server&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;other-notable-items&quot;&gt;Other Notable Items&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;WildFly 12 includes a new thread pooling strategy that reduces the number of threads active at any given time, which helps conserve system resources.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;MicroProfile REST Client 1.0 is now supported&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Java 9 compatibilty has been improved&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;CLI scripts can now take advantage of loops with variables&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;WildFly Documentation is now in asciidoc, and part of the source tree&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;jira-release-notes&quot;&gt;Jira Release Notes&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The full list of issues resolved is available &lt;a href=&quot;https://issues.jboss.org/secure/ReleaseNote.jspa?projectId=12313721&amp;amp;version=12336563&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</content><author><name>jgreene</name></author><category term="announcement" /><category term="release" /><summary type="html">WildFly 12 Final is now available! jgreene 2018-02-28</summary></entry><entry><title type="html">WildFly 11 Final is now available!</title><link href="http://localhost:4000/wildflysite/blog/2017-10-23-WildFly11-Final-Released/" rel="alternate" type="text/html" title="WildFly 11 Final is now available!" /><published>2017-10-23T23:00:00-06:00</published><updated>2017-10-23T23:00:00-06:00</updated><id>http://localhost:4000/wildflysite/blog/WildFly11-Final-Released</id><content type="html" xml:base="http://localhost:4000/wildflysite/blog/2017-10-23-WildFly11-Final-Released/">&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;wildfly-11-final-is-now-available&quot;&gt;WildFly 11 Final is now available!&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;jgreene
+2017-10-23&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;WildFly 11 Final is now available &lt;a href=&quot;{base_url}/downloads&quot;&gt;for download&lt;/a&gt;!  The highlights of WildFly 11 are as follows:&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;elytron-new-security-infrastructure&quot;&gt;Elytron - New Security Infrastructure&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The biggest change in WildFly 11 is unification on a new common security framework across the full application server.  Previously we had two separate security infrastructures (picketbox and security-realms), each covering separate use cases, and largely operating independent of the other. In addition to unification, Elytron brings a number of advanced capabilities such as privilege propagation across multiple service invocations, identity switching, pre-request TLS verification, and rich security policies. Finally, it improves the overall extensibility of the system allowing for tight integration with SSO / IDP systems such as KeyCloak.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;While WildFly 11 introduces a new security infrastructure, the existing security-domain and security-realm configurations and APIs are all present and internally mapped to Elytron. To further ease the impact of this change, WildFly 11’s default configurations still use the legacy security-domains and security-realms. A subsequent release will convert the default configurations over to the new configuration model.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;For more information see the Elytron documentation:
+&lt;a href=&quot;https://docs.jboss.org/author/display/WFLY/WildFly+Elytron+Security&quot; class=&quot;bare&quot;&gt;https://docs.jboss.org/author/display/WFLY/WildFly+Elytron+Security&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;As well as the section on migration:
+&lt;a href=&quot;https://docs.jboss.org/author/display/WFLY/Migrate+Legacy+Security+to+Elytron+Security&quot; class=&quot;bare&quot;&gt;https://docs.jboss.org/author/display/WFLY/Migrate+Legacy+Security+to+Elytron+Security&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;simplified-ejb-naming-proxies&quot;&gt;Simplified EJB / Naming Proxies&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;JNDI and EJB invocation have both been simplified and enhanced in WildFly 11. There is a new naming client library, WildFly Naming Client that allows you to easily configure access to WildFly with minimal properties and configuration. EJBs (and other resources) can be accessed in a dynamic discovery mode, or alternatively, in a new point to point mode that locks all EJB proxies to a specified address. This replaces the previous scoped context feature with more intuitive semantics that are ideal for ad-hoc behavior. Additionally, with the new Elytron authentication infrastructure, the user identity can now be changed in-between requests. Finally, older clients from past WildFly releases can still be used with WildFly 11.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;See the following for more information on the new WildFly Naming client:&lt;br&gt;
+&lt;a href=&quot;https://github.com/wildfly/wildfly-naming-client&quot; class=&quot;bare&quot;&gt;https://github.com/wildfly/wildfly-naming-client&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;request-oriented-ejbjndi-over-http&quot;&gt;Request oriented EJB/JNDI over HTTP&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Since WildFly 8, all protocols (with the exception of IIOP) can utilize HTTP Upgrade to communicate over a reduced set of ports on the server (one for management, and one for applications). However, since HTTP Upgrade converts the connection to the native protocol used, any HTTP load-balancers acting as an intermediary can only balance on initial connection establishment. To allow for balancing at the individual invocation level, a new “pure” HTTP protocol was added. Clients which utilize http:// URLs as opposed to remoting+http:// will obtain this new behavior. Since this protocol utilizes standard HTTP behavior, it can be efficiently balanced by any load-balancer, not just the one built into WildFly.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;wildfly-openssl-http2&quot;&gt;WildFly OpenSSL &amp;amp; HTTP/2&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;WildFly 11 now provides a JSSE provider that can offload TLS handling from the JVM’s internal implementation to an OpenSSL library on your system, typically improving TLS performance. If the version discovered and/or specified is 1.0.2 or greater, then WildFly will utilize OpenSSL’s ALPN support to provide HTTP/2 support. HTTP/2 support will be disabled on versions less than 1.0.2.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Note that HTTP/2 is also supported without OpenSSL, out of the box, on Java 8 (on VMs derived from OpenJDK) and Java 9 (using the new standard ALPN API).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;You can enable OpenSSL in the default configurations with the following CLI command:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;/core-service=management/security-realm=ApplicationRealm/server-identity=ssl:write-attribute(name=protocol,value=openssl.TLS)&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;If your openssl library is not installed in a standard location, you will need to additionally set the org.wildfly.openssl.path system property to point to the location of the library:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;-Dorg.wildfly.openssl.path=/path/to/dir/with/openssl/lib&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;new-load-balancer-configs&quot;&gt;New Load-Balancer Configs&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;In order to simplify the setup of WildFly as an HTTP load-balancer, there is an additional standalone-load-balancer.xml configuration in the distribution, which is an instance slimmed to just running the load balancing services. Additionally the stock domain.xml also includes this as a profile configuration that can be referenced by server groups.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;graceful-shutdownstartup-improvements&quot;&gt;Graceful Shutdown/Startup Improvements&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Distributed transactions are now handled by the graceful shutdown mechanism. Existing transactions will allow local operations to continue, but any new in-flowed transaction will be rejected. Additionally there is a new EJB parameter that allows for additional remote calls to occur against an established/active remote transaction. Finally you can now start the server directly in suspended mode, for staging changes. This is now part of the default start sequence where the server enters suspend first, and then resumes after all services have launched, so new requests aren’t accepted during the brief window of the server starting.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;web-console-improvements&quot;&gt;Web Console Improvements&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;A number of Web Console improvements are included in WildFly 11, including the ability to see recent configuration changes, to manage active JMS transactions, manage active batch jobs, manage Undertow filters, and test data-sources during creation.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;management-and-configuration-improvements&quot;&gt;Management and Configuration Improvements&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;WildFly 11 now supports remote managed exploded deployments, which allows remote management clients the ability to update content within the deployment, such as html and jsp files without requiring a full redeployment. Additionally there is a new management operation that can be used to read individual files in any deployment. In addition to these new capabilities, errors in the XML now lead to pretty printed easier to understand error messages,&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Also notable is that CLI tab completion can now tab complete attribute reference values that have capabilities present, such as references to socket bindings.  Finally, there is a new SPI for server extensions, that can be used to register a process state listener, and react to server life-cycle changes (such as the server stopping).&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;further-reading&quot;&gt;Further Reading&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;In the run-up to the release, we have been blogging about WildFly 11&amp;#8217;s features. These articles contain detailed information and useful tips on how take advantage of these capabilities, so be sure to take a look!&lt;/p&gt;
+&lt;/div&gt;
+&lt;table class=&quot;tableblock frame-all grid-all stretch&quot;&gt;
+&lt;caption class=&quot;title&quot;&gt;Table 1. Recent Articles&lt;/caption&gt;
+&lt;colgroup&gt;
+&lt;col style=&quot;width: 25%;&quot;&gt;
+&lt;col style=&quot;width: 75%;&quot;&gt;
+&lt;/colgroup&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th class=&quot;tableblock halign-left valign-top&quot;&gt;Author&lt;/th&gt;
+&lt;th class=&quot;tableblock halign-left valign-top&quot;&gt;Title&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Emmanuel Hugonnet&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;a href=&quot;http://wildfly.org/news/2017/09/08/Exploded-deployments/&quot;&gt;Using exploded deployments and CLI attachments&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Farah Juma&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;a href=&quot;https://developer.jboss.org/people/fjuma/blog/2017/09/08/getting-started-with-ejbs-and-elytron-part-1&quot;&gt;How to secure EJBs with Elytron and invoke them from remote clients&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Farah Juma&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;a href=&quot;https://developer.jboss.org/people/fjuma/blog/2017/09/08/getting-started-with-ejbs-and-elytron-part-2&quot;&gt;EJB invocations from remote servers&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Farah Juma&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;a href=&quot;https://developer.jboss.org/people/fjuma/blog/2017/09/28/how-to-use-an-elytron-sasl-plus-mechanism&quot;&gt;How to use an Elytron SASL mechanism that supports channel binding&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Claudio Miranda&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;a href=&quot;http://claudius.com.br/2017/09/wildfly-11-web-console-new-features&quot;&gt;Admin/Web Console Features &amp;amp; Enhancements&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Darran Lofthouse&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;a href=&quot;http://darranl.blogspot.ch/2017/09/wildfly-elytron-add-kerberos.html&quot;&gt;WildFly Elytron - Add Kerberos Authentication to Existing Web Application&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Darran Lofthouse&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;a href=&quot;http://darranl.blogspot.ch/2017/09/using-wildfly-elytron-with-undertow.html&quot;&gt;Using WildFly Elytron with Undertow Standalone&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Brian Stansberry&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;a href=&quot;http://wildfly.org/news/2017/09/29/Management-model-referential-integrity/&quot;&gt;Management Model Referential Integrity and Suggestions&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Jeff Mesnil&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;a href=&quot;http://wildfly.org/news/2017/10/03/Messaging-features/&quot;&gt;Messaging features in WildFly 11&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Stuart Douglas&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;a href=&quot;http://wildfly.org/news/2017/10/06/OpenSSL-Support-In-Wildfly/&quot;&gt;OpenSSL &amp;amp; HTTP/2&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Ken Wills&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;a href=&quot;http://wildfly.org/news/2017/10/09/Embedded-Host-Controller/&quot;&gt;Embedded Hostcontroller&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;jira-release-notes&quot;&gt;Jira Release Notes&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The full list of issues resolved is available &lt;a href=&quot;https://issues.jboss.org/secure/ReleaseNote.jspa?projectId=12313721&amp;amp;version=12335280&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;whats-next&quot;&gt;What&amp;#8217;s Next&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Now that WildFly 11 is out the door, we plan to move to a faster, more incremental release model, starting with WildFly 12. Expect to see more details here in the future, and as always, your contributions are welcome!&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</content><author><name>jgreene</name></author><category term="announcement" /><category term="release" /><summary type="html">WildFly 11 Final is now available! jgreene 2017-10-23</summary></entry><entry><title type="html">Running an Embedded WildFly Host Controller in the CLI</title><link href="http://localhost:4000/wildflysite/blog/2017-10-09-Embedded-Host-Controller/" rel="alternate" type="text/html" title="Running an Embedded WildFly Host Controller in the CLI" /><published>2017-10-09T19:54:36-06:00</published><updated>2017-10-09T19:54:36-06:00</updated><id>http://localhost:4000/wildflysite/blog/Embedded-Host-Controller</id><content type="html" xml:base="http://localhost:4000/wildflysite/blog/2017-10-09-Embedded-Host-Controller/">&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;running-an-embedded-wildfly-host-controller-in-the-cli&quot;&gt;Running an Embedded WildFly Host Controller in the CLI&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;kwills
+2017-10-09&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;WildFly supports running a standalone server in &lt;a href=&quot;{base_url}/news/2015/03/13/Offline-CLI/&quot;&gt;Offline mode&lt;/a&gt; as an embedded server. An analogous capability has been added for domain mode in the form of running an offline host controller. This article discusses some of the details and possible applications of this feature.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;introduction&quot;&gt;&lt;a id=&quot;introduction&quot;&gt;&lt;/a&gt;Introduction&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;For those not familiar with the existing embedded standalone server, see: &lt;a href=&quot;{base_url}/news/2015/03/13/Offline-CLI/&quot;&gt;Offline mode Running an Embedded WildFly 9 Server in the CLI · WildFly&lt;/a&gt;. One of the major use cases of this feature was to allow local administration of a WIldFly / &lt;a href=&quot;https://developers.redhat.com/products/eap/overview/&quot;&gt;JBoss EAP&lt;/a&gt; instance without requiring a socket based connection, or opening any local ports but still enabling configuration and administration operations. The embedded approach also allows for a fast boot that will allow multiple concurrent running instances to co-exist without configuring any additional socket offsets or interfaces to avoid port conflicts etc.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Using &lt;em&gt;jboss-cli.sh&lt;/em&gt; and the &lt;em&gt;embed-host-controller&lt;/em&gt; command enables a fast and flexible means of configuring host controller instances and servers.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;embedded-host-controller&quot;&gt;&lt;a id=&quot;embeddedhc&quot;&gt;&lt;/a&gt;Embedded Host Controller&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;In a similar way to the standalone &lt;em&gt;embed-server&lt;/em&gt; command, the &lt;em&gt;embed-host-controller&lt;/em&gt; command is provided, to start an embedded host controller running in the CLI. This host controller is started in &lt;em&gt;admin-only&lt;/em&gt; mode, and no servers are started. [See below for more details on &lt;em&gt;admin-only&lt;/em&gt; restrictions].&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;starting-an-embedded-host-controller&quot;&gt;Starting an embedded Host Controller:&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;literalblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre&gt;$ ./bin/jboss-cli.sh
+
+You are disconnected at the moment. Type 'connect' to connect to the server or 'help' for the list of supported commands.
+[disconnected /] embed-host-controller --std-out=echo
+11:07:46,723 INFO  [org.jboss.modules] (AeshProcess: 1) JBoss Modules version 1.6.0.Final
+11:07:46,825 INFO  [org.jboss.msc] (AeshProcess: 1) JBoss MSC version 1.2.7.SP1
+11:07:46,870 INFO  [org.jboss.as] (MSC service thread 1-7) WFLYSRV0049: WildFly Full 11.0.0 (WildFly Core 3.0.1.Final) starting
+[ Note: some startup output omitted for brevity. ]
+11:07:48,845 INFO  [org.jboss.as] (Controller Boot Thread) WFLYSRV0025: WildFly Full 11.0.0 (WildFly Core 3.0.1.Final) (Host Controller) started in 2105ms - Started 56 of 61 services (18 services are lazy, passive or on-demand)
+
+[domain@embedded /] ls -l
+ATTRIBUTE                VALUE           TYPE
+domain-organization      undefined       STRING
+launch-type              EMBEDDED        STRING
+local-host-name          master          STRING
+management-major-version 5               INT
+management-micro-version 0               INT
+management-minor-version 0               INT
+name                     Unnamed Domain  STRING
+namespaces               []              OBJECT
+process-type             Host Controller STRING
+product-name             WildFly Full    STRING
+product-version          11.0.0          STRING
+release-codename         Kenny           STRING
+release-version          3.0.1.Final     STRING
+schema-locations         []              OBJECT
+
+CHILD                     MIN-OCCURS MAX-OCCURS
+core-service              n/a        n/a
+deployment                n/a        n/a
+deployment-overlay        n/a        n/a
+extension                 n/a        n/a
+host                      n/a        n/a
+host-exclude              n/a        n/a
+interface                 n/a        n/a
+management-client-content n/a        n/a
+path                      n/a        n/a
+profile                   n/a        n/a
+server-group              n/a        n/a
+socket-binding-group      n/a        n/a
+system-property           n/a        n/a&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The non-modular client may also be used from the &lt;em&gt;bin/client&lt;/em&gt; WildFly distribution:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;literalblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre&gt;$ java -jar bin/client/jboss-cli-client.jar
+You are disconnected at the moment. Type 'connect' to connect to the server or 'help' for the list of supported commands.
+[disconnected /] embed-host-controller --jboss-home=/wildfly-11.0.0
+Warning! The CLI is running in a non-modular environment and cannot load commands from management extensions.
+[domain@embedded /] cd /host=master/server-config=server-one
+[domain@embedded server-config=server-one] ls -l
+ATTRIBUTE                            VALUE             TYPE
+auto-start                           true              BOOLEAN
+cpu-affinity                         undefined         STRING
+group                                main-server-group STRING
+name                                 server-one        STRING
+priority                             undefined         INT
+socket-binding-default-interface     undefined         STRING
+socket-binding-group                 undefined         STRING
+socket-binding-port-offset           0                 INT
+status                               STOPPED           STRING
+update-auto-start-with-server-status false             BOOLEAN
+
+CHILD           MIN-OCCURS MAX-OCCURS
+interface       n/a        n/a
+jvm             n/a        n/a
+path            n/a        n/a
+ssl             n/a        n/a
+system-property n/a        n/a
+[domain@embedded server-config=server-one]&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;See &lt;a href=&quot;{base_url}/news/2015/03/13/Offline-CLI/#classloading&quot;&gt;Modular vs Non-Modular Classloading and JBOSS_HOME&lt;/a&gt; in the original embedded server news article for details.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;executing-commands&quot;&gt;Executing commands:&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;literalblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre&gt;[domain@embedded /]  /host=master/interface=public:write-attribute(name=inet-address, value=127.0.0.1)
+{
+    &quot;outcome&quot; =&amp;gt; &quot;success&quot;,
+    &quot;result&quot; =&amp;gt; undefined,
+    &quot;server-groups&quot; =&amp;gt; undefined,
+    &quot;response-headers&quot; =&amp;gt; {&quot;process-state&quot; =&amp;gt; &quot;reload-required&quot;}
+}&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;reloading&quot;&gt;Reloading:&lt;/h3&gt;
+&lt;div class=&quot;literalblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre&gt;[domain@embedded /] reload --host=master --admin-only=true
+11:17:20,092 INFO  [org.jboss.as] (Controller Boot Thread) WFLYSRV0025: WildFly Full 11.0.0 (WildFly Core 3.0.1.Final) (Host Controller) started in 279ms - Started 56 of 61 services (18 services are lazy, passive or on-demand)
+[domain@embedded /]&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Note that currently, the embedded host controller may only be started / reloaded in &lt;em&gt;admin-only&lt;/em&gt; mode. In domain mode, servers are started and stopped via use of the &lt;em&gt;process controller&lt;/em&gt; which is not currently supported as part of embedded mode.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;stopping&quot;&gt;Stopping:&lt;/h3&gt;
+&lt;div class=&quot;literalblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre&gt;[domain@embedded /] stop-embedded-host-controller
+11:08:29,925 INFO  [org.jboss.as] (MSC service thread 1-7) WFLYSRV0050: WildFly Full 11.0.0 (WildFly Core 3.0.1.Final) stopped in 13ms&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;command-usage&quot;&gt;Command usage:&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The &lt;em&gt;embed-host-controller&lt;/em&gt; command has several options that behave in the same way as the previously mentioned standalone embedded server, which will not be discussed again here. The relevant &lt;em&gt;embed-host-controller&lt;/em&gt; parameters are:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;literalblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre&gt;-c                - Name of the domain configuration file to use
+                     (default is &quot;domain.xml&quot;)
+                     (Same as --domain-config)
+
+--domain-config   - Name of the domain configuration file to use
+                     (default is &quot;domain.xml&quot;)
+                     (Same as -c)
+
+--host-config     - Name of the host configuration file to use
+                     (default is &quot;host.xml&quot;)&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;As mentioned above, &lt;em&gt;--jboss-home&lt;/em&gt;, &lt;em&gt;--std-out&lt;/em&gt; and &lt;em&gt;--timeout&lt;/em&gt; may also be provided and function in the same manner as the &lt;a href=&quot;{base_url}/news/2015/03/13/Offline-CLI/&quot;&gt;embed-server&lt;/a&gt; command. The configuration files mentioned above (domain.xml, host.xml) above should be located in the &lt;em&gt;$JBOSS_HOME/domain/configuration&lt;/em&gt; directory (or under the location pointed to by the system property &lt;em&gt;jboss.domain.config.dir&lt;/em&gt;.) [See &lt;a href=&quot;https://docs.jboss.org/author/display/WFLY8/Command+line+parameters&quot;&gt;Command Line Properties&lt;/a&gt; for additional details on those properties.]&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;For example, to start an embedded host controller with configuration files contained in the &lt;em&gt;otherdomain/configuration&lt;/em&gt; directory:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;literalblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre&gt;[wildfly-11]$ ./bin/jboss-cli.sh -Djboss.domain.config.dir=/wildfly-11/otherdomain/configuration
+You are disconnected at the moment. Type 'connect' to connect to the server or 'help' for the list of supported commands.
+[disconnected /] embed-host-controller --std-out=echo
+11:26:44,122 INFO  [org.jboss.as] (Controller Boot Thread) WFLYSRV0025: WildFly Full 11.0.0 (WildFly Core 3.0.1.Final) (Host Controller) started in 1894ms - Started 56 of 61 services (18 services are lazy, passive or on-demand)
+[domain@embedded /]&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Configuration may then proceed and will be persisted to the &lt;em&gt;otherdomain/configuration&lt;/em&gt; directory. This directory must already exist and contain base copies of the required configuration files (host.xml, domain.xml etc.).&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;scripted-configuration&quot;&gt;Scripted configuration&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The embedded host controller may be useful for configuration from a prepared file of scripted CLI commands. For example:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;literalblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre&gt;$ cat commands.cli
+embed-host-controller
+/server-group=main-server-group:write-attribute(name=socket-binding-port-offset, value=100)
+/host=master/server-config=server-one:write-attribute(name=auto-start, value=false)
+deploy --all-server-groups test.war
+stop-embedded-host-controller
+
+$ ./bin/jboss-cli.sh --file=commands.cli
+{
+    &quot;outcome&quot; =&amp;gt; &quot;success&quot;,
+    &quot;result&quot; =&amp;gt; undefined,
+    &quot;server-groups&quot; =&amp;gt; undefined
+}&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;This approach may be used for a variety of setup and configuration tasks, for example setting up unit or integration tests quickly using the embedded host controller, then restarting in domain mode using &lt;em&gt;domain.sh&lt;/em&gt; may require less time than starting the host controller normally using &lt;em&gt;domain.sh&lt;/em&gt;, performing configuration and deployment etc, then restarting.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;other-examples&quot;&gt;Other examples&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;set-server-socket-binding-port-offset&quot;&gt;Set server socket-binding-port-offset&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;In order to allow more than one running instance on the same host, a common configuration for testing (or any scenario needing to run a domain controller and a slave host controller (with servers) on the same host), a &lt;em&gt;socket-binding-port-offset&lt;/em&gt; is commonly used. The slave host is configured to have a port offset so that the ports already in use by the domain controller&amp;#8217;s servers do not conflict with those of the slave.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;literalblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre&gt;[domain@embedded /] /server-group=main-server-group:write-attribute(name=socket-binding-port-offset, value=100)
+{
+    &quot;outcome&quot; =&amp;gt; &quot;success&quot;,
+    &quot;result&quot; =&amp;gt; undefined,
+    &quot;server-groups&quot; =&amp;gt; undefined
+}&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;configure-connection-to-remote-domain-controller&quot;&gt;Configure connection to remote domain controller&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;When configuring a slave host controller, configure the connection to the domain controller.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;literalblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre&gt;[domain@embedded /] /host=master:write-remote-domain-controller(host=remotedc.somedomain.tld, security-realm=ManagementRealm)
+{
+    &quot;outcome&quot; =&amp;gt; &quot;success&quot;,
+    &quot;result&quot; =&amp;gt; undefined,
+    &quot;server-groups&quot; =&amp;gt; undefined,
+    &quot;response-headers&quot; =&amp;gt; {&quot;process-state&quot; =&amp;gt; &quot;reload-required&quot;}
+}&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;system-property&quot;&gt;System property&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;This can be useful as an initial configuration step before the host controller is started with &lt;em&gt;domain.sh&lt;/em&gt;:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;literalblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre&gt;[domain@embedded /] /server-group=main-server-group/system-property=foo:add(value=bar)
+{
+    &quot;outcome&quot; =&amp;gt; &quot;success&quot;,
+    &quot;result&quot; =&amp;gt; undefined,
+    &quot;server-groups&quot; =&amp;gt; undefined
+}&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;future-direction&quot;&gt;Future Direction&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;In the future we&amp;#8217;d like to allow for starting the embedded host controller with some additional features, such as empty configurations in host and domain configuration files (similar to standalone embedded), and also re-examine the meaning and usage of &lt;em&gt;--admin-only&lt;/em&gt; in the context of the embedded host controller.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</content><author><name>kwills</name></author><category term="wildfly11" /><category term="management" /><category term="CLI" /><category term="embedded" /><category term="domain" /><summary type="html">Running an Embedded WildFly Host Controller in the CLI kwills 2017-10-09</summary></entry><entry><title type="html">OpenSSL support with WildFly</title><link href="http://localhost:4000/wildflysite/blog/2017-10-06-OpenSSL-Support-In-Wildfly/" rel="alternate" type="text/html" title="OpenSSL support with WildFly" /><published>2017-10-05T19:00:00-06:00</published><updated>2017-10-05T19:00:00-06:00</updated><id>http://localhost:4000/wildflysite/blog/OpenSSL-Support-In-Wildfly</id><content type="html" xml:base="http://localhost:4000/wildflysite/blog/2017-10-06-OpenSSL-Support-In-Wildfly/">&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;openssl-support-with-wildfly&quot;&gt;OpenSSL support with WildFly&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;sdouglas
+2017-10-06&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The upcoming WildFly 11 release includes support for OpenSSL. This provides two main advantages over JSSE:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Support for ALPN on all JDK&amp;#8217;s&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Significantly improved performance compared to JSSE&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;setting-up-openssl&quot;&gt;Setting up OpenSSL&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;In general for Linux based systems all that is required is to install a recent version of OpenSSL using your systems
+package manager. The OpenSSL support will search the library path, and use whatever version of OpenSSL it finds. The
+same applies to MacOS when OpenSSL has been installed using brew (the system default OpenSSL installation is too old).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;For windows and for custom OpenSSL locations you need to specify the location via a system property,
+&lt;code&gt;org.wildfly.openssl.path&lt;/code&gt;. If this is set then Wildfly will search for OpenSSL in the directory specified. If you have
+multiple versions of OpenSSL in the same directory and need to specify the precise file to use you can instead use
+&lt;code&gt;org.wildfly.openssl.path.ssl&lt;/code&gt; and &lt;code&gt;org.wildfly.openssl.path.crypto&lt;/code&gt; to specify the path to libssl and libcrypto
+respectively.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;As Wildfly uses dynamic linking this should work with any OpenSSL version from 1.0.1 onwards (however for security
+reasons it is recommended to always use the most up to date 1.1.x or 1.0.x version that is available, as older versions
+may have unpatched vulnerabilities).&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;setting-up-wildfly-with-security-realms&quot;&gt;Setting up Wildfly with Security Realms&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;As Wildfly supports SSL out of the box with dynamically generated self signed certificates all that is required is to
+change the protocol in use. Doing this is as simple as running a single command in the CLI:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre&gt;/core-service=management/security-realm=ApplicationRealm/server-identity=ssl:write-attribute(name=protocol, value=openssl.TLS)&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Other valid values are &lt;code&gt;openssl.TLSv1.1&lt;/code&gt; and &lt;code&gt;openssl.TLSv1.2&lt;/code&gt;, which limit the minimum TLS version to 1.1 and 1.2
+respectively.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Once this is done you can use OpenSSL by simply pointing your browser to &lt;a href=&quot;https://localhost:8443&quot;&gt;https://localhost:8443&lt;/a&gt;.
+You should see the following message in the log that tells you that OpenSSL is in use:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre&gt;09:01:04,150 INFO  [org.wildfly.openssl.SSL] (MSC service thread 1-6) WFOPENSSL0002 OpenSSL Version OpenSSL 1.0.2l  25 May 2017&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;setting-up-wildfly-with-elytron&quot;&gt;Setting up Wildfly with Elytron&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;As Elytron is not used by default there is a little bit more work involved in setting it up. Elytron does not support
+auto generation of SSL certificates, so for the sake of this example I am going to assume that the keystore is
+located at &lt;code&gt;standalone/configuration/application.keystore&lt;/code&gt; (the same location that the auto generated keystore is placed,
+if you just want a self signed certificate for testing purposes you can simply connect to
+&lt;a href=&quot;https://localhost:8443&quot;&gt;https://localhost:8443&lt;/a&gt; with the default configuration and one will be generated for you).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;In order to set up SSL using Elytron run the following commands (note that this is just to use JSSE, the OpenSSL config
+will come later).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre&gt;/subsystem=elytron/key-store=server:add(path=application.keystore, relative-to=jboss.server.config.dir, credential-reference={clear-text=password}, type=jks)
+/subsystem=elytron/key-manager=server:add(key-store=server, credential-reference={clear-text=password}, algorithm=SunX509)
+/subsystem=elytron/server-ssl-context=server:add(key-manager=server, protocols=[TLSv1.2])
+batch
+/subsystem=undertow/server=default-server/https-listener=https:undefine-attribute(name=security-realm)
+/subsystem=undertow/server=default-server/https-listener=https:write-attribute(name=ssl-context, value=server)
+run-batch
+:reload&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;If you point your browser at &lt;a href=&quot;https://localhost:8443&quot;&gt;https://localhost:8443&lt;/a&gt; you should now have a working Elytron based
+SSL config. Once you have verified that this has worked we now need to change it to use OpenSSL. To do this we change
+the ordering of the providers in the elytron combined-providers, which means that OpenSSL will now take precedence:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre&gt;/subsystem=elytron/aggregate-providers=combined-providers:list-add(index=0, name=providers, value=openssl)
+/subsystem=elytron/aggregate-providers=combined-providers:list-remove(index=2, name=providers)&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;You should now have OpenSSL working with Elytron.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</content><author><name>sdouglas</name></author><category term="wildfly" /><category term="openssl" /><summary type="html">OpenSSL support with WildFly sdouglas 2017-10-06</summary></entry><entry><title type="html">Messaging features in WildFly 11</title><link href="http://localhost:4000/wildflysite/blog/2017-10-03-Messaging-features/" rel="alternate" type="text/html" title="Messaging features in WildFly 11" /><published>2017-10-03T12:00:00-06:00</published><updated>2017-10-03T12:00:00-06:00</updated><id>http://localhost:4000/wildflysite/blog/Messaging-features</id><content type="html" xml:base="http://localhost:4000/wildflysite/blog/2017-10-03-Messaging-features/">&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;messaging-features-in-wildfly-11&quot;&gt;Messaging features in WildFly 11&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;jmesnil
+2017-10-03&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;WildFly 11 is integrating &lt;a href=&quot;http://activemq.apache.org/artemis/&quot;&gt;Apache ActiveMQ Artemis 1.5&lt;/a&gt; to provides its messaging features.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;new-features&quot;&gt;New features&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;With the integration of Artemis 1.5, WildFly has udpated its &lt;code&gt;messaging-activemq&lt;/code&gt; subsystem to provides new Artemis features through WildFly management model.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The two new main features are the &lt;strong&gt;JDBC Store&lt;/strong&gt; and the configuration for &lt;strong&gt;ActiveMQ client thread pools&lt;/strong&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;jdbc-store&quot;&gt;JDBC Store&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The JDBC store is an alternative to Artemis File journal that uses a SQL database to store broker state (messages, addresses and other application state) instead of files.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;It relies on a &lt;code&gt;data-source&lt;/code&gt; resource configured in the &lt;a href=&quot;https://wildscribe.github.io/WildFly/11.0.CR1/subsystem/datasources/index.html&quot;&gt;&lt;code&gt;datasources subsystem&lt;/code&gt;&lt;/a&gt; to connect to the database.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;To use a JDBC store in WildFly, you need to configure the &lt;code&gt;journal-datasource&lt;/code&gt; attribute on its &lt;a href=&quot;https://wildscribe.github.io/WildFly/11.0.CR1/subsystem/messaging-activemq/server/index.html&quot;&gt;&lt;code&gt;server&lt;/code&gt; resource&lt;/a&gt; that corresponds to a JDBC DataSource configured in the &lt;code&gt;datasources&lt;/code&gt; subsystem:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;literalblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre&gt;[standalone@localhost:9990 /] /subsystem=messaging-activemq/server=default:write-attribute(name=journal-datasource, value=ExampleDS)&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;configuration-of-activemq-client-thread-pools&quot;&gt;Configuration of ActiveMQ client thread pools&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Artemis uses thread pools for its clients that are running inside the application server. They can now be configured in the &lt;code&gt;messaging-activemq&lt;/code&gt; subsystem to ensure that their sizes fit the application deployed in WildFly:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-xml&quot; data-lang=&quot;xml&quot;&gt;&amp;lt;subsystem xmlns=&quot;urn:jboss:domain:messaging-activemq:1.1&quot;&amp;gt;
+  &amp;lt;global-client thread-pool-max-size=&quot;${activemq.artemis.client.global.thread.pool.max.size}&quot;
+    scheduled-thread-pool-max-size=&quot;${activemq.artemis.client.global.scheduled.thread.pool.core.size}&quot; /&amp;gt;
+  &amp;lt;server ...&amp;gt;
+  &amp;lt;/server&amp;gt;
+  ...
+&amp;lt;/subsystem&amp;gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;admonitionblock note&quot;&gt;
+&lt;table&gt;
+&lt;tr&gt;
+&lt;td class=&quot;icon&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;Note&lt;/div&gt;
+&lt;/td&gt;
+&lt;td class=&quot;content&quot;&gt;
+By default, the maximum size for client thread pool is not defined. In that case, Artemis will configure them to be 8 x the number of available processors.
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;message-driven-beans-features&quot;&gt;Message-Driven Beans Features&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;We have also added new features for Message-Driven Beans (MDBs) related to their use in a cluster of Artemis brokers.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect3&quot;&gt;
+&lt;h4 id=&quot;full-support-for-clustered-singleton-mdb&quot;&gt;Full support for Clustered Singleton MDB&lt;/h4&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;When an MDB is identified as a clustered singleton and deployed in a cluster, it will always be active only on one node at a time. When the server node fails or is shut down, the clustered singleton MDB is activated on a different node and starts consuming messages on that node.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;admonitionblock note&quot;&gt;
+&lt;table&gt;
+&lt;tr&gt;
+&lt;td class=&quot;icon&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;Note&lt;/div&gt;
+&lt;/td&gt;
+&lt;td class=&quot;content&quot;&gt;
+The &lt;a href=&quot;https://github.com/wildfly/quickstart/tree/11.x/messaging-clustering-singleton&quot;&gt;messaging-clustering-singleton quickstart&lt;/a&gt; demonstrates how to setup and configure MDB to support clustered singleton.
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;rebalancing-of-all-inbound-mdb-connections&quot;&gt;Rebalancing of all inbound MDB connections&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;WildFly 11 provides the &lt;code&gt;rebalanceConnections&lt;/code&gt; activation configuration property for MDBs. This parameter allows for rebalancing of all inbound MDB connections when the underlying Artemis cluster topology changes so that when nodes are added/removed from the cluster, the MDB can connect to them instead of being &lt;em&gt;stuck&lt;/em&gt; to the topology when the MDB initially connected to the cluster.
+This property can also be configured on the &lt;code&gt;messaging-activemq&amp;#8217;s &lt;a href=&quot;https://wildscribe.github.io/WildFly/11.0.CR1/subsystem/messaging-activemq/server/pooled-connection-factory/index.html&quot;&gt;`pooled-connection-factory&lt;/code&gt; resources&lt;/a&gt; using the &lt;code&gt;rebalance-connections&lt;/code&gt; attribute:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;literalblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre&gt;[standalone@localhost:9990 /] /subsystem=messaging-activemq/server=default/pooled-connection-factory=activemq-ra:write-attribute(name=rebalance-connections, value=true)&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;generic-jms-resource-adapter-2-0&quot;&gt;Generic JMS Resource Adapter 2.0&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;WildFly supports messaging with Artemis out of the box.
+It also provides the &lt;a href=&quot;https://github.com/jms-ra/generic-jms-ra&quot;&gt;Generic JMS Resource Adapter&lt;/a&gt; that allows to use out of the box JMS brokers that does not provides a resource adapter (such as TIBCO EMS for example).
+MDBs can the connect to these external JMS brokers through the use of the Generic JMS RA. This component has been updated to support the JMS 2.0 API (provided that the external JMS broker behind it supports it).&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;improvements&quot;&gt;Improvements&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;There were also many improvements to the messaging features that were in WildFly 10.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;monitoring-of-jms-pooled-connections&quot;&gt;Monitoring of JMS pooled connections&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The &lt;code&gt;messaging-activemq&lt;/code&gt;  &lt;a href=&quot;https://wildscribe.github.io/WildFly/11.0.CR1/subsystem/messaging-activemq/server/pooled-connection-factory/index.html&quot;&gt;&lt;code&gt;pooled-connection-factory&lt;/code&gt; resources&lt;/a&gt; now offers statistics on their pools.
+They must first be enabled by setting the &lt;code&gt;statistics-enabled&lt;/code&gt; attribute to &lt;code&gt;true&lt;/code&gt;:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;literalblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre&gt;[standalone@localhost:9990 /] /subsystem=messaging-activemq/server=default/pooled-connection-factory=activemq-ra:write-attribute(name=statistics-enabled, value=true)&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Once statistics are enabled, the &lt;code&gt;pooled-connection-factory&lt;/code&gt; resource will have a &lt;code&gt;statistics=pool&lt;/code&gt; child resource that will returns metrics on the pool used by the &lt;code&gt;pooled-connection-factory&lt;/code&gt;:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;[standalone@localhost:9990 /] /subsystem=messaging-activemq/server=default/pooled-connection-factory=activemq-ra/statistics=pool:read-resource(include-runtime)
+{
+    &quot;outcome&quot; =&amp;gt; &quot;success&quot;,
+    &quot;result&quot; =&amp;gt; {
+        &quot;ActiveCount&quot; =&amp;gt; 15,
+        &quot;AvailableCount&quot; =&amp;gt; 20,
+        ...
+    }
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;web-console-improvements&quot;&gt;Web console improvements&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The management Web console that is bundled with WildFly 11 has been substantially improved to be able to manage messaging resources more efficiently.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://wildscribe.github.io/WildFly/11.0.CR1/subsystem/messaging-activemq/jms-bridge/index.html&quot;&gt;JMS Bridges&lt;/a&gt; can now be added and managed using the Web console.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;The Web console now displays prepared transactions for integrated Artemis brokers. You can then commit or rollback these prepared transactions from the Web console too.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;elytron-integration-with-the-messaging-activemq-subsystem&quot;&gt;Elytron integration with the &lt;code&gt;messaging-activemq&lt;/code&gt; subsystem&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The &lt;a href=&quot;https://github.com/wildfly-security/wildfly-elytron&quot;&gt;WildFly Elytron project&lt;/a&gt; is a security framework used to unify security across the entire application server. The &lt;code&gt;elytron&lt;/code&gt; subsystem enables a single point of configuration for securing both applications and the management interfaces and replaces the legacy &lt;code&gt;security&lt;/code&gt; subsystem.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The &lt;code&gt;messaging-activemq&lt;/code&gt; subsystem has been integrated with Elytron to provide its security features (authentication and authorization).&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;bug-fixes&quot;&gt;Bug fixes&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;There were also many many messaging bug fixes since last WildFly release.
+However if you find any new issues or want to request enhancements, do not hesitate to use &lt;a href=&quot;http://issues.jboss.org/browse/WFLY&quot;&gt;WildFly issue tracker&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</content><author><name>jmesnil</name></author><category term="wildfly" /><category term="messaging" /><summary type="html">Messaging features in WildFly 11 jmesnil 2017-10-03</summary></entry><entry><title type="html">Management Model Referential Integrity and Suggestions</title><link href="http://localhost:4000/wildflysite/blog/2017-09-29-Management-model-referential-integrity/" rel="alternate" type="text/html" title="Management Model Referential Integrity and Suggestions" /><published>2017-09-29T12:00:00-06:00</published><updated>2017-09-29T12:00:00-06:00</updated><id>http://localhost:4000/wildflysite/blog/Management-model-referential-integrity</id><content type="html" xml:base="http://localhost:4000/wildflysite/blog/2017-09-29-Management-model-referential-integrity/">&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;management-model-referential-integrity-and-suggestions&quot;&gt;Management Model Referential Integrity and Suggestions&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;bstansberry
+2017-09-29&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;A significant improvement in WildFly 11 is much better support for referential integrity when one resource in your configuration refers to another resource.
+Going beyond just checking that your references are correct, the server provides reference information that our CLI and the HAL web console are able to use
+to suggest valid values to you as you set up your configuration.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;configuration-references&quot;&gt;Configuration references&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;When you are configuring a WildFly server, a common thing you need to do is configure attributes whose value refers to the name of some other resource.
+A common example of this is a resource that includes a &lt;code&gt;socket-binding&lt;/code&gt; attribute:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;literalblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre&gt;[standalone@localhost:9999 /] /subsystem=undertow/server=default-server/ajp-listener=ajp:add(socket-binding=ajp)&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;When you do this, it&amp;#8217;s because the services managed by the resource you are configuring need some capabilities provided by another resource. What you&amp;#8217;re
+doing is configuring which one to use. But what kind of resource that &lt;code&gt;socket-binding&lt;/code&gt; attribute refers to may not be obvious, and what the valid values are
+is also not obvious. And before the rollout of improved reference support, if you got it wrong the failure you&amp;#8217;d see could be difficult to understand.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Here, using WildFly 9 with a config where the previously unused 'ajp' socket binding config had been removed, we try and add an AJP listener
+to the web container:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;literalblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre&gt;[standalone@localhost:9990 /] /subsystem=undertow/server=default-server/ajp-listener=ajp:add(socket-binding=ajp)
+{
+    &quot;outcome&quot; =&amp;gt; &quot;failed&quot;,
+    &quot;failure-description&quot; =&amp;gt; {&quot;WFLYCTL0180: Services with missing/unavailable dependencies&quot; =&amp;gt; [&quot;jboss.undertow.listener.ajp is missing [jboss.binding.ajp]&quot;]},
+    &quot;rolled-back&quot; =&amp;gt; true
+}&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;That error message says nothing about where to go to correct the mistake.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Worse, if you made that mistake when working with a server started in &lt;code&gt;admin-only&lt;/code&gt; mode, that bad reference would not be detected when you entered it.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;literalblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre&gt;[standalone@localhost:9990 /] reload --admin-only=true
+[standalone@localhost:9990 /] /subsystem=undertow/server=default-server/ajp-listener=ajp:add(socket-binding=ajp)
+{&quot;outcome&quot; =&amp;gt; &quot;success&quot;}&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The configuration would be updated and the problem would only be detected when the server was reloaded or restarted not in &lt;code&gt;admin-only&lt;/code&gt; mode.
+The server would boot but would not function correctly.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;referential-integrity-checks-and-reference-suggestions&quot;&gt;Referential Integrity Checks and Reference Suggestions&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Starting in WildFly 10 and greatly expanded in WildFly 11, we&amp;#8217;ve added reference description metadata to our resources and attributes, and we use that
+to proactively ensure that management operations that violate referential integrity fail immediately.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The same incorrect operation shown above will now fail immediately, with a message that gives a hint as to where you can configure the missing resource:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;literalblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre&gt;[standalone@embedded /] /subsystem=undertow/server=default-server/ajp-listener=ajp:add(socket-binding=ajp)
+{
+    &quot;outcome&quot; =&amp;gt; &quot;failed&quot;,
+    &quot;failure-description&quot; =&amp;gt; &quot;WFLYCTL0369: Required capabilities are not available:
+    org.wildfly.network.socket-binding.ajp; Possible registration points for this capability:
+		/socket-binding-group=*/socket-binding=*&quot;,
+    &quot;rolled-back&quot; =&amp;gt; true
+}&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The same failure will happen if the server is running in &lt;code&gt;admin-only&lt;/code&gt; mode (with some exceptions; see &quot;Referential Integrity Checks in an &lt;code&gt;admin-only&lt;/code&gt; Process&quot;
+below.)&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;If you think the resource you need already exists, but you&amp;#8217;re not sure of its name, you can use CLI tab completion to get a list of suggestions:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;literalblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre&gt;[standalone@embedded /] /subsystem=undertow/server=default-server/ajp-listener=ajp:add(socket-binding=
+http  https  management-http  management-https  txn-recovery-environment  txn-status-manager
+[standalone@embedded /] /subsystem=undertow/server=default-server/ajp-listener=ajp:add(socket-binding=&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Once the needed socket binding resource is added, it is available in the tab completion results.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;literalblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre&gt;[standalone@embedded /] /socket-binding-group=standard-sockets/socket-binding=ajp:add(port=8009)
+{&quot;outcome&quot; =&amp;gt; &quot;success&quot;}
+[standalone@embedded /] /subsystem=undertow/server=default-server/ajp-listener=ajp:add(socket-binding=
+ajp                       https                     management-https          txn-status-manager
+http                      management-http           txn-recovery-environment
+[standalone@embedded /] /subsystem=undertow/server=default-server/ajp-listener=ajp:add(socket-binding=ajp)
+{&quot;outcome&quot; =&amp;gt; &quot;success&quot;}&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The HAL console will also suggest valid values by means of a pull-down:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/wildflysite/assets/img/posts/choose-socket-binding.png&quot; alt=&quot;choose socket binding&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;If you try and remove a resource whose capabilities are depended upon by other resources, that will also result in a failed operation:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;literalblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre&gt;[standalone@embedded /] /socket-binding-group=standard-sockets/socket-binding=ajp:remove
+{
+    &quot;outcome&quot; =&amp;gt; &quot;failed&quot;,
+    &quot;failure-description&quot; =&amp;gt; &quot;WFLYCTL0367: Cannot remove capability 'org.wildfly.network.socket-binding.ajp' as it is required by other capabilities:
+capability 'org.wildfly.undertow.listener.ajp' requires it for attribute 'socket-binding' at address '/subsystem=undertow/server=default-server/ajp-listener=ajp'&quot;,
+    &quot;rolled-back&quot; =&amp;gt; true
+}&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;referential-integrity-checks-in-an-admin-only-process&quot;&gt;Referential Integrity Checks in an &lt;code&gt;admin-only&lt;/code&gt; Process&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;If your xml configuration file contains invalid references and you start the server normally, the server will fail to boot and the log will have an
+error message describing the problem. However, if you start the server with the &lt;code&gt;--admin-only&lt;/code&gt; flag, the server boot will not fail. This is because
+starting in admin-only and manipulating the configuration via the CLI is the recommended way of correcting your configuration. If we didn&amp;#8217;t allow
+the server to boot, the user would have no alternative to manually editing the xml.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;When the server is started in this state, no operation will be rejected due to an invalid reference until all referential integrity problems have been
+corrected. Once the configuration reaches a state where there are no integrity issues, thereafter any changes that break integrity will be rejected.
+If a server is started in &lt;code&gt;admin-only&lt;/code&gt; and has no integrity problems at boot, any changes that break integrity will be rejected. So, leniency in
+integrity checks is only enabled when the server&amp;#8217;s configuration at boot has problems.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;further-work&quot;&gt;Further Work&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The referential integrity functionality discussed here first began to appear in WildFly 10, but it&amp;#8217;s use was greatly expanded in WildFly 11, and
+the use of it to drive CLI tab completion and HAL pulldowns is new in 11. But still, we don&amp;#8217;t yet have complete coverage of all capabilities
+subsystems provide, although the bulk of cases are covered, particularly those involve configuration attributes. Rollout of the use of capabilities
+will continue in future WildFly releases.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;more-information&quot;&gt;More Information&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;If you are interested in learning more about how the capabilities and requirements system works from the point of view of someone working on developing
+WildFly, please see the &lt;a href=&quot;https://docs.jboss.org/author/display/WFLY/Working+with+WildFly+Capabilities&quot;&gt;Working with WildFly Capabilities&lt;/a&gt; document in the
+WildFly documentation.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</content><author><name>bstansberry</name></author><category term="wildfly" /><category term="cli" /><category term="hal" /><summary type="html">Management Model Referential Integrity and Suggestions bstansberry 2017-09-29</summary></entry><entry><title type="html">Using exploded deployments and CLI attachments</title><link href="http://localhost:4000/wildflysite/blog/2017-09-08-Exploded-deployments/" rel="alternate" type="text/html" title="Using exploded deployments and CLI attachments" /><published>2017-09-08T12:00:00-06:00</published><updated>2017-09-08T12:00:00-06:00</updated><id>http://localhost:4000/wildflysite/blog/Exploded-deployments</id><content type="html" xml:base="http://localhost:4000/wildflysite/blog/2017-09-08-Exploded-deployments/">&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;using-exploded-deployments-and-cli-attachments&quot;&gt;Using exploded deployments and CLI attachments&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;ehsavoie
+2017-09-08&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;In WildFly there used to be two worlds : one for developers with exploded deployments using a scanner and one for production where artifacts (wars/ears/jars) were deployed.&lt;br&gt;
+Now those two worlds have collided and you can have exploded deployments without a scanner.&lt;br&gt;
+And since this is using the management API you get remote access to the content for &quot;free&quot; and of course it works in domain mode.&lt;br&gt;
+While this new feature is really usefull for tools developers (JBoss Developer Studio will use this in a tech preview, and NetBeans should use it also), YOU can also take advantage of it.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;creating-exploded-deployments&quot;&gt;Creating exploded deployments&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;There are two ways to create an exploded deployment:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Create an empty deployment and add content to it.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Deploy an artifact and explode it.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;creating-an-exploded-deployment-from-scratch&quot;&gt;Creating an exploded deployment from scratch&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Let&amp;#8217;s create a from_scratch.war deployment:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;[standalone@localhost:9990 /] /deployment=from_scratch.war:add(content=[{empty=true}])
+[standalone@localhost:9990 /] /deployment=from_scratch.war:add-content(content=[
+          {input-stream-index=/home/ehsavoie/NetBeansProjects/SimpleWebapp/target/SimpleWebapp/index.html,target-path=index.html},
+          {input-stream-index=/home/ehsavoie/NetBeansProjects/SimpleWebapp/target/SimpleWebapp/WEB-INF/web.xml, target-path=WEB-INF/web.xml},
+          {input-stream-index=/home/ehsavoie/NetBeansProjects/SimpleWebapp/target/SimpleWebapp/WEB-INF/classes/org/wildfly/sample/simplewebapp/SimpleServlet.class, target-path=WEB-INF/classes/org/wildfly/sample/simplewebapp/SimpleServlet.class}])
+[standalone@localhost:9990 /] /deployment=from_scratch.war:deploy&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Here we have created an empty deployment called from_scratch.war to which we have added 3 files:
+    - a simple HTML page index.html.
+    - A class file for a servlet.
+    - A web.xml descriptor.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Then we have enabled the deployment and thus could access the index.html and the servlet.&lt;br&gt;
+If you take a look at the $JBOSS_HOME/standalone/content/dc/9567f71b186466b21fff825d60f5fbc84ae6b1/content/ you will see the exploded war content.&lt;br&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;admonitionblock important&quot;&gt;
+&lt;table&gt;
+&lt;tr&gt;
+&lt;td class=&quot;icon&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;Important&lt;/div&gt;
+&lt;/td&gt;
+&lt;td class=&quot;content&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Since this content is managed, don&amp;#8217;t touch it directly by copying file to it manually, always use the Management API (through the jboss-cli or the web console).&lt;/p&gt;
+&lt;/div&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;div class=&quot;admonitionblock note&quot;&gt;
+&lt;table&gt;
+&lt;tr&gt;
+&lt;td class=&quot;icon&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;Note&lt;/div&gt;
+&lt;/td&gt;
+&lt;td class=&quot;content&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Note that the add-content can be used to replace files in a deployment but if the deployment is running this might not show until you redeploy it.&lt;br&gt;
+You can also delete files in a deployment using remove-content but if the deployment is running this might not show until you redeploy it.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;exploding-a-deployment&quot;&gt;Exploding a deployment&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Let&amp;#8217;s install and explode a to_be_exploded.war deployment:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;[standalone@localhost:9990 /] /deployment=to_be_exploded.war:add(content=[{input-stream-index=/home/ehsavoie/NetBeansProjects/SimpleWebapp/target/SimpleWebapp.war}],enabled=false)
+[standalone@localhost:9990 /] /deployment=to_be_exploded.war:explode
+[standalone@localhost:9990 /] /deployment=to_be_exploded.war:deploy&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;This can be achieved via the web console using the explode operation in the menu:
+image::exploded_deployments/explode.png[explode]&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;If you take a look at the $JBOSS_HOME/standalone/content//cf/9918bad9d875ffb20da8747b5dcd15bdab16e0/content/ you will see the exploded war content (it differs from the first example hash has the war file contains META-INF files).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;admonitionblock important&quot;&gt;
+&lt;table&gt;
+&lt;tr&gt;
+&lt;td class=&quot;icon&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;Important&lt;/div&gt;
+&lt;/td&gt;
+&lt;td class=&quot;content&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Since this content is managed, don&amp;#8217;t touch it directly by copying file to it manually, always use the Management API (through the jboss-cli or the web console).&lt;/p&gt;
+&lt;/div&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;div class=&quot;admonitionblock note&quot;&gt;
+&lt;table&gt;
+&lt;tr&gt;
+&lt;td class=&quot;icon&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;Note&lt;/div&gt;
+&lt;/td&gt;
+&lt;td class=&quot;content&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Note also that you can only explode an unexploded deployment or an archive file if the deployment is not running (aka is disabled).&lt;/p&gt;
+&lt;/div&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;reading-content-from-a-deployment&quot;&gt;Reading content from a deployment&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Now you can read content from a deployment, so you can directly see what&amp;#8217;s in your deployment. This operation can be use to browse the content of a deployment and read or download its files (even from inside an archive file).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;using-the-jboss-cli&quot;&gt;Using the JBoss CLI&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Using the browse-content operation you can have the list of files in the deployment :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;[standalone@localhost:9990 /] /deployment=to_be_exploded.war:browse-content
+{
+    &quot;outcome&quot; =&amp;gt; &quot;success&quot;,
+    &quot;result&quot; =&amp;gt; [
+        {
+            &quot;path&quot; =&amp;gt; &quot;META-INF/&quot;,
+            &quot;directory&quot; =&amp;gt; true
+        },
+        {
+            &quot;path&quot; =&amp;gt; &quot;META-INF/MANIFEST.MF&quot;,
+            &quot;directory&quot; =&amp;gt; false,
+            &quot;file-size&quot; =&amp;gt; 134L
+        },
+        {
+            &quot;path&quot; =&amp;gt; &quot;WEB-INF/&quot;,
+            &quot;directory&quot; =&amp;gt; true
+        },
+        {
+            &quot;path&quot; =&amp;gt; &quot;WEB-INF/classes/&quot;,
+            &quot;directory&quot; =&amp;gt; true
+        },
+        {
+            &quot;path&quot; =&amp;gt; &quot;WEB-INF/classes/org/&quot;,
+            &quot;directory&quot; =&amp;gt; true
+        },
+        {
+            &quot;path&quot; =&amp;gt; &quot;WEB-INF/classes/org/wildfly/&quot;,
+            &quot;directory&quot; =&amp;gt; true
+        },
+        {
+            &quot;path&quot; =&amp;gt; &quot;WEB-INF/classes/org/wildfly/sample/&quot;,
+            &quot;directory&quot; =&amp;gt; true
+        },
+        {
+            &quot;path&quot; =&amp;gt; &quot;WEB-INF/classes/org/wildfly/sample/simplewebapp/&quot;,
+            &quot;directory&quot; =&amp;gt; true
+        },
+        {
+            &quot;path&quot; =&amp;gt; &quot;WEB-INF/web.xml&quot;,
+            &quot;directory&quot; =&amp;gt; false,
+            &quot;file-size&quot; =&amp;gt; 916L
+        },
+        {
+            &quot;path&quot; =&amp;gt; &quot;WEB-INF/classes/org/wildfly/sample/simplewebapp/SimpleServlet.class&quot;,
+            &quot;directory&quot; =&amp;gt; false,
+            &quot;file-size&quot; =&amp;gt; 2302L
+        },
+        {
+            &quot;path&quot; =&amp;gt; &quot;index.html&quot;,
+            &quot;directory&quot; =&amp;gt; false,
+            &quot;file-size&quot; =&amp;gt; 234L
+        },
+        {
+            &quot;path&quot; =&amp;gt; &quot;META-INF/maven/&quot;,
+            &quot;directory&quot; =&amp;gt; true
+        },
+        {
+            &quot;path&quot; =&amp;gt; &quot;META-INF/maven/org.wildfly.sample/&quot;,
+            &quot;directory&quot; =&amp;gt; true
+        },
+        {
+            &quot;path&quot; =&amp;gt; &quot;META-INF/maven/org.wildfly.sample/SimpleWebapp/&quot;,
+            &quot;directory&quot; =&amp;gt; true
+        },
+        {
+            &quot;path&quot; =&amp;gt; &quot;META-INF/maven/org.wildfly.sample/SimpleWebapp/pom.xml&quot;,
+            &quot;directory&quot; =&amp;gt; false,
+            &quot;file-size&quot; =&amp;gt; 2992L
+        },
+        {
+            &quot;path&quot; =&amp;gt; &quot;META-INF/maven/org.wildfly.sample/SimpleWebapp/pom.properties&quot;,
+            &quot;directory&quot; =&amp;gt; false,
+            &quot;file-size&quot; =&amp;gt; 125L
+        }
+    ]
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;You can reduce the output by filtering using the &lt;em&gt;path&lt;/em&gt;, &lt;em&gt;depth&lt;/em&gt; and &lt;em&gt;archive&lt;/em&gt; parameters.
+For exemple&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;[standalone@localhost:9990 /] /deployment=to_be_exploded.war:browse-content(path=WEB-INF/, depth=1)
+{
+    &quot;outcome&quot; =&amp;gt; &quot;success&quot;,
+    &quot;result&quot; =&amp;gt; [
+        {
+            &quot;path&quot; =&amp;gt; &quot;web.xml&quot;,
+            &quot;directory&quot; =&amp;gt; false,
+            &quot;file-size&quot; =&amp;gt; 916L
+        },
+        {
+            &quot;path&quot; =&amp;gt; &quot;classes/&quot;,
+            &quot;directory&quot; =&amp;gt; true
+        }
+    ]
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;So now we can display the content of the web.xml. Using the read-content operation is not sufficient enough as it will return an attachment:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;[standalone@localhost:9990 /] /deployment=to_be_exploded.war:read-content(path=WEB-INF/web.xml)
+{
+    &quot;outcome&quot; =&amp;gt; &quot;success&quot;,
+    &quot;result&quot; =&amp;gt; {&quot;uuid&quot; =&amp;gt; &quot;c778c51e-a507-4a71-a21f-d6af8b230db4&quot;},
+    &quot;response-headers&quot; =&amp;gt; {&quot;attached-streams&quot; =&amp;gt; [{
+        &quot;uuid&quot; =&amp;gt; &quot;c778c51e-a507-4a71-a21f-d6af8b230db4&quot;,
+        &quot;mime-type&quot; =&amp;gt; &quot;application/xml&quot;
+    }]}
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;So we need to combine this operation with the attachment operation like this :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;[standalone@localhost:9990 /] attachment display --operation=/deployment=to_be_exploded.war:read-content(path=WEB-INF/web.xml)
+ATTACHMENT 582a10e0-5159-4d2b-8d07-8d39af0df8c3:
+&amp;lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&amp;gt;
+
+&amp;lt;web-app xmlns=&quot;http://xmlns.jcp.org/xml/ns/javaee&quot;
+    xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+    xsi:schemaLocation=&quot;http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd&quot;
+    version=&quot;3.1&quot;&amp;gt;
+    &amp;lt;session-config&amp;gt;
+        &amp;lt;session-timeout&amp;gt;
+            30
+        &amp;lt;/session-timeout&amp;gt;
+    &amp;lt;/session-config&amp;gt;
+    &amp;lt;servlet id=&quot;SimpleServlet&quot;&amp;gt;
+        &amp;lt;servlet-name&amp;gt;SimpleServlet&amp;lt;/servlet-name&amp;gt;
+        &amp;lt;display-name&amp;gt;SimpleServlet&amp;lt;/display-name&amp;gt;
+        &amp;lt;servlet-class&amp;gt;org.wildfly.sample.simplewebapp.SimpleServlet&amp;lt;/servlet-class&amp;gt;
+        &amp;lt;init-param&amp;gt;
+            &amp;lt;param-name&amp;gt;message&amp;lt;/param-name&amp;gt;
+            &amp;lt;param-value&amp;gt;Hello World&amp;lt;/param-value&amp;gt;
+        &amp;lt;/init-param&amp;gt;
+    &amp;lt;/servlet&amp;gt;
+    &amp;lt;servlet-mapping&amp;gt;
+        &amp;lt;servlet-name&amp;gt;SimpleServlet&amp;lt;/servlet-name&amp;gt;
+        &amp;lt;url-pattern&amp;gt;/SimpleServlet&amp;lt;/url-pattern&amp;gt;
+    &amp;lt;/servlet-mapping&amp;gt;
+&amp;lt;/web-app&amp;gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;And to save this content locally we can use:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;[standalone@localhost:9990 /] attachment save --operation=/deployment=to_be_exploded.war:read-content(path=WEB-INF/web.xml) --file=/home/ehsavoie/tmp/web.xml
+File saved to /home/ehsavoie/tmp/web.xml&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;using-the-web-console&quot;&gt;Using the web console&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Navigate to 'Deployments' and select the deployment you want to browse. Then open the context menu and choose Browse Content:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/wildflysite/assets/img/posts/exploded_deployments/browse_content_op.png&quot; alt=&quot;browse content op&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;This opens a new page with the contents of the deployment. For each file, there&amp;#8217;s a link with the full path and size of the file. Click on the link to download the file:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/wildflysite/assets/img/posts/exploded_deployments/content.png&quot; alt=&quot;content&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;using-hal-next&quot;&gt;Using HAL.NEXT&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The next major version of the web console (HAL.next) is currently under active development and is available as technical preview &lt;a href=&quot;https://github.com/hal/hal.next&quot; class=&quot;bare&quot;&gt;https://github.com/hal/hal.next&lt;/a&gt;.
+Follow the instruction in &lt;a href=&quot;https://github.com/hal/hal.next#running&quot; class=&quot;bare&quot;&gt;https://github.com/hal/hal.next#running&lt;/a&gt;  to get started.
+Besides general improvements like better navigation and a revisited look and feel, HAL.next comes with many improvements for dealing with deployments:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Add Deployments using drag &amp;amp; drop.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;New content browser using a tree view and an editor with syntax highlighting.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Download complete deployments or single files of a deployment.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Select deployments and just click on View to display its content:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/wildflysite/assets/img/posts/exploded_deployments/explode_next.png&quot; alt=&quot;explode next&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;This opens a new page which allows for a really nice way to browse and read content from a deployment:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/wildflysite/assets/img/posts/exploded_deployments/content_next.png&quot; alt=&quot;content next&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;For the official documentation regarding deployments: &lt;a href=&quot;https://docs.jboss.org/author/display/WFLY/Application+deployment&quot;&gt;Official Documentation&lt;/a&gt;&lt;br&gt;
+The example basic webapp used in this article is available &lt;a href=&quot;images/exploded_deployments/SimpleWebapp.tar.gz&quot;&gt;here&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</content><author><name>ehsavoie</name></author><category term="wildfly" /><category term="deployment" /><category term="cli" /><category term="hal" /><summary type="html">Using exploded deployments and CLI attachments ehsavoie 2017-09-08</summary></entry><entry><title type="html">WildFly 11 CR1 is now available!</title><link href="http://localhost:4000/wildflysite/blog/2017-08-25-WildFly11-CR1-Released/" rel="alternate" type="text/html" title="WildFly 11 CR1 is now available!" /><published>2017-08-25T23:00:00-06:00</published><updated>2017-08-25T23:00:00-06:00</updated><id>http://localhost:4000/wildflysite/blog/WildFly11-CR1-Released</id><content type="html" xml:base="http://localhost:4000/wildflysite/blog/2017-08-25-WildFly11-CR1-Released/">&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;wildfly-11-cr1-is-now-available&quot;&gt;WildFly 11 CR1 is now available!&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;jgreene
+2017-08-25&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;WildFly 11 CR1 is now available &lt;a href=&quot;{base_url}/downloads&quot;&gt;for download&lt;/a&gt;!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Since the Beta, 66 issues have been resolved. You can find the full list below. Provided that no major issues are found, we hope to release the final very soon.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The highlights of WildFly 11 are as follows:&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;elytron-new-security-infrastructure&quot;&gt;Elytron - New Security Infrastructure&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The biggest change in WildFly 11 is unification on a new common security framework across the full application server.  Previously we had two separate security infrastructures (picketbox and security-realms), each covering separate use cases, and largely operating independent of the other. In addition to unification, Elytron brings a number of advanced capabilities such as privilege propagation across multiple service invocations, identity switching, pre-request TLS verification, and rich security policies. Finally it improves the overall extensibility of the system allowing for tight integration with SSO / IDP systems such as KeyCloak.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;While WildFly 11 introduces a new security infrastructure, the existing security-domain and security-realm configurations and APIs are all present and internally mapped to Elytron. To further  ease the impact of this change, WildFly 11’s default configurations still use the legacy security-domains and security-realms. A subsequent release will convert the default configurations over to the new configuration model.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;For more information see the Elytron documentation:
+&lt;a href=&quot;https://docs.jboss.org/author/display/WFLY/WildFly+Elytron+Security&quot; class=&quot;bare&quot;&gt;https://docs.jboss.org/author/display/WFLY/WildFly+Elytron+Security&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;As well as the section on migration:
+&lt;a href=&quot;https://docs.jboss.org/author/display/WFLY/Migrate+Legacy+Security+to+Elytron+Security&quot; class=&quot;bare&quot;&gt;https://docs.jboss.org/author/display/WFLY/Migrate+Legacy+Security+to+Elytron+Security&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;simplified-ejb-naming-proxies&quot;&gt;Simplified EJB / Naming Proxies&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;JNDI and EJB invocation have both been simplified and enhanced in WildFly 11. There is a new naming client library, WildFly Naming Client that allows you to easily configure access to WildFly with minimal properties and configuration. EJBs (and other resources) can be accessed in a dynamic discovery mode, or alternatively, in a new point to point mode that locks all EJB proxies to a specified address. This replaces the previous scoped context feature with more intuitive semantics that are ideal for ad-hoc behavior. Additionally, with the new Elytron authentication infrastructure, the user identity can now be changed in between requests. Finally, older clients from past WildFly releases can still be used with WildFly 11.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;See the following for more information on the new WildFly Naming client:&lt;br&gt;
+&lt;a href=&quot;https://github.com/wildfly/wildfly-naming-client&quot; class=&quot;bare&quot;&gt;https://github.com/wildfly/wildfly-naming-client&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;request-oriented-ejbjndi-over-http&quot;&gt;Request oriented EJB/JNDI over HTTP&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Since WildFly 8, all protocols (with the exception of IIOP) can utilize HTTP Upgrade to communicate over a reduced set of ports on the server (one for management, and one for applications). However, since HTTP Upgrade converts the connection to the native protocol used, any HTTP load-balancers acting as an intermediary can only balance on initial connection establishment. To allow for balancing at the individual invocation level, a new “pure” HTTP protocol was added. Clients which utilize http:// URLs as opposed to remoting+http:// will obtain this new behavior. Since this protocol utilizes standard HTTP behavior, it can be efficiently balanced by any load-balancer, not just the one built into EAP.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;wildfly-openssl-http2&quot;&gt;WildFly OpenSSL &amp;amp; HTTP/2&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;WildFly 11 now provides a JSSE provider that can offload TLS handling from the JVM’s internal implementation to an OpenSSL library on your system, typically improving TLS performance. If the version discovered and/or specified is 1.0.2 or greater, then WildFly will utilize OpenSSL’s ALPN support to provide HTTP/2 support. HTTP/2 support will be disabled on versions less than 1.0.2.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Note that HTTP/2 is also supported without OpenSSL, out of the box, on Java 8 (on VMs derived from OpenJDK) and Java 9 (using the new standard ALPN API).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;You can enable OpenSSL in the default configurations with the following CLI command:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;/core-service=management/security-realm=ApplicationRealm/server-identity=ssl:write-attribute(name=protocol,value=openssl.TLS)&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;If your openssl library is not installed in a standard location, you will need to additionally set the org.wildfly.openssl.path system property to point to the location of the library:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;-Dorg.wildfly.openssl.path=/path/to/dir/with/openssl/lib&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;new-load-balancer-configs&quot;&gt;New Load-Balancer Configs&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;In order to simplify the setup of EAP as an HTTP load-balancer, there is an additional standalone-load-balancer.xml configuration in the distribution, which is an instance slimmed to just running the load balancing services. Additionally the stock domain.xml also includes this as a profile configuration that can be referenced by server groups.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;graceful-shutdownstartup-improvements&quot;&gt;Graceful Shutdown/Startup Improvements&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Distributed transactions are now handled by the graceful shutdown mechanism. Existing transactions will allow local operations to continue, but any new in-flowed transaction will be rejected. Additionally there is a new EJB parameter that allows for additional remote calls to occur against an established/active remote transaction. Finally you can now start the server directly in suspended mode, for staging changes. This is now part of the default start sequence where the server enters suspend first, and then resumes after all services have launched, so new requests aren’t accepted during the brief window of the server starting.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;web-console-improvements&quot;&gt;Web Console Improvements&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;A number of Web Console improvements are included in WildFly 11, including the ability to see recent configuration changes, to manage active JMS transactions, manage active batch jobs, manage Undertow filters, and test data-sources during creation.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;management-and-configuration-improvements&quot;&gt;Management and Configuration Improvements&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;WildFly 11 now supports remote managed exploded deployments, which allows remote management clients the ability to update content within the deployment, such as html and jsp files without requiring a full redeployment. Additionally there is a new management operation that can be used to read individual files in any deployment. In addition to these new capabilities, errors in the XML now lead to pretty printed easier to understand error messages,&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Also notable is that CLI tab completion can now tab complete attribute reference values that have capabilities present, such as references to socket bindings.  Finally, there is a new SPI for server extensions, that can be used to register a process state listener, and react to server life-cycle changes (such as the server stopping).&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;jira-release-notes&quot;&gt;Jira Release Notes&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The full list of issues resolved is available &lt;a href=&quot;https://issues.jboss.org/secure/ReleaseNote.jspa?projectId=12313721&amp;amp;version=12328764&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</content><author><name>jgreene</name></author><category term="announcement" /><category term="release" /><summary type="html">WildFly 11 CR1 is now available! jgreene 2017-08-25</summary></entry></feed>

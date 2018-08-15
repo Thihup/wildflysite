@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>JVM settings | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="JVM settings" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_admin-guide/management-tasks/JVM_settings.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_admin-guide/management-tasks/JVM_settings.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_admin-guide/management-tasks/JVM_settings.html","headline":"JVM settings","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Configuration of the JVM settings is different for a managed domain and
+a standalone server. In a managed domain, the domain controller
+components are responsible for starting and stoping server processes and
+hence determine the JVM settings. For a standalone server, it&#8217;s the
+responsibility of the process that started the server (e.g. passing them
+as command line arguments).</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="managed-domain">Managed Domain</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In a managed domain the JVM settings can be declared at different
+scopes: For a specific server group, for a host or for a particular
+server. If not declared, the settings are inherited from the parent
+scope. This allows you to customize or extend the JVM settings within
+every layer.</p>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s take a look at the JVM declaration for a server group:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;server-groups&gt;
+       &lt;server-group name="main-server-group" profile="default"&gt;
+           &lt;jvm name="default"&gt;
+               &lt;heap size="64m" max-size="512m"/&gt;
+           &lt;/jvm&gt;
+           &lt;socket-binding-group ref="standard-sockets"/&gt;
+       &lt;/server-group&gt;
+       &lt;server-group name="other-server-group" profile="default"&gt;
+           &lt;jvm name="default"&gt;
+               &lt;heap size="64m" max-size="512m"/&gt;
+           &lt;/jvm&gt;
+           &lt;socket-binding-group ref="standard-sockets"/&gt;
+       &lt;/server-group&gt;
+&lt;/server-groups&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><sub>(See</sub> <code>domain/configuration/domain.xml</code> <sub>)</sub></p>
+</div>
+<div class="paragraph">
+<p>In this example the server group "main-server-group" declares a heap
+size of <code>64m</code> and a maximum heap size of <code>512m</code>. Any server that belongs
+to this group will inherit these settings. You can change these settings
+for the group as a whole, or a specific server or host:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;servers&gt;
+       &lt;server name="server-one" group="main-server-group" auto-start="true"&gt;
+           &lt;jvm name="default"/&gt;
+       &lt;/server&gt;
+       &lt;server name="server-two" group="main-server-group" auto-start="true"&gt;
+           &lt;jvm name="default"&gt;
+               &lt;heap size="64m" max-size="256m"/&gt;
+           &lt;/jvm&gt;
+           &lt;socket-binding-group ref="standard-sockets" port-offset="150"/&gt;
+       &lt;/server&gt;
+       &lt;server name="server-three" group="other-server-group" auto-start="false"&gt;
+           &lt;socket-binding-group ref="standard-sockets" port-offset="250"/&gt;
+       &lt;/server&gt;
+&lt;/servers&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>~(See domain/configuration/host.xml)~</p>
+</div>
+<div class="paragraph">
+<p>In this case, <em>server-two</em>, belongs to the <em>main-server-group</em> and
+inherits the JVM settings named <em>default</em>, but declares a lower maximum
+heap size.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[domain@localhost:9999 /] /host=local/server-config=server-two/jvm=default:read-resource
+{
+   "outcome" =&gt; "success",
+   "result" =&gt; {
+       "heap-size" =&gt; "64m",
+       "max-heap-size" =&gt; "256m",
+   }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="standalone-server">Standalone Server</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>For a standalone sever you have to pass in the JVM settings either as
+command line arguments when executing the
+<code>$JBOSS_HOME/bin/standalone.sh</code> script, or by declaring them in
+<code>$JBOSS_HOME/bin/standalone.conf</code>. (For Windows users, the script to
+execute is <code>%JBOSS_HOME%/bin/standalone.bat</code> while the JVM settings can
+be declared in <code>%JBOSS_HOME%/bin/standalone.conf.bat.)</code></p>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

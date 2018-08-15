@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Simple SSL Migration | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Simple SSL Migration" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_elytron/migrate/Simple_SSL_Migration.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_elytron/migrate/Simple_SSL_Migration.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_elytron/migrate/Simple_SSL_Migration.html","headline":"Simple SSL Migration","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="sect1">
+<h2 id="simple-ssl-migration">Simple SSL Migration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This section describe securing HTTP connections to the server using SSL
+using Elytron.<br>
+It suppose you have already configured SSL using legacy
+<code>security-realm</code>, for example by
+<a href="Admin_Guide.html#src-557075_AdminGuide-EnableSSL">Admin Guide#Enable
+SSL</a>, and your configuration looks like:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;security-realm name="ApplicationRealm"&gt;
+  &lt;server-identities&gt;
+    &lt;ssl&gt;
+      &lt;keystore path="server.keystore" relative-to="jboss.server.config.dir" keystore-password="keystore_password" alias="server" key-password="key_password" /&gt;
+    &lt;/ssl&gt;
+  &lt;/server-identities&gt;
+&lt;/security-realm&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To switch to Elytron you need to:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Create Elytron <code>key-store</code> - specifying where is the keystore file
+stored and password by which it is encrypted. Default type of keystore
+generated using keytool is JKS:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">/subsystem=elytron/key-store=LocalhostKeyStore:add(path=server.keystore,relative-to=jboss.server.config.dir,credential-reference={clear-text="keystore_password"},type=JKS)</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Create Elytron <code>key-manager</code> - specifying keystore, alias (using
+<code>alias-filter</code>) and password of key:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">/subsystem=elytron/key-manager=LocalhostKeyManager:add(key-store=LocalhostKeyStore,alias-filter=server,credential-reference={clear-text="key_password"})</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Create Elytron <code>server-ssl-context</code> - specifying only reference to
+<code>key-manager</code> defined above:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">/subsystem=elytron/server-ssl-context=LocalhostSslContext:add(key-manager=LocalhostKeyManager)</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Switch <code>https-listener</code> from legacy <code>security-realm</code> to newly
+created Elytron <code>ssl-context</code>:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">/subsystem=undertow/server=default-server/https-listener=https:undefine-attribute(name=security-realm)
+/subsystem=undertow/server=default-server/https-listener=https:write-attribute(name=ssl-context,value=LocalhostSslContext)</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>And reload the server:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">reload</code></pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Output XML configuration of Elytron subsystem should look like:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">        &lt;subsystem xmlns="urn:wildfly:elytron:1.0" ...&gt;
+            ...
+            &lt;tls&gt;
+                &lt;key-stores&gt;
+                    &lt;key-store name="LocalhostKeyStore"&gt;
+                        &lt;credential-reference clear-text="keystore_password"/&gt;
+                        &lt;implementation type="JKS"/&gt;
+                        &lt;file path="server.keystore" relative-to="jboss.server.config.dir"/&gt;
+                    &lt;/key-store&gt;
+                &lt;/key-stores&gt;
+                &lt;key-managers&gt;
+                    &lt;key-manager name="LocalhostKeyManager" key-store="LocalhostKeyStore"&gt;
+                        &lt;credential-reference clear-text="key_password"/&gt;
+                    &lt;/key-manager&gt;
+                &lt;/key-managers&gt;
+                &lt;server-ssl-contexts&gt;
+                    &lt;server-ssl-context name="LocalhostSslContext" key-manager="LocalhostKeyManager"/&gt;
+                &lt;/server-ssl-contexts&gt;
+            &lt;/tls&gt;
+        &lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Output <code>https-listener</code> in Undertow subsystem should be:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;https-listener name="https" socket-binding="https" ssl-context="LocalhostSslContext" enable-http2="true"/&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="client-cert-ssl-authentication-migration">Client-Cert SSL Authentication Migration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This suppose you have already configured Client-Cert SSL authentication
+using <code>truststore</code> in legacy <code>security-realm</code>, for example by
+<a href="Admin_Guide.html#src-557075_AdminGuide-AddClient-CerttoSSL">Admin
+Guide#Add Client-Cert to SSL</a>, and your configuration looks like:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;security-realm name="ApplicationRealm"&gt;
+  &lt;server-identities&gt;
+    &lt;ssl&gt;
+      &lt;keystore path="server.keystore" relative-to="jboss.server.config.dir" keystore-password="keystore_password" alias="server" key-password="key_password" /&gt;
+    &lt;/ssl&gt;
+  &lt;/server-identities&gt;
+  &lt;authentication&gt;
+    &lt;truststore path="server.truststore" relative-to="jboss.server.config.dir" keystore-password="truststore_password" /&gt;
+    &lt;local default-user="$local"/&gt;
+    &lt;properties path="application-users.properties" relative-to="jboss.server.config.dir"/&gt;
+  &lt;/authentication&gt;
+&lt;/security-realm&gt;</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+Following configuration is sufficient to prevent users without valid
+certificate and private key to access the server, but it does not
+provide user identity to the application. That require to define
+<code>CLIENT_CERT</code> HTTP mechanism / <code>EXTERNAL</code> SASL mechanism, which will be
+described later.)
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>At first use steps above to migrate basic part of the configuration.
+Then continue by following:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Create <code>key-store</code> of truststore - like for keystore above:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">/subsystem=elytron/key-store=TrustStore:add(path=server.truststore,relative-to=jboss.server.config.dir,credential-reference={clear-text="truststore_password"},type=JKS)</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Create <code>trust-manager</code> - specifying <code>key-store</code> of trustore, created
+above:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">/subsystem=elytron/trust-manager=TrustManager:add(key-store=TrustStore)</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Modify <code>server-ssl-context</code> to use newly created trustmanager:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">/subsystem=elytron/server-ssl-context=LocalhostSslContext:write-attribute(name=trust-manager,value=TrustManager)</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Enable client authentication for <code>server-ssl-context</code>:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">/subsystem=elytron/server-ssl-context=LocalhostSslContext:write-attribute(name=need-client-auth,value=true)</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>And reload the server:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">reload</code></pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Output XML configuration of Elytron subsystem should look like:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;subsystem xmlns="urn:wildfly:elytron:1.0" ...&gt;
+    ...
+    &lt;tls&gt;
+        &lt;key-stores&gt;
+            &lt;key-store name="LocalhostKeyStore"&gt;
+                &lt;credential-reference clear-text="keystore_password"/&gt;
+                &lt;implementation type="JKS"/&gt;
+                &lt;file path="server.keystore" relative-to="jboss.server.config.dir"/&gt;
+            &lt;/key-store&gt;
+            &lt;key-store name="TrustStore"&gt;
+                &lt;credential-reference clear-text="truststore_password"/&gt;
+                &lt;implementation type="JKS"/&gt;
+                &lt;file path="server.truststore" relative-to="jboss.server.config.dir"/&gt;
+            &lt;/key-store&gt;
+        &lt;/key-stores&gt;
+        &lt;key-managers&gt;
+            &lt;key-manager name="LocalhostKeyManager" key-store="LocalhostKeyStore" alias-filter="server"&gt;
+                &lt;credential-reference clear-text="key_password"/&gt;
+            &lt;/key-manager&gt;
+        &lt;/key-managers&gt;
+        &lt;trust-managers&gt;
+            &lt;trust-manager name="TrustManager" key-store="TrustStore"/&gt;
+        &lt;/trust-managers&gt;
+        &lt;server-ssl-contexts&gt;
+            &lt;server-ssl-context name="LocalhostSslContext" need-client-auth="true" key-manager="LocalhostKeyManager" trust-manager="TrustManager"/&gt;
+        &lt;/server-ssl-contexts&gt;
+    &lt;/tls&gt;
+&lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

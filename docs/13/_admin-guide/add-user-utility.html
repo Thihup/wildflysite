@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>add-user utility | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="add-user utility" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_admin-guide/add-user-utility.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_admin-guide/add-user-utility.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_admin-guide/add-user-utility.html","headline":"add-user utility","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>For use with the default configuration we supply a utility <code>add-user</code>
+which can be used to manage the properties files for the default realms
+used to store the users and their roles.</p>
+</div>
+<div class="paragraph">
+<p>The add-user utility can be used to manage both the users in the
+<code>ManagementRealm</code> and the users in the <code>ApplicationRealm</code>, changes made
+apply to the properties file used both for domain mode and standalone
+mode.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Tip</div>
+</td>
+<td class="content">
+After you have installed your application server and decided if you are
+going to run in standalone mode or domain mode you can delete the parent
+folder for the mode you are not using, the add-user utility will then
+only be managing the properties file for the mode in use.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The add-user utility is a command line utility however it can be run in
+both interactive and non-interactive mode. Depending on your platform
+the script to run the add-user utility is either <code>add-user.sh</code> or
+<code>add-user.bat</code> which can be found in \{ <code>jboss.home}/bin</code>.</p>
+</div>
+<div class="paragraph">
+<p>This guide now contains a couple of examples of this utility in use to
+accomplish the most common tasks.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="adding-a-user">Adding a User</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Adding users to the properties files is the primary purpose of this
+utility. Usernames can only contain the following characters in any
+number and in any order:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Alphanumeric characters (a-z, A-Z, 0-9)</p>
+</li>
+<li>
+<p>Dashes (-), periods (.), commas (,), at (@)</p>
+</li>
+<li>
+<p>Escaped backslash ( \\ )</p>
+</li>
+<li>
+<p>Escaped equals (\=)</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+The server caches the contents of the properties files in memory,
+however the server does check the modified time of the properties files
+on each authentication request and re-load if the time has been updated
+- this means all changes made by this utility are immediately applied to
+any running server.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="a-management-user">A Management User</h3>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+The default name of the realm for management users is <code>ManagementRealm</code>,
+when the utility prompts for the realm name just accept the default
+unless you have switched to a different realm.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect3">
+<h4 id="interactive-mode">Interactive Mode</h4>
+<div class="paragraph">
+<p><span class="image"><img src="/wildflysite/assets/img/posts/images/add-mgmt-user-interactive.png" alt="Add mgmt user interactive"></span></p>
+</div>
+<div class="paragraph">
+<p>Here we have added a new Management User called <code>adminUser</code>, as you can
+see some of the questions offer default responses so you can just press
+enter without repeating the default value.</p>
+</div>
+<div class="paragraph">
+<p>For now just answer <code>n</code> or <code>no</code> to the final question, adding users to
+be used by processes is described in more detail in the domain
+management chapter.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="add-user-non-interactive-mode">Non-Interactive Mode</h4>
+<div class="paragraph">
+<p>To add a user in non-interactive mode the command
+<code>./add-user.sh {username} {password</code>} can be used.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="/wildflysite/assets/img/posts/images/add-mgmt-user-non-interactive.png" alt="add-mgmt-user-non-interactive.png"></span></p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Warning</div>
+</td>
+<td class="content">
+If you add users using this approach there is a risk that any other user
+that can view the list of running process may see the arguments
+including the password of the user being added, there is also the risk
+that the username / password combination will be cached in the history
+file of the shell you are currently using.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="an-application-user">An Application User</h3>
+<div class="paragraph">
+<p>When adding application users in addition to adding the user with their
+pre-hashed password it is also now possible to define the roles of the
+user.</p>
+</div>
+<div class="sect3">
+<h4 id="interactive-mode-1">Interactive Mode</h4>
+<div class="paragraph">
+<p><span class="image"><img src="/wildflysite/assets/img/posts/images/add-app-user-interactive.png" alt="add-app-user-interactive.png"></span></p>
+</div>
+<div class="paragraph">
+<p>Here a new user called <code>appUser</code> has been added, in this case a comma
+separated list of roles has also been specified.</p>
+</div>
+<div class="paragraph">
+<p>As with adding a management user just answer <code>n</code> or <code>no</code> to the final
+question until you know you are adding a user that will be establishing
+a connection from one server to another.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="non-interactive-mode-1">Non-Interactive Mode</h4>
+<div class="paragraph">
+<p>To add an application user non-interactively use the command
+<code>./add-user.sh -a {username} {password</code>}.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="/wildflysite/assets/img/posts/images/add-app-user-non-interactive.png" alt="add-app-user-non-interactive.png"></span></p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+Non-interactive mode does not support defining a list of users, to
+associate a user with a set of roles you will need to manually edit the
+<code>application-roles.properties</code> file by hand.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="updating-a-user">Updating a User</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Within the add-user utility it is also possible to update existing
+users, in interactive mode you will be prompted to confirm if this is
+your intention.</p>
+</div>
+<div class="sect2">
+<h3 id="a-management-user-1">A Management User</h3>
+<div class="sect3">
+<h4 id="interactive-mode-2">Interactive Mode</h4>
+<div class="paragraph">
+<p><span class="image"><img src="/wildflysite/assets/img/posts/images/update-mgmt-user-interactive.png" alt="update-mgmt-user-interactive.png"></span></p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="non-interactive-mode-2">Non-Interactive Mode</h4>
+<div class="paragraph">
+<p>In non-interactive mode if a user already exists the update is automatic
+with no confirmation prompt.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="an-application-user-1">An Application User</h3>
+<div class="sect3">
+<h4 id="interactive-mode-3">Interactive Mode</h4>
+<div class="paragraph">
+<p><span class="image"><img src="/wildflysite/assets/img/posts/images/update-app-user-interactive.png" alt="images/update-app-user-interactive.png"></span></p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+On updating a user with roles you will need to re-enter the list of
+roles assigned to the user.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="non-interactive-mode">Non-Interactive Mode</h4>
+<div class="paragraph">
+<p>In non-interactive mode if a user already exists the update is automatic
+with no confirmation prompt.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="community-contributions">Community Contributions</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>There are still a few features to add to the add-user utility such as
+removing users or adding application users with roles in non-interactive
+mode, if you are interested in contributing to WildFly development the
+add-user utility is a good place to start as it is a stand alone
+utility, however it is a part of the AS build so you can become familiar
+with the AS development processes without needing to delve straight into
+the internals of the application server.</p>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>JMX subsystem configuration | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="JMX subsystem configuration" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_admin-guide/subsystem-configuration/JMX.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_admin-guide/subsystem-configuration/JMX.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_admin-guide/subsystem-configuration/JMX.html","headline":"JMX subsystem configuration","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>The JMX subsystem registers a service with the Remoting endpoint so that
+remote access to JMX can be obtained over the exposed Remoting
+connector.</p>
+</div>
+<div class="paragraph">
+<p>This is switched on by default in standalone mode and accessible over
+port 9990 but in domain mode is switched off so needs to be enabled - in
+domain mode the port will be the port of the Remoting connector for the
+WildFly instance to be monitored.</p>
+</div>
+<div class="paragraph">
+<p>To use the connector you can access it in the standard way using a
+<code>service:jmx</code> URL:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">import javax.management.MBeanServerConnection;
+import javax.management.remote.JMXConnector;
+import javax.management.remote.JMXConnectorFactory;
+import javax.management.remote.JMXServiceURL;
+ 
+public class JMXExample {
+ 
+    public static void main(String[] args) throws Exception {
+        //Get a connection to the WildFly MBean server on localhost
+        String host = "localhost";
+        int port = 9990;  // management-web port
+        String urlString =
+            System.getProperty("jmx.service.url","service:jmx:remote+http://" + host + ":" + port);
+        JMXServiceURL serviceURL = new JMXServiceURL(urlString);
+        JMXConnector jmxConnector = JMXConnectorFactory.connect(serviceURL, null);
+        MBeanServerConnection connection = jmxConnector.getMBeanServerConnection();
+ 
+        //Invoke on the WildFly MBean server
+        int count = connection.getMBeanCount();
+        System.out.println(count);
+        jmxConnector.close();
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You also need to set your classpath when running the above example. The
+following script covers Linux. If your environment is much different,
+paste your script when you have it working.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">!/bin/bash
+
+# specify your WildFly folder +
+export YOUR_JBOSS_HOME=~/WildFly
+
+java -classpath $YOUR_JBOSS_HOME/bin/client/jboss-client.jar:./
+JMXExample</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can also connect using jconsole.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+If using jconsole use the <code>jconsole.sh</code> and <code>jconsole.bat</code> scripts
+included in the /bin directory of the WildFly distribution as these set
+the classpath as required to connect over Remoting.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>In addition to the standard JVM MBeans, the WildFly MBean server
+contains the following MBeans:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">JMX ObjectName</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">jboss.msc:type=container,name=jboss-as</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Exposes management operations
+on the JBoss Modular Service Container, which is the dependency
+injection framework at the heart of WildFly. It is useful for debugging
+dependency problems, for example if you are integrating your own
+subsystems, as it exposes operations to dump all services and their
+current states</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">jboss.naming:type=JNDIView</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Shows what is bound in JNDI</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">jboss.modules:type=ModuleLoader,name=*</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This collection of MBeans
+exposes management operations on JBoss Modules classloading layer. It is
+useful for debugging dependency problems arising from missing module
+dependencies</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="audit-logging">Audit logging</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Audit logging for the JMX MBean server managed by the JMX subsystem. The
+resource is at <code>/subsystem=jmx/configuration=audit-log</code> and its
+attributes are similar to the ones mentioned for
+<code>/core-service=management/access=audit/logger=audit-log</code> in
+<a href="#Audit_logging">Audit logging</a>.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Attribute</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true to enable logging of the JMX operations</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">log-boot</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true to log the JMX operations when booting the server, false
+otherwise</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">log-read-only</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If true all operations will be audit logged, if false
+only operations that change the model will be logged</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Then which handlers are used to log the management operations are
+configured as <code>handler=*</code> children of the logger. These handlers and
+their formatters are defined in the global
+<code>/core-service=management/access=audit</code> section mentioned in
+<a href="#Audit_logging">Audit logging</a>.</p>
+</div>
+<div class="sect2">
+<h3 id="json-formatter">JSON Formatter</h3>
+<div class="paragraph">
+<p>The same JSON Formatter is used as described in
+<a href="#Audit_logging">Audit logging</a>. However the records for MBean
+Server invocations have slightly different fields from those logged for
+the core management layer.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">2013-08-29 18:26:29 - {
+    "type" : "jmx",
+    "r/o" : false,
+    "booting" : false,
+    "version" : "10.0.0.Final",
+    "user" : "$local",
+    "domainUUID" : null,
+    "access" : "JMX",
+    "remote-address" : "127.0.0.1/127.0.0.1",
+    "method" : "invoke",
+    "sig" : [
+        "javax.management.ObjectName",
+        "java.lang.String",
+        "[Ljava.lang.Object;",
+        "[Ljava.lang.String;"
+    ],
+    "params" : [
+        "java.lang:type=Threading",
+        "getThreadInfo",
+        "[Ljava.lang.Object;@5e6c33c",
+        "[Ljava.lang.String;@4b681c69"
+    ]
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It includes an optional timestamp and then the following information in
+the json record</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Field name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This will have the value jmx meaning it comes from the jmx
+subsystem</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">r/o</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true if the operation has read only impact on the MBean(s)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">booting</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true if the operation was executed during the bootup process,
+false if it was executed once the server is up and running</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">version</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The version number of the WildFly instance</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">user</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The username of the authenticated user.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">domainUUID</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This is not currently populated for JMX operations</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">access</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This can have one of the following values:*NATIVE - The
+operation came in through the native management interface, for example
+the CLI*HTTP - The operation came in through the domain HTTP interface,
+for example the admin console*JMX - The operation came in through the
+JMX subsystem. See JMX for how to configure audit logging for JMX.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">remote-address</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The address of the client executing this operation</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">method</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the called MBeanServer method</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">sig</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The signature of the called called MBeanServer method</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">params</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The actual parameters passed in to the MBeanServer method, a
+simple Object.toString() is called on each parameter.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">error</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If calling the MBeanServer method resulted in an error, this
+field will be populated with Throwable.getMessage()</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

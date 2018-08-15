@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Web Single Sign-On | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Web Single Sign-On" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_elytron/Web_Single_Sign_On.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_elytron/Web_Single_Sign_On.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_elytron/Web_Single_Sign_On.html","headline":"Web Single Sign-On","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>This document will guide on how to enable single sign-on across different applications deployed into different servers, where these applications belong to same security domain.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="create-a-server-configuration-template">Create a Server Configuration Template</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>For this document, you&#8217;ll need to run at least two server instances in order to check single sign-on and how it affect usability in your applications. Users should be able to log in once and have access to any application using the same security domain.</p>
+</div>
+<div class="paragraph">
+<p>All configuration described in the next sections should be done with a server instance using <strong>standalone-ha.xml</strong> (or standalone-full-ha.xml).</p>
+</div>
+<div class="paragraph">
+<p>Run a server instance using the following command:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>bin/standalone.sh -c standalone-ha.xml</pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="create-a-http-authentication-factory">Create a HTTP Authentication Factory</h3>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+If you already have a <em>http-authentication-factory</em>&nbsp;defined in Elytron subsystem and just want to use it to enable single sign-on to your applications, please skip this section.{info}
+First, you need a <em>security-domain</em> which we&#8217;ll use to authenticate users. Please, execute the following CLI commands:
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre># Creates a FileSystem Realm, an identity store where users are stored in the local filesystem
+/subsystem=elytron/filesystem-realm=example-realm:add(path=/tmp/example-realm)
+
+# Creates a Security Domain
+/subsystem=elytron/security-domain=example-domain:add(default-realm=example-realm, permission-mapper=default-permission-mapper,realms=[{realm=example-realm, role-decoder=groups-to-roles}]
+
+# Creates an user that you can use to access your applications
+/subsystem=elytron/filesystem-realm=example-realm:add-identity(identity=alice)
+/subsystem=elytron/filesystem-realm=example-realm:add-identity-attribute(identity=alice, name=groups, value=["user"])
+/subsystem=elytron/filesystem-realm=example-realm:set-password(identity=alice, clear={password=alice})</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now you can create a <em>http-authentication-factory</em> that you&#8217;ll use to actually protect your web applications using Undertow:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code># Create a Http Authentication Factory
+/subsystem=elytron/http-authentication-factory=example-http-authentication:add(security-domain=example-domain, http-server-mechanism-factory=global, mechanism-configurations=[{mechanism-name=FORM}]</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="create-a-application-security-domain-in-undertow">Create a Application Security Domain in Undertow</h3>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+If you already have a&nbsp;_application-security-domain_&nbsp;defined in Undertow subsystem and just want to use it to enable single sign-on to your applications, please skip this section.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>In order to protect applications using the configuration defined in Elytron subsystem, you should create a application-security-domain definition in Undertow subsystem as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>/subsystem=undertow/application-security-domain=other:add(http-authentication-factory=example-http-authentication)</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>By default, if your application does not define any specific <em>security-domain</em> in <em>jboss-web.xml</em>, the application server will choose one with a name <strong>other</strong>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="create-a-key-store">Create a Key Store</h3>
+<div class="paragraph">
+<p>In order to create a <em>key-store</em> in Elytron subsystem, first create a Java Key Store as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">keytool -genkeypair -alias localhost -keyalg RSA -keysize 1024 -validity 365 -keystore keystore.jks -dname "CN=localhost" -keypass secret -storepass secret</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Once the <em>keystore.jks</em> file is created, execute the following CLI commands to create a <em>key-store</em> definition in Elytron:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>/subsystem=elytron/key-store=example-keystore:add(path=keystore.jks, relative-to=jboss.server.config.dir, credential-reference={clear-text=secret}, type=JKS)</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="enable-single-sign-on">Enable Single Sign-On</h3>
+<div class="paragraph">
+<p>Single Sign-On is enabled to a specific <em>application-security-domain</em> definition in Undertow subsystem. It is important that the servers you will be using to deploy applications are using the same configuration.</p>
+</div>
+<div class="paragraph">
+<p>To enable single-sign on, just change an existing application-security-domain in Undertow subsystem as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">/subsystem=undertow/application-security-domain=other/setting=single-sign-on:add(key-store=example-keystore, key-alias=localhost, domain=localhost, credential-reference={clear-text=secret})</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>After restarting the servers, users should be able to log in once and have access to any application using the same <em>application-security-domain</em>.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="create-two-server-instances">Create Two Server Instances</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>All configuration you did so far should be reflect in <em>$JBOSS_HOME</em>/<em>standalone/standalone-ha.xml.</em> You can now create two distinct server configuration directories_:\_</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">cp -r standalone standalone-a
+cp -r standalone standalone-b</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And you can run the two instances using the command below:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$JBOSS_HOME/bin/standalone.sh -c standalone-ha.xml -Djboss.node.name=node-a -Djboss.socket.binding.port-offset=200 -Djboss.server.base.dir=$JBOSS_HOME/standalone-a
+$JBOSS_HOME/bin/standalone.sh -c standalone-ha.xml -Djboss.node.name=node-b -Djboss.socket.binding.port-offset=300 -Djboss.server.base.dir=$JBOSS_HOME/standalone-b ----</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="deploy-an-application">Deploy an Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>For the sake of simplicity, these are the minimum files you need in your application:</p>
+</div>
+<div class="listingblock">
+<div class="title">WEB-INF/web.xml</div>
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"&gt;
+
+    &lt;security-constraint&gt;
+        &lt;display-name&gt;SecurityConstraint&lt;/display-name&gt;
+        &lt;web-resource-collection&gt;
+            &lt;web-resource-name&gt;All Resources&lt;/web-resource-name&gt;
+            &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
+        &lt;/web-resource-collection&gt;
+        &lt;auth-constraint&gt;
+            &lt;role-name&gt;user&lt;/role-name&gt;
+        &lt;/auth-constraint&gt;
+    &lt;/security-constraint&gt;
+
+    &lt;login-config&gt;
+        &lt;auth-method&gt;FORM&lt;/auth-method&gt;
+        &lt;form-login-config&gt;
+            &lt;form-login-page&gt;/login.html&lt;/form-login-page&gt;
+            &lt;form-error-page&gt;/login.html&lt;/form-error-page&gt;
+        &lt;/form-login-config&gt;
+    &lt;/login-config&gt;
+
+    &lt;security-role&gt;
+        &lt;role-name&gt;user&lt;/role-name&gt;
+    &lt;/security-role&gt;
+&lt;/web-app&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">login.html</div>
+<div class="content">
+<pre class="highlight"><code class="language-html" data-lang="html">&lt;html&gt;
+    &lt;body&gt;
+        &lt;form method="post" action="j_security_check"&gt;
+            &lt;input type="text" name="j_username"&gt;
+            &lt;input type="password" name="j_password"&gt;
+            &lt;input type="submit" value="Log In"&gt;
+        &lt;/form&gt;
+    &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+Make sure you have at least a welcome file (e.g.: index.html\|jsp).
+</td>
+</tr>
+</table>
+</div>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>Deploy your application into both server instances and try to log in using the user you created at the beginning of this document:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Username: <strong>alice</strong></p>
+</li>
+<li>
+<p>Password: <strong>alice</strong></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

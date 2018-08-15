@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>CLI Recipes | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="CLI Recipes" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_admin-guide/CLI_Recipes.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_admin-guide/CLI_Recipes.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_admin-guide/CLI_Recipes.html","headline":"CLI Recipes","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="sect1">
+<h2 id="properties">Properties</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="adding-reading-and-removing-system-property-using-cli">Adding, reading and removing system property using CLI</h3>
+<div class="paragraph">
+<p>For standalone mode:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">$ ./bin/jboss-cli.sh --connect controller=IP_ADDRESS
+[standalone@IP_ADDRESS:9990 /] /system-property=foo:add(value=bar)
+[standalone@IP_ADDRESS:9990 /] /system-property=foo:read-resource
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; {"value" =&gt; "bar"}
+}
+[standalone@IP_ADDRESS:9990 /] /system-property=foo:remove
+{"outcome" =&gt; "success"}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For domain mode the same commands are used, you can add/read/remove
+system properties for:<br>
+All hosts and server instances in domain</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[domain@IP_ADDRESS:9990 /] /system-property=foo:add(value=bar)
+[domain@IP_ADDRESS:9990 /] /system-property=foo:read-resource
+[domain@IP_ADDRESS:9990 /] /system-property=foo:remove</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Host and its server instances</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[domain@IP_ADDRESS:9990 /] /host=master/system-property=foo:add(value=bar)
+[domain@IP_ADDRESS:9990 /] /host=master/system-property=foo:read-resource
+[domain@IP_ADDRESS:9990 /] /host=master/system-property=foo:remove</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Just one server instance</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[domain@IP_ADDRESS:9990 /] /host=master/server-config=server-one/system-property=foo:add(value=bar)
+[domain@IP_ADDRESS:9990 /] /host=master/server-config=server-one/system-property=foo:read-resource
+[domain@IP_ADDRESS:9990 /] /host=master/server-config=server-one/system-property=foo:remove</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="overview-of-all-system-properties">Overview of all system properties</h3>
+<div class="paragraph">
+<p>Overview of all system properties in WildFly including OS system
+properties and properties specified on command line using -D, -P or
+--properties arguments.</p>
+</div>
+<div class="paragraph">
+<p>Standalone</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@IP_ADDRESS:9990 /] /core-service=platform-mbean/type=runtime:read-attribute(name=system-properties)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Domain</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[domain@IP_ADDRESS:9990 /] /host=master/core-service=platform-mbean/type=runtime:read-attribute(name=system-properties)
+[domain@IP_ADDRESS:9990 /] /host=master/server=server-one/core-service=platform-mbean/type=runtime:read-attribute(name=system-properties)</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuration">Configuration</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="list-subsystems">List Subsystems</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9990 /] /:read-children-names(child-type=subsystem)
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; [
+        "batch",
+        "datasources",
+        "deployment-scanner",
+        "ee",
+        "ejb3",
+        "infinispan",
+        "io",
+        "jaxrs",
+        "jca",
+        "jdr",
+        "jmx",
+        "jpa",
+        "jsf",
+        "logging",
+        "mail",
+        "naming",
+        "pojo",
+        "remoting",
+        "resource-adapters",
+        "sar",
+        "security",
+        "threads",
+        "transactions",
+        "undertow",
+        "webservices",
+        "weld"
+    ]
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="list-description-of-available-attributes-and-childs">List description of available attributes and childs</h3>
+<div class="paragraph">
+<p>Descriptions, possible attribute type and values, permission and whether
+expressions ( <em>$\{ &#8230;&#8203; }</em> ) are allowed from the underlying model are
+shown by the read-resource-description command.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">/subsystem=datasources/data-source=ExampleDS:read-resource-description
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; {
+        "description" =&gt; "A JDBC data-source configuration",
+        "head-comment-allowed" =&gt; true,
+        "tail-comment-allowed" =&gt; true,
+        "attributes" =&gt; {
+            "connection-url" =&gt; {
+                "type" =&gt; STRING,
+                "description" =&gt; "The JDBC driver connection URL",
+                "expressions-allowed" =&gt; true,
+                "nillable" =&gt; false,
+                "min-length" =&gt; 1L,
+                "max-length" =&gt; 2147483647L,
+                "access-type" =&gt; "read-write",
+                "storage" =&gt; "configuration",
+                "restart-required" =&gt; "no-services"
+            },
+            "driver-class" =&gt; {
+                "type" =&gt; STRING,
+                "description" =&gt; "The fully qualified name of the JDBC driver class",
+                "expressions-allowed" =&gt; true,
+                "nillable" =&gt; true,
+                "min-length" =&gt; 1L,
+                "max-length" =&gt; 2147483647L,
+                "access-type" =&gt; "read-write",
+                "storage" =&gt; "configuration",
+                "restart-required" =&gt; "no-services"
+            },
+            "datasource-class" =&gt; {
+                "type" =&gt; STRING,
+                "description" =&gt; "The fully qualified name of the JDBC datasource class",
+                "expressions-allowed" =&gt; true,
+                "nillable" =&gt; true,
+                "min-length" =&gt; 1L,
+                "max-length" =&gt; 2147483647L,
+                "access-type" =&gt; "read-write",
+                "storage" =&gt; "configuration",
+                "restart-required" =&gt; "no-services"
+            },
+            "jndi-name" =&gt; {
+                "type" =&gt; STRING,
+                "description" =&gt; "Specifies the JNDI name for the datasource",
+                "expressions-allowed" =&gt; true,
+                "nillable" =&gt; false,
+                "access-type" =&gt; "read-write",
+                "storage" =&gt; "configuration",
+                "restart-required" =&gt; "no-services"
+            },
+           ...</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="view-configuration-as-xml-for-domain-model-or-host-model">View configuration as XML for domain model or host model</h3>
+<div class="paragraph">
+<p>Assume you have a host that is called master</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[domain@localhost:9990 /] /host=master:read-config-as-xml</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Just for the domain or standalone</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[domain@localhost:9990 /] :read-config-as-xml</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="take-a-snapshot-of-what-the-current-domain-is">Take a snapshot of what the current domain is</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[domain@localhost:9990 /] :take-snapshot()
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; {
+        "domain-results" =&gt; {"step-1" =&gt; {"name" =&gt; "JBOSS_HOME/domain/configuration/domain_xml_history/snapshot/20110908-165222603domain.xml"}},
+        "server-operations" =&gt; undefined
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="take-the-latest-snapshot-of-the-host.xml-for-a-particular-host">Take the latest snapshot of the host.xml for a particular host</h3>
+<div class="paragraph">
+<p>Assume you have a host that is called master</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[domain@localhost:9990 /]  /host=master:take-snapshot
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; {
+        "domain-results" =&gt; {"step-1" =&gt; {"name" =&gt; "JBOSS_HOME/domain/configuration/host_xml_history/snapshot/20110908-165640215host.xml"}},
+        "server-operations" =&gt; undefined
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="how-to-get-interface-address">How to get interface address</h3>
+<div class="paragraph">
+<p>The attribute for interface is named "resolved-address". It&#8217;s a runtime
+attribute so it does not show up in :read-resource by default. You have
+to add the "include-runtime" parameter.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">./jboss-cli.sh --connect
+Connected to standalone controller at localhost:9990
+[standalone@localhost:9990 /] cd interface=public
+[standalone@localhost:9990 interface=public] :read-resource(include-runtime=true)
+{
+     "outcome" =&gt; "success",
+     "result" =&gt; {
+         "any" =&gt; undefined,
+         "any-address" =&gt; undefined,
+         "any-ipv4-address" =&gt; undefined,
+         "any-ipv6-address" =&gt; undefined,
+         "criteria" =&gt; [("inet-address" =&gt; expression "${jboss.bind.address:127.0.0.1}")],
+         "inet-address" =&gt; expression "${jboss.bind.address:127.0.0.1}",
+         "link-local-address" =&gt; undefined,
+         "loopback" =&gt; undefined,
+         "loopback-address" =&gt; undefined,
+         "multicast" =&gt; undefined,
+         "name" =&gt; "public",
+         "nic" =&gt; undefined,
+         "nic-match" =&gt; undefined,
+         "not" =&gt; undefined,
+         "point-to-point" =&gt; undefined,
+         "public-address" =&gt; undefined,
+         "resolved-address" =&gt; "127.0.0.1",
+         "site-local-address" =&gt; undefined,
+         "subnet-match" =&gt; undefined,
+         "up" =&gt; undefined,
+         "virtual" =&gt; undefined
+     }
+}
+[standalone@localhost:9990 interface=public] :read-attribute(name=resolved-address)
+{
+     "outcome" =&gt; "success",
+     "result" =&gt; "127.0.0.1"
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It&#8217;s similar for domain, just specify path to server instance:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[domain@localhost:9990 /] /host=master/server=server-one/interface=public:read-attribute(name=resolved-address)
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; "127.0.0.1"
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="runtime">Runtime</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="get-all-configuration-and-runtime-details-from-cli">Get all configuration and runtime details from CLI</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">./bin/jboss-cli.sh -c command=":read-resource(include-runtime=true, recursive=true, recursive-depth=10)"</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="scripting">Scripting</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="windows-and-press-any-key-to-continue-...-issue">Windows and "Press any key to continue &#8230;&#8203;" issue</h3>
+<div class="paragraph">
+<p>WildFly scripts for Windows end with "Press any key to continue &#8230;&#8203;".
+This behavior is useful when script is executed by double clicking the
+script but not when you need to invoke several commands from custom
+script (e.g. 'bin/jboss-admin.bat --connect command=:shutdown').</p>
+</div>
+<div class="paragraph">
+<p>To avoid "Press any key to continue &#8230;&#8203;" message you need to specify
+NOPAUSE variable. Call 'set NOPAUSE=true' in command line before running
+any WildFly {wildflyVersion} .bat script or include it in your custom script before
+invoking scripts from WildFly.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="statistics">Statistics</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="read-statistics-of-active-datasources">Read statistics of active datasources</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">/subsystem=datasources/data-source=ExampleDS/statistics=pool:read-resource(include-runtime=true)
+/subsystem=datasources/data-source=ExampleDS/statistics=jdbc:read-resource(include-runtime=true)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">/subsystem=datasources/data-source=ExampleDS:read-resource(include-runtime=true,recursive=true)</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="deployment">Deployment</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="cli-deployment-command">CLI <em>deployment</em> command</h3>
+<div class="paragraph">
+<p>In addition to the legacy <em>deploy</em>, <em>undeploy</em> and <em>deployment-info</em> commands,
+that stay un-changed, the CLI offers a <em>deployment</em> command that properly
+separates the various use cases encountered when managing deployments. This command
+offers a simpler interface and should be the way to go when managing deployments.
+New features will be added thanks to the <em>deployment</em> command, legacy commands will not evolve.
+This document contains a summary of the capabilities of this command, type <em>help deployment</em>
+to display the list of all available actions and <em>help deployment &lt;action&gt;</em> for the detailed
+description of an action.</p>
+</div>
+<div class="paragraph">
+<p>Actions to deploy some content:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><em>deployment deploy-file</em>: To deploy a file located on the file system.</p>
+</li>
+<li>
+<p><em>deployment deploy-url</em>: To deploy content referenced by an URL.</p>
+</li>
+<li>
+<p><em>deployment deploy-cli-achive</em>: To deploy some content thanks to a CLI archive
+(.cli file) located on the file system.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Actions to enable some deployments:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><em>deployment enable</em>: To enable a given disabled deployment.</p>
+</li>
+<li>
+<p><em>deployment enable-all</em>: To enable all disabled deployments.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Actions to disable some deployments:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><em>deployment disable</em>: To disable a given enabled deployment.</p>
+</li>
+<li>
+<p><em>deployment disable-all</em>: To disable all enabled deployments.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Actions to undeploy some deployments:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><em>deployment undeploy</em>: To undeploy a given deployment and remove its content
+from the repository.</p>
+</li>
+<li>
+<p><em>deployment undeploy-cli-archive</em>: To undeploy some content using a CLI archive
+(.cli file) located on the file system.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Actions to get information on some deployments:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><em>deployment info</em>: To display information about single or multiple deployments.</p>
+</li>
+<li>
+<p><em>deployment list</em>: To display all the existing deployments.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="incremental-deployment-with-the-cli">Incremental deployment with the CLI</h3>
+<div class="paragraph">
+<p>It can be desirable to incrementally create and(or) update a WildFly
+deployment. This chapter details how this can be achieved using the
+WildFly CLI tool.</p>
+</div>
+<div class="paragraph">
+<p>Steps to create an empty deployment and add an index html file.</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Create an empty deployment named my app:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9990 /] /deployment=myapp:add(content=[{empty=true}])</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Add an index.html to my app:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9990 /] /deployment=myapp:add-content(content=[{input-stream-index=&lt;press TAB&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then use completion to navigate to your index.html file.</p>
+</div>
+</li>
+<li>
+<p>Provide a target name for index.html inside the deployment and
+execute the operation:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9990 /] /deployment=myapp:add-content(content=[{input-stream-index=./index.html, target-path=index.xhtml}]</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Your content has been added, you can browse the content of a
+deployment using the browse-content operation:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9990 /] /deployment=myapp:browse-content(path=./)</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>You can display (or save) the content of a deployed file using the
+<em>attachement</em> command:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">attachment display --operation=/deployment=myapp:read-content(path=index.xhtml)</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>You can remove content from a deployment:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">/deployment=myapp:remove-content(paths=[./index.xhtml])</code></pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Tips</p>
+</div>
+<div class="ulist TIP">
+<ul class="TIP">
+<li>
+<p><em>add-content</em> operation allows you to add more than one file (
+<em>content</em> argument is a list of complex types).</p>
+</li>
+<li>
+<p>CLI offers completion for <em>browse-conten</em>t&#8217;s <em>path</em> and
+<em>remove-content</em>'s <em>paths</em> argument.</p>
+</li>
+<li>
+<p>You can safely use operations that are using attached streams in batch
+operations. In the case of batch operations, streams are attached to the
+composite operation.</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Warning</div>
+</td>
+<td class="content">
+On Windows, path separator '\' needs to be escaped, this is a limitation
+of CLI handling complex types. The file path completion is automatically
+escaping the paths it is proposing.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect3">
+<h4 id="notes-for-server-side-operation-handler-implementors">Notes for server side operation Handler implementors</h4>
+<div class="paragraph">
+<p>In order to benefit from CLI support for attached file streams and file
+system completion, you need to properly structure your operation
+arguments. Steps to create an operation that receives a list of file
+streams attached to the operation:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Define your operation argument as a <em>LIST</em> of <em>INT</em> (The <em>LIST</em>
+<em>value-type</em> must be of type <em>INT</em>).</p>
+</li>
+<li>
+<p>In the description of your argument, add the 2 following boolean
+descriptors: <em>filesystem-path</em> and <em>attached-streams</em></p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>When your operation is called from the CLI, file system completion will
+be automatically proposed for your argument. At execution time, the file
+system paths will be automatically converted onto the index of the
+attached streams.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="downloading-files-with-the-cli">Downloading files with the CLI</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Some management resources are exposing the content of files in the
+matter of <em>streams</em>. Streams returned by a management operation are
+attached to the headers of the management response. The CLI command
+<em>attachment</em> (see CLI help for a detailed description of this command)
+allows to display or save the content of the attached streams.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Displaying the content of server.log file:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">attachment display --operation=/subsystem=logging/log-file=server.log:read-resource(include-runtime)</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Saving locally the server.log file:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">attachment save --operation=/subsystem=logging/log-file=server.log:read-resource(include-runtime) --file=./server.log</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Displaying the content of a deployed file:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">attachment display --operation=/deployment=myapp:read-content(path=index.xhtml)</code></pre>
+</div>
+</div>
+</li>
+</ul>
+</div>
+<div class="ulist TIP">
+<ul class="TIP">
+<li>
+<p>By default existing files will be preserved. Use the option
+<em>--overwrite</em> to overwrite existing file.</p>
+</li>
+<li>
+<p><em>attachment</em> can be used in batch mode.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="iteration-of-collections">Iteration of Collections</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The command <em>for</em> allows to iterate the content of an operation result. As an
+example, this command can be used to display the content of the Manifest files
+present in all deployed applications. For example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">for deployed in :read-children-names(child-type=deployment)
+ echo $deployed Manifest content
+ attachment display --operation=/deployment=$deployed:read-content(path=META-INF/MANIFEST.MF)
+done</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>When this <em>for</em> block is executed, the content of all Manifest files is displayed in the CLI console.</p>
+</div>
+<div class="paragraph">
+<p>Tips</p>
+</div>
+<div class="ulist TIP">
+<ul class="TIP">
+<li>
+<p>The scope of the defined variable is limited to the <em>for</em> block.</p>
+</li>
+<li>
+<p>If a variable with the same name already exists, the <em>for</em> command will print an error.</p>
+</li>
+<li>
+<p>If the operation doesn&#8217;t return a list, the <em>for</em> command will print an error.</p>
+</li>
+<li>
+<p><em>for</em> block can be discarded and not execute by adding the option <em>--discard</em> to <em>done</em>.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="cli-security-commands">Security Commands</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>CLi offers a <em>security</em> command to group all security related management actions
+under a single command.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><em>security enable-ssl-management</em>: To enable SSL (elytron SSLContext) for the
+management interfaces. Type <em>help security enable-ssl-management</em> for a
+complete description of the command.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Among other ways to configure SSL, this command offers an interactive wizard to
+help you configure SSL by generating a self-signed certificate.
+Example of wizard usage:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">security enable-ssl-management --interactive
+Please provide required pieces of information to enable SSL:
+Key-store file name (default management.keystore):
+Password (blank generated):
+What is your first and last name? [Unknown]:
+What is the name of your organizational unit? [Unknown]:
+What is the name of your organization? [Unknown]:
+What is the name of your City or Locality? [Unknown]:
+What is the name of your State or Province? [Unknown]:
+What is the two-letter country code for this unit? [Unknown]:
+Is CN=Unknown, OU=Unknown, O=Unknown, L=Unknown, ST=Unknown, C=Unknown correct y/n [y]?
+Validity (in days, blank default):
+Alias (blank generated):
+Enable SSL Mutual Authentication y/n (blank n):n
+
+SSL options:
+key store file: management.keystore
+distinguished name: CN=Unknown, OU=Unknown, O=Unknown, L=Unknown, ST=Unknown, C=Unknown
+password: KRzne5s1
+validity: default
+alias: alias-265e6c6d-ff4e-4b8c-8f10-f015d678eb29
+Server keystore file management.keystore, certificate signing request management.csr and
+certificate file management.keystore.pem will be generated in server configuration directory.
+Do you confirm y/n :y</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>NB: Once the command is executed, the CLI will reload the server and reconnect to it.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><em>security disable-ssl-management</em>: To disable SSL (elytron SSLContext) for the
+management interfaces. Type <em>help security disable-ssl-management</em> for
+a complete description of the command.</p>
+</li>
+<li>
+<p><em>security enable-ssl-http-server</em>: To enable SSL (elytron SSLContext) for the
+<em>undertow</em> server. The same wizard as the <em>enable-ssl-management</em> action is available.
+Type <em>help security enable-ssl-http-server</em> for a complete description of the command.</p>
+</li>
+<li>
+<p><em>security disable-ssl-http-server</em>: To disable SSL (elytron SSLContext) for the
+<em>undertow</em> server. Type <em>help security disable-ssl-http-server</em> for a complete
+description of the command.</p>
+</li>
+<li>
+<p><em>security enable-sasl-management</em>: To enable SASL authentication (elytron SASL factory) for the
+management interfaces. Calling this command without any option will have the
+effect to associate the out of the box SASL factory to the http-interface.
+Type <em>help security enable-sasl-management</em> for a complete description of the command.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This command supports a subset of SASL mechanisms such as: EXTERNAL, DIGEST-MD5,
+JBOSS-LOCAL-USER, SCRAM-*, &#8230;&#8203; The CLI completer proposes the set of mechanisms that
+can be properly configured using this command. Each mechanism can be associated
+to a property file realm, a file-system realm or a trust-store realm according to its nature.</p>
+</div>
+<div class="paragraph">
+<p>NB: Once the command is executed, the CLI will reload the server and reconnect to it.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><em>security disable-sasl-management</em>: To disable SASL for the
+management interfaces. If a mechanism is provided, this mechanism will be removed
+from the factory, the factory will stay associated to the interface. Without mechanism, the
+factory is no more active on the management interface. Type <em>help security disable-sasl-management</em>
+for a complete description of the command.</p>
+</li>
+<li>
+<p><em>security reorder-sasl-management</em>: To re-order the list of SASL mechanisms present
+in the factory. Order of mechanisms is of importance, the first in the list is sent to the client.
+Type <em>help security reorder-sasl-management</em> for a complete description of the command.</p>
+</li>
+<li>
+<p><em>security enable-http-auth-management</em>: To enable HTTP authentication (elytron HTTP factory) for the
+management http-interface. Calling this command without any option will have the
+effect to associate the out of the box HTTP Authentication factory to the http-interface.
+Type <em>help security enable-http-auth-management</em> for a complete description of the command.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This command supports a subset of HTTP mechanisms such as: BASIC, CLIENT_CERT, DIGEST, &#8230;&#8203;
+The CLI completer proposes the set of mechanisms that can be properly configured
+using this command. Each mechanism can be associated to a property file realm,
+a file-system realm or a trust-store realm according to its nature.</p>
+</div>
+<div class="paragraph">
+<p>NB: Once the command is executed, the CLI will reload the server and reconnect to it.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><em>security disable-http-auth-management</em>: To disable HTTP Authentication for the
+http management interface. If a mechanism is provided, this mechanism will be removed
+from the factory, the factory will stay associated to the interface. Without mechanism, the
+factory is no more active on the management interface. Type <em>help security disable-http-auth-management</em>
+for a complete description of the command.</p>
+</li>
+<li>
+<p><em>security enable-http-auth-http-server</em>: To enable HTTP authentication (elytron HTTP factory) for the
+given undertow security domain.
+Type <em>help security enable-http-auth-http-server</em> for a complete description of the command.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This command supports a subset of HTTP mechanisms such as: BASIC, CLIENT_CERT, DIGEST, &#8230;&#8203;
+The CLI completer proposes the set of mechanisms that can be properly configured
+using this command. Each mechanism can be associated to a property file realm,
+a file-system realm or a trust-store realm according to its nature.</p>
+</div>
+<div class="paragraph">
+<p>NB: Once the command is executed, the CLI will reload the server and reconnect to it.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><em>security disable-http-auth-http-server</em>: To disable HTTP Authentication for the
+given undertow security domain. If a mechanism is provided, this mechanism will be removed
+from the factory, the factory will stay associated to the security domain. Without mechanism, the
+factory is no more active on the security-domain. Type <em>help security disable-http-auth-http-server</em>
+for a complete description of the command.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

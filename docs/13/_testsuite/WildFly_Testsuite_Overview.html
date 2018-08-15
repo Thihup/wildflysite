@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>WildFly Testsuite Overview | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="WildFly Testsuite Overview" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_testsuite/WildFly_Testsuite_Overview.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_testsuite/WildFly_Testsuite_Overview.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_testsuite/WildFly_Testsuite_Overview.html","headline":"WildFly Testsuite Overview","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>This document will detail the implementation of the testsuite
+Integration submodule as it guides you on adding your own test cases.</p>
+</div>
+<div class="paragraph">
+<p>The WildFly integration test suite has been designed with the following
+goals:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>support execution of all identified test case use cases</p>
+</li>
+<li>
+<p>employ a design/organization which is scalable and maintainable</p>
+</li>
+<li>
+<p>provide support for the automated measurement of test suite quality
+(generation of feature coverage reports, code coverage reports)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>In addition, these requirements were considered:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>identifying distinct test case runs of the same test case with a
+different set of client side parameters and server side parameters</p>
+</li>
+<li>
+<p>separately maintaining server side execution results (e.g. logs, the
+original server configuration) for post-execution debugging</p>
+</li>
+<li>
+<p>running the testsuite in conjunction with a debugger</p>
+</li>
+<li>
+<p>the execution of a single test (for debugging purposes)</p>
+</li>
+<li>
+<p>running test cases against different container modes (managed in the
+main, but also remote and embedded)</p>
+</li>
+<li>
+<p>configuring client and server JVMs separately (e.g., IPv6 testing)</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="test-suite-organization">Test Suite Organization</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The testsuite module has a small number of submodules:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>benchmark</strong> - holds all benchmark tests intended to assess relative
+performance of specific feature</p>
+</li>
+<li>
+<p><strong>domain</strong> - holds all domain management tests</p>
+</li>
+<li>
+<p><strong>integration</strong> - holds all integration tests</p>
+</li>
+<li>
+<p><strong>stress</strong> - holds all stress tests</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>It is expected that test contributions fit into one of these categories.</p>
+</div>
+<div class="paragraph">
+<p>The pom.xml file located in the testsuite module is inherited by all
+submodules and is used to do the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>set defaults for common testsuite system properties (which can then be
+overridden on the command line)</p>
+</li>
+<li>
+<p>define dependencies common to all tests (Arquillian, junit or testng,
+and container type)</p>
+</li>
+<li>
+<p>provide a workaround for @Resource(lookup=&#8230;&#8203;) which requires
+libraries in jbossas/endorsed</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>It should not:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>define module-specific server configuration build steps</p>
+</li>
+<li>
+<p>define module-specific surefire executions</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>These elements should be defined in logical profiles associated with
+each logical grouping of tests; e.g., in the pom for the module which
+contains the tests. The submodule poms contain additional details of
+their function and purpose as well as expanded information as shown in
+this document.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="profiles">Profiles</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>You should not activate the abovementioned profiles by -P, because that
+disables other profiles which are activated by default.</p>
+</div>
+<div class="paragraph">
+<p>Instead, you should always use activating properties, which are in
+parenthesis in the lists below.</p>
+</div>
+<div class="paragraph">
+<p><strong>Testsuite profiles</strong> are used to group tests into logical groups.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>all-modules.module.profile (all-modules)</p>
+</li>
+<li>
+<p>integration.module.profile (integration.module)</p>
+</li>
+<li>
+<p>compat.module.profile (compat.module)</p>
+</li>
+<li>
+<p>domain.module.profile (domain.module)</p>
+</li>
+<li>
+<p>benchmark.module.profile (benchmark.module)</p>
+</li>
+<li>
+<p>stress.module.profile (stress.module)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>They also pprepare WildFly instances and resources for respective
+testsuite submodules.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>jpda.profile - sets surefire.jpda.args (debug)</p>
+</li>
+<li>
+<p>ds.profile -sets database properties and prepares the datasource
+(ds=&lt;db id&gt;)</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Has related database-specific profiles, like mysql51.profile etc.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Integration testsuite profiles</strong> configure surefire executions.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>smoke.integration.tests.profile</p>
+</li>
+<li>
+<p>basic.integration.tests.profile</p>
+</li>
+<li>
+<p>clustering.integration.tests.profile</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="integration-tests">Integration tests</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="smoke--dts.smoke--dts.nosmoke">Smoke -Dts.smoke, -Dts.noSmoke</h3>
+<div class="paragraph">
+<p>Contains smoke tests.</p>
+</div>
+<div class="paragraph">
+<p>Runs by default; use -Dts.noSmoke to prevent running.</p>
+</div>
+<div class="paragraph">
+<p>Tests should execute quickly.</p>
+</div>
+<div class="paragraph">
+<p>Divided into two Surefire executions:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>One with full profile</p>
+</li>
+<li>
+<p>Second with web profile (majority of tests).</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="basic--dts.basic">Basic -Dts.basic</h3>
+<div class="paragraph">
+<p>Basic integration tests - those which do not need special configuration
+like cluster.</p>
+</div>
+<div class="paragraph">
+<p>Divided into three Surefire executions:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>One with full profile,</p>
+</li>
+<li>
+<p>Second with web profile (majority of tests).</p>
+</li>
+<li>
+<p>Third with web profile, but needs to be run after server restart to
+check whether persistent data are really persisted.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="cluster--dts.clust">Cluster -Dts.clust</h3>
+<div class="paragraph">
+<p>Sets up a cluster of two nodes.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="iiop--dts.iiop">IIOP -Dts.iiop</h3>
+
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="xts--dts.xts">XTS -Dts.XTS</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="multinode--dts.multinode">Multinode -Dts.multinode</h3>
+
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

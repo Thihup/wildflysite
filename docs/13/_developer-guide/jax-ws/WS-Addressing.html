@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>WS-Addressing | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="WS-Addressing" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_developer-guide/jax-ws/WS-Addressing.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_developer-guide/jax-ws/WS-Addressing.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_developer-guide/jax-ws/WS-Addressing.html","headline":"WS-Addressing","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>JBoss Web Services inherits full WS-Addressing capabilities from the
+underlying Apache CXF implementation. Apache CXF provides support for
+2004-08 and <a href="http://www.w3.org/TR/ws-addr-core/">1.0</a> versions of
+WS-Addressing.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="enabling-ws-addressing">Enabling WS-Addressing</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>WS-Addressing can be turned on in multiple standard ways:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>consuming a WSDL contract that specifies a WS-Addressing assertion /
+policy</p>
+</li>
+<li>
+<p>using the <code>@javax.xml.ws.soap.Addressing</code> annotation</p>
+</li>
+<li>
+<p>using the <code>javax.xml.ws.soap.AddressingFeature</code> feature</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+The supported addressing policy elements are:
+</td>
+</tr>
+</table>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>[http://www.w3.org/2005/02/addressing/wsdl]UsingAddressing
+[http://schemas.xmlsoap.org/ws/2004/08/addressing/policy]UsingAddressing
+[http://www.w3.org/2006/05/addressing/wsdl]UsingAddressing
+[http://www.w3.org/2007/05/addressing/metadata]Addressing</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Alternatively, Apache CXF proprietary ways are also available:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>specifying the ﻿ <em>[<a href="http://cxf.apache.org/ws/addressing" class="bare">http://cxf.apache.org/ws/addressing</a>]addressing</em>
+feature for a given client/endpoint</p>
+</li>
+<li>
+<p>using the <code>org.apache.cxf.ws.addressing.WSAddressingFeature</code> feature
+through the API</p>
+</li>
+<li>
+<p>manually configuring the Apache CXF addressing interceptors (
+<code>org.apache.cxf.ws.addressing.MAPAggregator</code> and
+<code>org.apache.cxf.ws.addressing.soap.MAPCodec</code>)</p>
+</li>
+<li>
+<p>setting the <em>org.apache.cxf.ws.addressing.using</em> property in the
+message context</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Please refer to the the Apache CXF documentation for further information
+on the proprietary
+<a href="http://cxf.apache.org/docs/ws-addressing.html">WS-Addressing setup</a> and
+<a href="http://cxf.apache.org/docs/wsaconfiguration.html">configuration details</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="ws-addressing-policy">WS-Addressing Policy</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The WS-Addressing support is also perfectly integrated with the Apache
+CXF WS-Policy engine.</p>
+</div>
+<div class="paragraph">
+<p>This basically means that the WSDL contract generation for code-first
+endpoint deployment is policy-aware: users can annotate endpoints with
+the <code>@</code> <code>javax.xml.ws.soap.</code> <code>Addressing</code> annotation and expect the
+published WSDL contract to contain proper WS-Addressing policy (assuming
+no <code>wsdlLocation</code> is specified in the endpoint&#8217;s <code>@WebService</code>
+annotation).</p>
+</div>
+<div class="paragraph">
+<p>Similarly, on client side users do not need to manually specify the
+<code>javax.xml.ws.soap.AddressingFeature</code> feature, as the policy engine is
+able to properly process the WS-Addressing policy in the consumed WSDL
+and turn on addressing as requested.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="example">Example</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Here is an example showing how to simply enable WS-Addressing through
+WS-Policy.</p>
+</div>
+<div class="sect2">
+<h3 id="endpoint">Endpoint</h3>
+<div class="paragraph">
+<p>A simple JAX-WS endpoint is prepared using a java-first approach;
+WS-Addressing is enforced through <code>@Addressing</code> annotation and no
+<code>wsdlLocation</code> is provided in <code>@WebService</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">package org.jboss.test.ws.jaxws.samples.wsa;
+ 
+import javax.jws.WebService;
+import javax.xml.ws.soap.Addressing;
+import org.jboss.logging.Logger;
+ 
+@WebService
+(
+   portName = "AddressingServicePort",
+   serviceName = "AddressingService",
+   targetNamespace = "http://www.jboss.org/jbossws/ws-extensions/wsaddressing",
+   endpointInterface = "org.jboss.test.ws.jaxws.samples.wsa.ServiceIface"
+)
+@Addressing(enabled=true, required=true)
+public class ServiceImpl implements ServiceIface
+{
+   private Logger log = Logger.getLogger(this.getClass());
+ 
+   public String sayHello(String name)
+   {
+      return "Hello " + name + "!";
+   }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The WSDL contract that&#8217;s generated at deploy time and published looks
+like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;wsdl:definitions ....&gt;
+...
+  &lt;wsdl:binding name="AddressingServiceSoapBinding" type="tns:ServiceIface"&gt;
+    &lt;soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/&gt;
+    &lt;wsaw:UsingAddressing wsdl:required="true"/&gt;
+    &lt;wsp:PolicyReference URI="#AddressingServiceSoapBinding_WSAM_Addressing_Policy"/&gt;
+ 
+    &lt;wsdl:operation name="sayHello"&gt;
+      &lt;soap:operation soapAction="" style="document"/&gt;
+      &lt;wsdl:input name="sayHello"&gt;
+        &lt;soap:body use="literal"/&gt;
+      &lt;/wsdl:input&gt;
+      &lt;wsdl:output name="sayHelloResponse"&gt;
+        &lt;soap:body use="literal"/&gt;
+      &lt;/wsdl:output&gt;
+    &lt;/wsdl:operation&gt;
+ 
+  &lt;/wsdl:binding&gt;
+  &lt;wsdl:service name="AddressingService"&gt;
+    &lt;wsdl:port binding="tns:AddressingServiceSoapBinding" name="AddressingServicePort"&gt;
+      &lt;soap:address location="http://localhost:8080/jaxws-samples-wsa"/&gt;
+    &lt;/wsdl:port&gt;
+  &lt;/wsdl:service&gt;
+    &lt;wsp:Policy wsu:Id="AddressingServiceSoapBinding_WSAM_Addressing_Policy"
+       xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"&gt;
+      &lt;wsam:Addressing xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata"&gt;
+        &lt;wsp:Policy/&gt;
+      &lt;/wsam:Addressing&gt;
+    &lt;/wsp:Policy&gt;
+&lt;/wsdl:definitions&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="client">Client</h3>
+<div class="paragraph">
+<p>Since the WS-Policy engine is on by default, the client side code is
+basically a pure JAX-WS client app:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">QName serviceName = new QName("http://www.jboss.org/jbossws/ws-extensions/wsaddressing", "AddressingService");
+URL wsdlURL = new URL("http://localhost:8080/jaxws-samples-wsa?wsdl");
+Service service = Service.create(wsdlURL, serviceName);
+ServiceIface proxy = (ServiceIface)service.getPort(ServiceIface.class);
+proxy.sayHello("World");</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Command line parameters | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Command line parameters" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_admin-guide/management-tasks/Command_line_parameters.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_admin-guide/management-tasks/Command_line_parameters.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_admin-guide/management-tasks/Command_line_parameters.html","headline":"Command line parameters","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>To start up a WildFly managed domain, execute the
+<code>$JBOSS_HOME/bin/domain.sh</code> script. To start up a standalone server,
+execute the <code>$JBOSS_HOME/bin/standalone.sh</code>. With no arguments, the
+default configuration is used. You can override the default
+configuration by providing arguments on the command line, or in your
+calling script.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="system-properties">System properties</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To set a system property, pass its new value using the standard jvm
+<code>-Dkey=value</code> options:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">$JBOSS_HOME/bin/standalone.sh -Djboss.home.dir=some/location/wildFly \
+    -Djboss.server.config.dir=some/location/wildFly/custom-standalone</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This command starts up a standalone server instance using a non-standard
+AS home directory and a custom configuration directory. For specific
+information about system properties, refer to the definitions below.</p>
+</div>
+<div class="paragraph">
+<p>Instead of passing the parameters directly, you can put them into a
+properties file, and pass the properties file to the script, as in the
+two examples below.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">$JBOSS_HOME/bin/domain.sh --properties=/some/location/jboss.properties
+$JBOSS_HOME/bin/domain.sh -P=/some/location/jboss.properties</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note however, that properties set this way are not processed as part of
+JVM launch. They are processed early in the boot process, but this
+mechanism should not be used for setting properties that control JVM
+behavior (e.g. java.net.perferIPv4Stack) or the behavior of the JBoss
+Modules classloading system.</p>
+</div>
+<div class="paragraph">
+<p>The syntax for passing in parameters and properties files is the same
+regardless of whether you are running the <code>domain.sh</code>, <code>standalone.sh</code>,
+or the Microsoft Windows scripts <code>domain.bat</code> or <code>standalone.bat</code>.</p>
+</div>
+<div class="paragraph">
+<p>The properties file is a standard Java property file containing
+<code>key=value</code> pairs:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">jboss.home.dir=/some/location/wildFly
+jboss.domain.config.dir=/some/location/wildFly/custom-domain</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>System properties can also be set via the xml configuration files. Note
+however that for a standalone server properties set this way will not be
+set until the xml configuration is parsed and the commands created by
+the parser have been executed. So this mechanism should not be used for
+setting properties whose value needs to be set before this point.</p>
+</div>
+<div class="sect2">
+<h3 id="controlling-filesystem-locations-with-system-properties">Controlling filesystem locations with system properties</h3>
+<div class="paragraph">
+<p>The standalone and the managed domain modes each use a default
+configuration which expects various files and writable directories to
+exist in standard locations. Each of these standard locations is
+associated with a system property, which has a default value. To
+override a system property, pass its new value using the one of the
+mechanisms above. The locations which can be controlled via system
+property are:</p>
+</div>
+<div class="sect3">
+<h4 id="standalone">Standalone</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Property name</th>
+<th class="tableblock halign-left valign-top">Usage</th>
+<th class="tableblock halign-left valign-top">Default value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">java.ext.dirs</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The JDK extension directory paths</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">null</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">jboss.home.dir</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The root directory of the WildFly installation.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Set by
+standalone.sh to $JBOSS_HOME</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">jboss.server.base.dir</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The base directory for server content.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">jboss.home.dir/standalone</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">jboss.server.config.dir</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The base configuration directory.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">jboss.server.base.dir/configuration</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">jboss.server.data.dir</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The directory used for persistent data file
+storage.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">jboss.server.base.dir/data</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">jboss.server.log.dir</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The directory containing the server.log file.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">jboss.server.base.dir/log</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">jboss.server.temp.dir</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The directory used for temporary file storage.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">jboss.server.base.dir/tmp</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">jboss.server.deploy.dir</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The directory used to store deployed content</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">jboss.server.data.dir/content</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="managed-domain">Managed Domain</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Property name</th>
+<th class="tableblock halign-left valign-top">Usage</th>
+<th class="tableblock halign-left valign-top">Default value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">jboss.home.dir</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The root directory of the WildFly installation.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Set by
+domain.sh to $JBOSS_HOME</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">jboss.domain.base.dir</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The base directory for domain content.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">jboss.home.dir/domain</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">jboss.domain.config.dir</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The base configuration directory</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">jboss.domain.base.dir/configuration</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">jboss.domain.data.dir</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The directory used for persistent data file
+storage.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">jboss.domain.base.dir/data</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">jboss.domain.log.dir</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The directory containing the host-controller.log
+and process-controller.log files</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">jboss.domain.base.dir/log</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">jboss.domain.temp.dir</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The directory used for temporary file storage</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">jboss.domain.base.dir/tmp</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">jboss.domain.deployment.dir</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The directory used to store deployed
+content</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">jboss.domain.base.dir/content</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">jboss.domain.servers.dir</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The directory containing the output for the
+managed server instances</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">jboss.domain.base.dir/servers</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="other-command-line-parameters">Other command line parameters</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The first acceptable format for command line arguments to the WildFly
+launch scripts is</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>--name=value</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">$JBOSS_HOME/bin/standalone.sh --server-config=standalone-ha.xml</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If the parameter name is a single character, it is prefixed by a single
+'-' instead of two. Some parameters have both a long and short option.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>-x=value</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">$JBOSS_HOME/bin/standalone.sh -P=/some/location/jboss.properties</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For some command line arguments frequently used in previous major
+releases of WildFly, replacing the "=" in the above examples with a
+space is supported, for compatibility.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>-b 192.168.100.10</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If possible, use the <code>-x=value</code> syntax. New parameters will always
+support this syntax.</p>
+</div>
+<div class="paragraph">
+<p>The sections below describe the command line parameter names that are
+available in standalone and domain mode.</p>
+</div>
+<div class="sect2">
+<h3 id="standalone-1">Standalone</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Default if absent</th>
+<th class="tableblock halign-left valign-top">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--admin-only</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Set the server&#8217;s running type to ADMIN_ONLY causing it
+to open administrative interfaces and accept management requests but not
+start other runtime services oraccept end user requests.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--server-config-c</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">standalone.xml</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A relative path which is interpreted
+to be relative to jboss.server.config.dir. The name of the configuration
+file to use.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--read-only-server-config</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A relative path which is interpreted to
+be relative to jboss.server.config.dir. This is similar to
+--server-config but if this alternative is specified the server willnot
+overwrite the file when the management model is changed. However a full
+versioned history is maintained of the file.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="managed-domain-1">Managed Domain</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Default if absent</th>
+<th class="tableblock halign-left valign-top">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--admin-only</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Set the server&#8217;s running type to ADMIN_ONLY causing it
+to open administrative interfaces and accept management requests but not
+start servers or, if this host controlleris the master for the domain,
+accept incoming connections from slave host controllers.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--domain-config-c</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">domain.xml</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A relative path which is interpreted to
+be relative to jboss.domain.config.dir. The name of the domain wide
+configuration file to use.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--read-only-domain-config</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A relative path which is interpreted to
+be relative to jboss.domain.config.dir. This is similar to
+--domain-config but if this alternative is specified the host
+controllerwill not overwrite the file when the management model is
+changed. However a full versioned history is maintained of the file.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--host-config</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">host.xml</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A relative path which is interpreted to be
+relative to jboss.domain.config.dir. The name of the host-specific
+configuration file to use.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--read-only-host-config</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A relative path which is interpreted to be
+relative to jboss.domain.config.dir. This is similar to --host-config
+but if this alternative is specified the host controller willnot
+overwrite the file when the management model is changed. However a full
+versioned history is maintained of the file.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>The following parameters take no value and are only usable on slave host
+controllers (i.e. hosts configured to connect to a <code>remote</code> domain
+controller.)</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Function</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--backup</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Causes the slave host controller to create and maintain a
+local copy (domain.cached-remote.xml) of the domain configuration. If
+ignore-unused-configuration is unset in host.xml,a complete copy of the
+domain configuration will be stored locally, otherwise the configured
+value of ignore-unused-configuration in host.xml will be used. (See
+ignore-unused-configuration for more details.)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--cached-dc</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If the slave host controller is unable to contact the
+master domain controller to get its configuration at boot, this option
+will allow the slave host controller to boot and becomeoperational using
+a previously cached copy of the domain configuration
+(domain.cached-remote.xml.) If the cached configuration is not present,
+this boot will fail. This file is created using using one ofthe
+following methods:- A previously successful connection to the master
+domain controller using --backup or --cached-dc.- Copying the domain
+configuration from an alternative host to
+domain/configuration/domain.cached-remote.xml.The unavailable master
+domain controller will be polled periodically for availability, and once
+becoming available, the slave host controller will reconnect to the
+master host controller and synchronize the domainconfiguration. During
+the interval the master domain controller is unavailable, the slave host
+controller will not be able make any modifications to the domain
+configuration, but it may launch servers and handlerequests to deployed
+applications etc.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top"> </th>
+<th class="tableblock halign-left valign-top"> </th>
+</tr>
+</thead>
+</table>
+</div>
+<div class="sect2">
+<h3 id="common-parameters">Common parameters</h3>
+<div class="paragraph">
+<p>These parameters apply in both standalone or managed domain mode:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Function</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-b=&lt;value&gt;</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sets system property jboss.bind.address to &lt;value&gt;. See
+Controlling the Bind Address with -b for further details.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-b&lt;name&gt;=&lt;value&gt;</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sets system property jboss.bind.address.&lt;name&gt; to
+&lt;value&gt; where name can vary. See Controlling the Bind Address with -b
+for further details.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-u=&lt;value&gt;</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sets system property jboss.default.multicast.address to
+&lt;value&gt;. See Controlling the Default Multicast Address with -u for
+further details.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--version-v-V</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Prints the version of WildFly to standard output and
+exits the JVM.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--help-h</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Prints a help message explaining the options and exits the
+JVM.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="controlling-the-bind-address">Controlling the Bind Address with -b</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>WildFly binds sockets to the IP addresses and interfaces contained in
+the <code>&lt;interfaces&gt;</code> elements in <code>standalone.xml</code>, <code>domain.xml</code> and
+<code>host.xml</code>. (See
+<a href="General_configuration_concepts.html#src-557065_Generalconfigurationconcepts-interfaces">Interfaces</a>
+and
+<a href="General_configuration_concepts.html#src-557065_Generalconfigurationconcepts-socket-bindings">Socket
+Bindings</a> for further information on these elements.) The standard
+configurations that ship with WildFly includes two interface
+configurations:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;interfaces&gt;
+    &lt;interface name="management"&gt;
+        &lt;inet-address value="${jboss.bind.address.management:127.0.0.1}"/&gt;
+    &lt;/interface&gt;
+    &lt;interface name="public"&gt;
+       &lt;inet-address value="${jboss.bind.address:127.0.0.1}"/&gt;
+    &lt;/interface&gt;
+&lt;/interfaces&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Those configurations use the values of system properties
+<code>jboss.bind.address.management</code> and <code>jboss.bind.address</code> if they are
+set. If they are not set, 127.0.0.1 is used for each value.</p>
+</div>
+<div class="paragraph">
+<p>As noted in
+<a href="#common-parameters">Common
+Parameters</a>, the AS supports the <code>-b</code> and <code>-b&lt;name&gt;</code> command line
+switches. The only function of these switches is to set system
+properties <code>jboss.bind.address</code> and <code>jboss.bind.address.&lt;name&gt;</code>
+respectively. However, because of the way the standard WildFly
+configuration files are set up, using the <code>-b</code> switches can indirectly
+control how the AS binds sockets.</p>
+</div>
+<div class="paragraph">
+<p><em>If your interface configurations match those shown above</em>, using this
+as your launch command causes all sockets associated with interface
+named "public" to be bound to <code>192.168.100.10</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">$JBOSS_HOME/bin/standalone.sh -b=192.168.100.10</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In the standard config files, public interfaces are those not associated
+with server management. Public interfaces handle normal end-user
+requests.</p>
+</div>
+<div class="paragraph">
+<p>Interface names</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+The interface named "public" is not inherently special. It is provided
+as a convenience. You can name your interfaces to suit your environment.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>To bind the public interfaces to all IPv4 addresses (the IPv4 wildcard
+address), use the following syntax:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$JBOSS_HOME/bin/standalone.sh -b=0.0.0.0</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can also bind the management interfaces, as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$JBOSS_HOME/bin/standalone.sh -bmanagement=192.168.100.10</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In the standard config files, management interfaces are those sockets
+associated with server management, such as the socket used by the CLI,
+the HTTP socket used by the admin console, and the JMX connector socket.</p>
+</div>
+<div class="paragraph">
+<p>Be Careful</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+The <code>-b</code> switch only controls the interface bindings because the
+standard config files that ship with WildFly sets things up that way. If
+you change the <code>&lt;interfaces&gt;</code> section in your configuration to no longer
+use the system properties controlled by <code>-b</code>, then setting <code>-b</code> in your
+launch command will have no effect.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>For example, this perfectly valid setting for the "public" interface
+causes <code>-b</code> to have no effect on the "public" interface:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;interface name="public"&gt;
+   &lt;nic name="eth0"/&gt;
+&lt;/interface&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The key point is <strong>the contents of the configuration files determine the
+configuration. Settings like</strong> <code>-b</code> <strong>are not overrides of the
+configuration files.</strong> They only provide a shorter syntax for setting a
+system properties that may or may not be referenced in the configuration
+files. They are provided as a convenience, and you can choose to modify
+your configuration to ignore them.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="controlling-the-default-multicast-address-with--u">Controlling the Default Multicast Address with -u</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>WildFly may use multicast communication for some services, particularly
+those involving high availability clustering. The multicast addresses
+and ports used are configured using the <code>socket-binding</code> elements in
+<code>standalone.xml</code> and <code>domain.xml</code>. (See
+<a href="General_configuration_concepts.html#src-557065_Generalconfigurationconcepts-socket-bindings">Socket
+Bindings</a> for further information on these elements.) The standard HA
+configurations that ship with WildFly include two socket binding
+configurations that use a default multicast address:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;socket-binding name="jgroups-mping" port="0" multicast-address="${jboss.default.multicast.address:230.0.0.4}" multicast-port="45700"/&gt;
+&lt;socket-binding name="jgroups-udp" port="55200" multicast-address="${jboss.default.multicast.address:230.0.0.4}" multicast-port="45688"/&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Those configurations use the values of system property
+<code>jboss.default.multicast.address</code> if it is set. If it is not set,
+<code>230.0.0.4</code> is used for each value. (The configuration may include other
+socket bindings for multicast-based services that are not meant to use
+the default multicast address; e.g. a binding the mod-cluster services
+use to communicate on a separate address/port with Apache httpd
+servers.)</p>
+</div>
+<div class="paragraph">
+<p>As noted in
+<a href="#common-parameters">Common Parameters</a>, the AS supports the <code>-u</code> command line switch. The only
+function of this switch is to set system property <code>jboss.default.multicast.address</code>. However, because of the way the
+standard AS configuration files are set up, using the <code>-u</code> switches can indirectly control how the AS uses multicast.</p>
+</div>
+<div class="paragraph">
+<p><em>If your socket binding configurations match those shown above</em>, using
+this as your launch command causes the service using those sockets
+configurations to be communicate over multicast address <code>230.0.1.2</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$JBOSS_HOME/bin/standalone.sh -u=230.0.1.2</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Be Careful</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+As with the <code>-b</code> switch, the <code>-u</code> switch only controls the multicast
+address used because the standard config files that ship with WildFly
+sets things up that way. If you change the <code>&lt;socket-binding&gt;</code> sections
+in your configuration to no longer use the system properties controlled
+by <code>-u</code>, then setting <code>-u</code> in your launch command will have no effect.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

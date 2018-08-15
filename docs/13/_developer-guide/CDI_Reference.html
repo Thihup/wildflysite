@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>CDI Reference | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="CDI Reference" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_developer-guide/CDI_Reference.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_developer-guide/CDI_Reference.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_developer-guide/CDI_Reference.html","headline":"CDI Reference","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>WildFly uses <a href="http://weld.cdi-spec.org/">Weld</a>, the CDI reference
+implementation as its CDI provider. To activate CDI for a deployment
+simply add a <code>beans.xml</code> file in any archive in the deployment.</p>
+</div>
+<div class="paragraph">
+<p>This document is not intended to be a CDI tutorial, it only covers CDI
+usage that is specific to WildFly. For some general information on CDI
+see the below links:</p>
+</div>
+<div class="paragraph">
+<p><a href="http://docs.jboss.org/cdi/spec/1.2/cdi-spec.html">CDI Specification</a><br>
+<a href="http://docs.jboss.org/weld/reference/latest/en-US/html/">Weld Reference
+Guide</a><br>
+<a href="https://github.com/wildfly/quickstart/">The WildFly Quickstarts</a></p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="using-cdi-beans-from-outside-the-deployment">Using CDI Beans from outside the deployment</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>For WildFly {wildflyVersion} onwards, it is now possible have classes outside the
+deployment be picked up as CDI beans. In order for this to work you must
+add a dependency on the external deployment that your beans are coming
+from, and make sure the META-INF directory of this deployment is
+imported, so that your deployment has visibility to the <code>beans.xml</code> file
+(To import beans from outside the deployment they must be in an archive
+with a <code>beans.xml</code> file).</p>
+</div>
+<div class="paragraph">
+<p>There are two ways to do this, either using the <code>MANIFEST.MF</code> or using
+<code>jboss-deployment-structure.xml</code>.</p>
+</div>
+<div class="paragraph">
+<p>Using <code>MANIFEST.MF</code> you need to add a <code>Dependencies</code> entry, with
+meta-inf specified after the entry, e.g.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>Dependencies: com.my-cdi-module meta-inf, com.my-other-cdi-module meta-inf</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Using <code>jboss-deployment-structure.xml</code> you need to add a dependency
+entry with <code>meta-inf="import"</code>, e.g.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.2"&gt;
+    &lt;deployment&gt;
+        &lt;dependencies&gt;
+            &lt;module name="deployment.d1.jar" meta-inf="import"/&gt;
+        &lt;/dependencies&gt;
+    &lt;/deployment&gt;
+&lt;/jboss-deployment-structure&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note that this can be used to create beans from both modules in the
+<code>modules</code> directory, and from other deployments.</p>
+</div>
+<div class="paragraph">
+<p>For more information on class loading and adding dependencies to your
+deployment please see the <a href="#Class_Loading_in_WildFly">Class
+Loading Guide</a></p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="suppressing-implicit-bean-archives">Suppressing implicit bean archives</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>CDI 1.1 brings new options to packaging of CDI-enabled applications. In
+addition to well-known explicit bean archives (basically any archive
+containing the <strong>beans.xml</strong> file) the specification introduces <strong>implicit
+bean archives</strong>.</p>
+</div>
+<div class="paragraph">
+<p>An implicit bean archive is any archive that contains one or more
+classes annotated with a bean defining annotation (scope annotation) or
+one or more session beans. As a result, the beans.xml file is no longer
+required for CDI to work in your application.</p>
+</div>
+<div class="paragraph">
+<p>In an implicit bean archive <strong>only those classes</strong> that are either
+annotated with bean defining annotations or are session beans are
+recognized by CDI as beans (other classes cannot be injected).</p>
+</div>
+<div class="paragraph">
+<p>This has a side-effect, though. Libraries exist that make use of scope
+annotation (bean defining annotations) for their own convenience but are
+not designed to run with CDI support. Guava would be an example of such
+library. If your application bundles such library it will be recognized
+as a CDI archive and may
+<a href="https://code.google.com/p/guava-libraries/issues/detail?id=1433">fail the
+deployment</a>.</p>
+</div>
+<div class="paragraph">
+<p>Fortunately, WildFly makes it possible to suppress implicit bean
+archives and only enable CDI in archives that bundle the beans.xml file.
+There are two ways to achieve this:</p>
+</div>
+<div class="sect2">
+<h3 id="per-deployment-configuration">Per-deployment configuration</h3>
+<div class="paragraph">
+<p>You can either set this up for your deployment only by adding the
+following content to the <strong>META-INF/jboss-all.xml</strong> file of your
+application:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;jboss xmlns="urn:jboss:1.0"&gt;
+    &lt;weld xmlns="urn:jboss:weld:1.0" require-bean-descriptor="true"/&gt;
+&lt;/jboss&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="global-configuration">Global configuration</h3>
+<div class="paragraph">
+<p>Alternatively, you may configure this for all deployments in your
+WildFly instance by executing the following command:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">/subsystem=weld:write-attribute(name=require-bean-descriptor,value=true)</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="development-mode">Development mode</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>WildFly 10 introduces a special mode for application development which
+allows you to inspect and monitor your CDI deployments. This mode is
+turned off by default and note that some features of the <strong>development
+mode may have negative impact on the performance and/or functionality of
+the application</strong>.</p>
+</div>
+<div class="sect2">
+<h3 id="per-deployment-configuration-1">Per-deployment configuration</h3>
+<div class="paragraph">
+<p>You can enable it locally in your application <code>web.xml</code> by setting the
+Servlet initialization parameter <code>org.jboss.weld.development</code> to <code>true:</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml"> &lt;context-param&gt;
+   &lt;param-name&gt;org.jboss.weld.development&lt;/param-name&gt;
+   &lt;param-value&gt;true&lt;/param-value&gt;
+ &lt;/context-param&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="global-configuration-1">Global configuration</h3>
+<div class="paragraph">
+<p>Alternatively, you can enable it globally in Weld subsystem by setting
+<code>development-mode</code> attribute to <code>true:</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">/subsystem=weld:write-attribute(name=development-mode,value=true)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For more details and example you can check
+<a href="http://docs.jboss.org/weld/reference/latest/en-US/html_single/#devmode">Weld
+development mode</a>.</p>
+</div>
+<div class="paragraph">
+<p>Once the development mode is enabled you can check your applications CDI
+information using Weld Probe -
+<a href="http://docs.jboss.org/weld/reference/latest/en-US/html_single/#probe">Weld
+Probe</a>.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="non-portable-mode">Non-portable mode</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>CDI 1.1 clarifies some aspects of how CDI protable extensions work. As a
+result, some extensions that do not use the API properly (but were
+tolerated in CDI 1.0 environment) may stop working with CDI 1.1.If this
+is the case of your application you will see an exception like this:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>org.jboss.weld.exceptions.IllegalStateException: WELD-001332: BeanManager method getBeans() is not available during application initialization</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Fortunatelly, there is a non-portable mode available in WildFly which
+skips some of the API usage checks and therefore allows the legacy
+extensions to work as before.</p>
+</div>
+<div class="paragraph">
+<p>Again, there are two ways to enable the non-portable mode:</p>
+</div>
+<div class="sect2">
+<h3 id="per-deployment-configuration-2">Per-deployment configuration</h3>
+<div class="paragraph">
+<p>You can either set this up for your deployment only by adding the
+following content to the <strong>META-INF/jboss-all.xml</strong> file of your
+application:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;jboss xmlns="urn:jboss:1.0"&gt;
+    &lt;weld xmlns="urn:jboss:weld:1.0" non-portable-mode="true" /&gt;
+&lt;/jboss&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="global-configuration-2">Global configuration</h3>
+<div class="paragraph">
+<p>Alternatively, you may configure this for all deployments in your
+WildFly instance by executing the following command:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">/subsystem=weld:write-attribute(name=non-portable-mode,value=true)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Note that new portable extensions should always use the</strong>
+<strong><a href="http://docs.jboss.org/cdi/api/1.1/javax/enterprise/inject/spi/BeanManager.html">BeanManager
+API</a></strong> <strong>properly and thus never required the non-portable mode. The
+non-portable mode only exists to preserve compatibility with legacy
+extensions!</strong></p>
+</div>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

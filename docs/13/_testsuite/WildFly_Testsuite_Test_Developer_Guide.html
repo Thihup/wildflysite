@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Wildfly_testsuite_test_developer_guide | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Wildfly_testsuite_test_developer_guide" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="WildFly Testsuite Test Developer Guide" />
+<meta property="og:description" content="WildFly Testsuite Test Developer Guide" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_testsuite/WildFly_Testsuite_Test_Developer_Guide.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_testsuite/WildFly_Testsuite_Test_Developer_Guide.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_testsuite/WildFly_Testsuite_Test_Developer_Guide.html","headline":"Wildfly_testsuite_test_developer_guide","description":"WildFly Testsuite Test Developer Guide","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="sect1">
+<h2 id="WildFly_Testsuite_Test_Developer_Guide">WildFly Testsuite Test Developer Guide</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><strong>See also:</strong> <a href="#WildFly_Integration_Testsuite_User_Guide">WildFly
+Integration Testsuite User Guide</a></p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="pre-requisites">Pre-requisites</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Please be sure to read <a href="#Pre-requisites_-_test_quality_standards">Pre-requisites - test quality
+standards</a> and follow those guidelines.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="arquillian-container-configuration">Arquillian container configuration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>See
+<a href="https://docs.jboss.org/author/display/ARQ/JBoss+AS+7.1%2C+JBoss+EAP+6.0+-+Managed">AS
+7.1 managed container adapter refrence</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="managementclient-and-modelnode-usage-example">ManagementClient and ModelNode usage example</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">final ModelNode operation = new ModelNode();
+operation.get(ModelDescriptionConstants.OP).set(ModelDescriptionConstants.READ_RESOURCE_OPERATION);
+operation.get(ModelDescriptionConstants.OP_ADDR).set(address);
+operation.get(ModelDescriptionConstants.RECURSIVE).set(true);
+ 
+final ModelNode result = managementClient.getControllerClient().execute(operation);
+Assert.assertEquals(ModelDescriptionConstants.SUCCESS, result.get(ModelDescriptionConstants.OUTCOME).asString());</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ManagementClient can be obtained as described below.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="arquillian-features-available-in-tests">Arquillian features available in tests</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>@ServerSetup</p>
+</div>
+<div class="paragraph">
+<p>TBD</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@ContainerResource private ManagementClient managementClient;
+final ModelNode result = managementClient.getControllerClient().execute(operation);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>TBD</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@ArquillianResource private ManagementClient managementClient;
+ModelControllerClient client = managementClient.getControllerClient();</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@ArquillianResource ContainerController cc;
+ 
+@Test
+public void test() {
+    cc.setup("test", ...properties..)
+    cc.start("test")
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;arquillian&gt;
+    &lt;container qualifier="test" mode="manual" /&gt;
+&lt;/arquillian&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">// Targeted containers HTTP context.
+@ArquillianResource URL url;</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">// Targeted containers HTTP context where servlet is located.
+@ArquillianResource(SomeServlet.class) URL url;</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">// Targeted containers initial context.
+@ArquillianResource InitialContext|Context context;</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">// The manual deployer.
+@ArquillianResource Deployer deployer;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>See
+<a href="https://docs.jboss.org/author/display/ARQ/Resource+injection">Arquillian&#8217;s
+Resource Injection docs</a> for more info,
+<a href="https://github.com/arquillian/arquillian-examples" class="bare">https://github.com/arquillian/arquillian-examples</a> for examples.</p>
+</div>
+<div class="paragraph">
+<p>See also
+<a href="https://docs.jboss.org/author/display/ARQ/Reference+Guide">Arquillian
+Reference</a>.</p>
+</div>
+<div class="paragraph">
+<p>Note to @ServerSetup annotation: It works as expected only on non-manual
+containers. In case of manual mode containers it calls setup() method
+after each server start up which is right (or actually before
+deployment), but the tearDown() method is called only at AfterClass
+event, i.e. usually after your manual shutdown of the server. Which
+limits you on the ability to revert some configuration changes on the
+server and so on. I cloned the annotation and changed it to fit the
+manual mode, but it is still in my github branch :)</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="properties-available-in-tests">Properties available in tests</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="directories">Directories</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>jbosssa.project.dir - Project&#8217;s root dir (where ./build.sh is).</p>
+</li>
+<li>
+<p>jbossas.ts.dir - Testsuite dir.</p>
+</li>
+<li>
+<p>jbossas.ts.integ.dir - Testsuite&#8217;s integration module dir.</p>
+</li>
+<li>
+<p>jboss.dist - Path to AS distribution, either built
+(build/target/jboss-as-&#8230;&#8203;) or user-provided via -Djboss.dist</p>
+</li>
+<li>
+<p>jboss.inst - (Arquillian in-container only) Path to the AS instance in
+which the test is running (until ARQ-650 is possibly done)</p>
+</li>
+<li>
+<p><strong class="line-through">jboss.home</strong> - Deprecated as it&#8217;s name is unclear and
+confusing. Use jboss.dist or jboss.inst.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="networking">Networking</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>node0</p>
+</li>
+<li>
+<p>node1</p>
+</li>
+<li>
+<p>230.0.0.4</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="time-related-coefficients-ratios">Time-related coefficients (ratios)</h3>
+<div class="paragraph">
+<p>In case some of the following causes timeouts, you may prolong the
+timeouts by setting value &gt;= 100:</p>
+</div>
+<div class="paragraph">
+<p>100 = leave as is,<br>
+150 = 50 % longer, etc.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>timeout.ratio.gen - General ratio - can be used to adjust all
+timeouts.When this and specific are defined, both apply.</p>
+</li>
+<li>
+<p>timeout.ratio.fs- Filesystem IO</p>
+</li>
+<li>
+<p>timeout.ratio.net - Network IO</p>
+</li>
+<li>
+<p>timeout.ratio.mem - Memory IO</p>
+</li>
+<li>
+<p>timeout.ratio.cpu - Processor</p>
+</li>
+<li>
+<p>timeout.ratio.db - Database</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Time ratios will soon be provided by
+<code>org.jboss.as.test.shared.time.TimeRatio.for*()</code> methods.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="negative-tests">Negative tests</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To test invalid deployment handling: @ShouldThrowException</p>
+</div>
+<div class="paragraph">
+<p>Currently doesn&#8217;t work due to
+<a href="https://issues.jboss.org/browse/WFLY-673">WFLY-673</a>.</p>
+</div>
+<div class="paragraph">
+<p>optionally you might be able to catch it using the manual deployer</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@Deployment(name = "X", managed = false) ...
+ 
+@Test
+public void shouldFail(@ArquillianResource Deployer deployer) throws Exception {
+  try {
+    deployer.deploy("X")
+  }
+  catch(Exception e) {
+   // do something
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="clustering-tests-wfly-616">Clustering tests (WFLY-616)</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>You need to deploy the same thing twice, so two deployment methods that
+just return the same thing.<br>
+And then you have tests that run against each.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@Deployment(name = "deplA", testable = false)
+    @TargetsContainer("serverB")
+    public static Archive&lt;?&gt; deployment()
+ 
+    @Deployment(name = "deplB", testable = false)
+    @TargetsContainer("serverA")
+    public static Archive&lt;?&gt; deployment(){ ... }
+ 
+    @Test
+    @OperateOnDeployment("deplA")
+    public void testA(){ ... }
+ 
+    @Test
+    @OperateOnDeployment("deplA")
+    public void testA() {...}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="how-to-get-the-tests-to-master">How to get the tests to master</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>First of all, <strong>be sure to read the "Before you add a test" section</strong>.</p>
+</li>
+<li>
+<p><strong>Fetch</strong> the newest mater:
+<code>git fetch upstream # Provided you have the jbossas/jbossas GitHub repo</code>
+<code>as a remote called 'upstream'.</code></p>
+</li>
+<li>
+<p><strong>Rebase</strong> your branch: git checkout WFLY-1234-your-branch; git rebase
+upstream/master</p>
+</li>
+<li>
+<p><strong>Run</strong> <strong><em>whole</em></strong> <strong>testsuite</strong> (integration-tests -DallTests). You may
+use
+<a href="https://jenkins.mw.lab.eng.bos.redhat.com/hudson/job/wildfly-as-testsuite-RHEL-matrix-openJDK7/lastCompletedBuild/testReport/" class="bare">https://jenkins.mw.lab.eng.bos.redhat.com/hudson/job/wildfly-as-testsuite-RHEL-matrix-openJDK7/lastCompletedBuild/testReport/</a>.</p>
+<div class="ulist">
+<ul>
+<li>
+<p>If any tests fail and they do not fail in master, fix it and go back
+to the "Fetch" step.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>Push</strong> to a new branch in your GitHub repo:
+<code>git push origin WFLY-1234-new-XY-tests</code></p>
+</li>
+<li>
+<p><strong>Create a pull-request</strong> on GitHub. Go to your branch and click on
+"Pull Request".</p>
+<div class="ulist">
+<ul>
+<li>
+<p>If you have a jira, start the title with it, like - WFLY-1234 New
+tests for XYZ.</p>
+</li>
+<li>
+<p>If you don&#8217;t, write some apposite title. In the description, describe
+in detail what was done and why should it be merged. Keep in mind that
+the diff will be visible under your description.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>Keep the branch rebased daily</strong> until it&#8217;s merged (see the Fetch
+step). If you don&#8217;t, you&#8217;re dramatically decreasing chance to get it
+merged.</p>
+</li>
+<li>
+<p>There&#8217;s a mailing list, jbossas-pull-requests, which is notified of
+every pull-request.</p>
+</li>
+<li>
+<p>You might have someone with merge privileges to cooperate with you, so
+they know what you&#8217;re doing, and expect your pull request.</p>
+</li>
+<li>
+<p>When your pull request is reviewed and merged, you&#8217;ll be notified by
+mail from GitHub.</p>
+</li>
+<li>
+<p>You may also check if it was merged by the following:
+<code>git fetch upstream; git cherry</code> <code>&lt;branch&gt; ## Or</code> git branch
+--contains\{\{&lt;branch&gt; - see}} <code>here</code></p>
+</li>
+<li>
+<p>Your commits will appear in master. They will have the same hash as in
+your branch.</p>
+<div class="ulist">
+<ul>
+<li>
+<p>You are now safe to delete both your local and remote branches:
+<code>git branch -D WFLY-1234-your-branch; git push origin :WFLY-1234-your-branch</code></p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="How_to_Add_a_Test_Case">How to Add a Test Case</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><em>(Please don&#8217;t (re)move - this is a landing page from a Jira link.)</em></p>
+</div>
+<div class="paragraph">
+<p><strong>Thank you for finding time to contribute to WildFly {wildflyVersion} quality.</strong><br>
+Covering corner cases found by community users with tests is very
+important to increase stability.<br>
+If you&#8217;re providing a test case to support your bug report, it&#8217;s very
+likely that your bug will be fixed much sooner.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="create-a-test-case.">1) Create a test case.</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>It&#8217;s quite easy - a simple use case may even consist of one short .java
+file.</p>
+</div>
+<div class="paragraph">
+<p>Check WildFly {wildflyVersion}
+<a href="https://github.com/wildfly/wildfly/tree/master/testsuite/integration/basic/src/test/java/org/jboss/as/test/integration">test
+suite test cases</a> for examples.</p>
+</div>
+<div class="paragraph">
+<p>For more information, see <a href="#WildFly_Testsuite_Test_Developer_Guide">WildFly Testsuite Test
+Developer Guide</a>. Check the requirements for a test to be included in
+the testsuite.</p>
+</div>
+<div class="paragraph">
+<p>Ask for help at WildFly {wildflyVersion} forum or at IRC - #wildfly @ FreeNode.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="push-your-test-case-to-github-and-create-a-pull-request.">2) Push your test case to GitHub and create a pull request.</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>For information on how to create a GitHub account and push your code
+therein, see <a href="https://community.jboss.org/wiki/HackingOnWildFly">Hacking
+on WildFly</a>.</p>
+</div>
+<div class="paragraph">
+<p>If you&#8217;re not into Git, send a diff file to JBoss forums, someone might
+pick it up.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="wait-for-the-outcome.">3) Wait for the outcome.</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Your test case will be reviewed and eventually added. It may take few
+days.</p>
+</div>
+<div class="paragraph">
+<p>When something happens, you&#8217;ll receive a notification e-mail.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="Pre-requisites_-_test_quality_standards">Before you add a test</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Every added test, whether ported or new should follow the same
+guidelines:</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="verify-the-test-belongs-in-wildfly">Verify the test belongs in WildFly</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>AS6 has a lot of tests for things that are discontinued. For example
+the<br>
+legacy JBoss Transaction Manager which was replaced by Arjuna. Also we<br>
+had tests for SPIs that no longer exist. None of these things should
+be<br>
+migrated.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="only-add-correct-and-understandable-tests">Only add CORRECT and UNDERSTANDABLE tests</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If you don&#8217;t understand what a test is doing (perhaps too complex), or<br>
+it&#8217;s going about things in a strange way that might not be correct,
+THEN<br>
+DO NOT PORT IT. Instead we should have a simpler, understandable, and<br>
+correct test. Write a new one, ping the author, or skip it altogether.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="do-not-add-duplicate-tests">Do not add duplicate tests</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Always check that the test you are adding doesn&#8217;t have coverage<br>
+elsewhere (try using "git grep"). As mentioned above we have some<br>
+overlap between 6 and 7. The 7 test version will likely be better.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="dont-name-tests-after-jiras">Don&#8217;t name tests after JIRAs</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A JIRA number is useless without an internet connection, and they are<br>
+hard to read. If I get a test failure thats XDGR-843534578 I have to
+dig<br>
+to figure out the context. It&#8217;s perfectly fine though to link to a
+JIRA<br>
+number in the comments of the test. Also the commit log is always
+available.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="tests-should-contain-javadoc-that-explains-what-is-being-tested">Tests should contain javadoc that explains what is being tested</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This is especially critical if the test is non-trivial</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="prefer-expanding-an-existing-test-over-a-new-test-class">Prefer expanding an EXISTING test over a new test class</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If you are looking at migrating or creating a test with similar<br>
+functionality to an exiting test, it is better to<br>
+expand upon the existing one by adding more test methods, rather than<br>
+creating a whole new test. In general each<br>
+new test class adds at least 300ms to execution time, so as long as it<br>
+makes sense it is better to add it to an<br>
+existing test case.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="organize-tests-by-subsystem">Organize tests by subsystem</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Integration tests should be packaged in subpackages under the relevant<br>
+subsystem (e.g org.jboss.as.test.integration.ejb.async). When a test<br>
+impacts multiple subsystems this is a bit of a judgement call, but in<br>
+general the tests should go into the package of<br>
+the spec that defines the functionality (e.g. CDI based constructor<br>
+injection into an EJB, even though this involves CDI and EJB,<br>
+the CDI spec defines this behaviour)</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="explain-non-obvious-spec-behavior-in-comments">Explain non-obvious spec behavior in comments</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The EE spec is full of odd requirements. If the test is covering<br>
+behavior that is not obvious then please add something like "Verifies
+EE<br>
+X.T.Z - The widget can&#8217;t have a foobar if it is declared like blah"</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="put-integration-test-resources-in-the-source-directory-of-the-test">Put integration test resources in the source directory of the test</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>At the moment there is not real organization of these files. It makes<br>
+sense for most apps to have this separation, however the testsuite is<br>
+different. e.g. most apps will have a single deployment descriptor of
+a<br>
+given type, for the testsuite will have hundreds, and maintaining
+mirroring<br>
+package structures is error prone.<br>
+This also makes the tests easier to understand, as all the artifacts
+in<br>
+the deployment are in one place, and that place tends to be small
+(only<br>
+a handful of files).</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="do-not-hard-code-values-likely-to-need-configuration-urls-ports">Do not hard-code values likely to need configuration (URLs, ports, &#8230;&#8203;)</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>URLs hardcoded to certain address (localhost) or port (like the default
+8080 for web) prevent running the test against different address or with
+IPv6 adress.<br>
+Always use the configurable values provided by Arquillian or as a system
+property.<br>
+If you come across a value which is not configurable but you think it
+should be, file an WildFly {wildflyVersion} jira issue with component "Test suite".<br>
+See
+<a href="https://github.com/arquillian/arquillian/blob/master/examples/junit/src/test/java/com/acme/web/LocalRunServletTestCase.java">@ArquillianResourrce
+usage example</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="follow-best-committing-practices">Follow best committing practices</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Only do changes related to the topic of the jira/pull request.</p>
+</li>
+<li>
+<p>Do not clutter your pull request with e.g. reformatting, fixing typos
+spotted along the way - do another pull request for such.</p>
+</li>
+<li>
+<p>Prefer smaller changes in more pull request over one big pull request
+which are difficult to merge.</p>
+</li>
+<li>
+<p>Keep the code consistent across commits - e.g. when renaming
+something, be sure to update all references to it.</p>
+</li>
+<li>
+<p>Describe your commits properly as they will appear in master&#8217;s linear
+history.</p>
+</li>
+<li>
+<p>If you&#8217;re working on a jira issue, include it&#8217;s ID in the commit
+message(s).</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="do-not-use-blind-timeouts">Do not use blind timeouts</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Do not use Thread.sleep() without checking for the actual condition you
+need to be fulfilled.<br>
+You may use active waiting with a timeout, but prefer using timeouts of
+the API/SPI you test where available.</p>
+</div>
+<div class="paragraph">
+<p>Make the timeouts configurable: For a group of similar test, use a
+configurable timeout value with a default if not set.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="provide-messages-in-assert-and-fail-calls">Provide messages in assert*() and fail() calls</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Definitely, it&#8217;s better to see "File x/y/z.xml not found" instead of:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">junit.framework.AssertionFailedError
+     at junit.framework.Assert.fail(Assert.java:48) [arquillian-service:]
+     at junit.framework.Assert.assertTrue(Assert.java:20) [arquillian-service:]
+     at junit.framework.Assert.assertTrue(Assert.java:27) [arquillian-service:]
+     at org.jboss.as.test.smoke.embedded.parse.ParseAndMarshalModelsTestCase.getOriginalStandaloneXml(ParseAndMarshalModelsTestCase.java:554) [bogus.jar:]</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="provide-configuration-properties-hints-in-exceptions">Provide configuration properties hints in exceptions</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If your test uses some configuration property and it fails possibly due
+to misconfiguration, note the property and it&#8217;s value in the exception:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">File jdbcJar = new File( System.getProperty("jbossas.ts.dir", "."),
+       "integration/src/test/resources/mysql-connector-java-5.1.15.jar");
+    if( !jdbcJar.exists() )
+        throw new IllegalStateException("Can't find " + jdbcJar + " using $\{jbossas.ts.dir} == " + System.getProperty("jbossas.ts.dir") );</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="clean-up">Clean up</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Close sockets, connections, file descriptors;</p>
+</li>
+<li>
+<p>Don&#8217;t put much data to static fields, or clean them in a finaly {&#8230;&#8203;} block.</p>
+</li>
+<li>
+<p>Don&#8217;t alter AS config (unless you are absolutely sure that it will
+reload in a final \{&#8230;&#8203;} block or an @After* method)</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="keep-the-tests-configurable">Keep the tests configurable</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Keep these things in properties, set them at the beginning of the test:
+* Timeouts
+* Paths
+* URLs
+* Numbers (of whatever)</p>
+</div>
+<div class="paragraph">
+<p>They either will be or already are provided in form of system
+properties, or a simple testsuite until API (soon to come).</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="Shared_Test_Classes_and_Resources">Shared Test Classes and Resources</h2>
+<div class="sectionbody">
+
+</div>
+</div>
+<div class="sect1">
+<h2 id="among-testsuite-modules">Among Testsuite Modules</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Use the testsuite/shared module.</p>
+</div>
+<div class="paragraph">
+<p>Classes and resources in this module are available in all testsuite
+modules - i.e. in testsuite/* .</p>
+</div>
+<div class="paragraph">
+<p>Only use it if necessary - don&#8217;t put things "for future use" in there.</p>
+</div>
+<div class="paragraph">
+<p><strong>Don&#8217;t split packages across modules.</strong> <strong>Make sure the java package is
+unique in the WildFly project.</strong></p>
+</div>
+<div class="paragraph">
+<p><strong>Document your util classes</strong> (javadoc) so they can be easily found and
+reused! A generated list will be put here.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="between-components-and-testsuite-modules">Between Components and Testsuite Modules</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To share component&#8217;s test classes with some module in testsuite, you
+don&#8217;t need to split to submodules.
+You can create a jar with classifier using this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;plugin&gt;
+    &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+    &lt;artifactId&gt;maven-jar-plugin&lt;/artifactId&gt;
+    &lt;executions&gt;
+        &lt;execution&gt;
+            &lt;goals&gt;
+                &lt;goal&gt;test-jar&lt;/goal&gt;
+            &lt;/goals&gt;
+        &lt;/execution&gt;
+    &lt;/executions&gt;
+&lt;/plugin&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This creates a jar with classifier "tests", so you can add it as
+dependency to a testsuite module:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">    &lt;dependency&gt;
+        &lt;groupId&gt;org.wildfly&lt;/groupId&gt;
+        &lt;artifactId&gt;wildfly-clustering-common&lt;/artifactId&gt;
+        &lt;classifier&gt;tests&lt;/classifier&gt;
+        &lt;version&gt;${project.version}&lt;/version&gt;
+        &lt;scope&gt;test&lt;/scope&gt;
+    &lt;/dependency&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

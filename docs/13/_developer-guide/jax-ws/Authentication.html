@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Authentication | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Authentication" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_developer-guide/jax-ws/Authentication.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_developer-guide/jax-ws/Authentication.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_developer-guide/jax-ws/Authentication.html","headline":"Authentication","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="sect1">
+<h2 id="jax-ws-authentication">Authentication</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Here the simplest way to authenticate a web service user with JBossWS is
+explained.</p>
+</div>
+<div class="paragraph">
+<p>First we secure the access to the SLSB as we would do for normal (non
+web service) invocations: this can be easily done through the
+@RolesAllowed, @PermitAll, @DenyAll annotation. The allowed user roles
+can be set with these annotations both on the bean class and on any of
+its business methods.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@Stateless
+@RolesAllowed("friend")
+public class EndpointEJB implements EndpointInterface
+{
+  ...
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Similarly POJO endpoints are secured the same way as we do for normal
+web applications in web.xml:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;security-constraint&gt;
+  &lt;web-resource-collection&gt;
+    &lt;web-resource-name&gt;All resources&lt;/web-resource-name&gt;
+    &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
+  &lt;/web-resource-collection&gt;
+  &lt;auth-constraint&gt;
+    &lt;role-name&gt;friend&lt;/role-name&gt;
+  &lt;/auth-constraint&gt;
+&lt;/security-constraint&gt;
+ 
+&lt;security-role&gt;
+  &lt;role-name&gt;friend&lt;/role-name&gt;
+&lt;/security-role&gt;</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="specify-the-security-domain">Specify the security domain</h3>
+<div class="paragraph">
+<p>Next, specify the security domain for this deployment. This is performed
+using the <code>@SecurityDomain</code> annotation for EJB3 endpoints</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@Stateless
+@SecurityDomain("JBossWS")
+@RolesAllowed("friend")
+public class EndpointEJB implements EndpointInterface
+{
+  ...
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or modifying the jboss-web.xml for POJO endpoints</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;jboss-web&gt;
+&lt;security-domain&gt;JBossWS&lt;/security-domain&gt;
+&lt;/jboss-web&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The security domain as well as its the authentication and authorization
+mechanisms are defined differently depending on the application server
+version in use.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="use-bindingprovider-to-set-principalcredential">Use BindingProvider to set principal/credential</h3>
+<div class="paragraph">
+<p>A web service client may use the <code>javax.xml.ws.BindingProvider</code>
+interface to set the username/password combination</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">URL wsdlURL = new File("resources/jaxws/samples/context/WEB-INF/wsdl/TestEndpoint.wsdl").toURL();
+QName qname = new QName("http://org.jboss.ws/jaxws/context", "TestEndpointService");
+Service service = Service.create(wsdlURL, qname);
+port = (TestEndpoint)service.getPort(TestEndpoint.class);
+ 
+BindingProvider bp = (BindingProvider)port;
+bp.getRequestContext().put(BindingProvider.USERNAME_PROPERTY, "kermit");
+bp.getRequestContext().put(BindingProvider.PASSWORD_PROPERTY, "thefrog");</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="using-http-basic-auth-for-security">Using HTTP Basic Auth for security</h3>
+<div class="paragraph">
+<p>To enable HTTP Basic authentication you use the <code>@WebContext</code> annotation
+on the bean class</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@Stateless
+@SecurityDomain("JBossWS")
+@RolesAllowed("friend")
+@WebContext(contextRoot="/my-cxt", urlPattern="/*", authMethod="BASIC", transportGuarantee="NONE", secureWSDLAccess=false)
+public class EndpointEJB implements EndpointInterface
+{
+  ...
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For POJO endpoints, we modify the <em>web.xml</em> adding the auth-method
+element:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;login-config&gt;
+  &lt;auth-method&gt;BASIC&lt;/auth-method&gt;
+  &lt;realm-name&gt;Test Realm&lt;/realm-name&gt;
+&lt;/login-config&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="jaspi-authentication">JASPI Authentication</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A Java Authentication SPI (JASPI) provider can be configured in WildFly
+security subsystem to authenticate SOAP messages:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;security-domain name="jaspi"&gt;
+&lt;authentication-jaspi&gt;
+&lt;login-module-stack name="jaas-lm-stack"&gt;
+&lt;login-module code="UsersRoles" flag="required"&gt;
+&lt;module-option name="usersProperties" value="jbossws-users.properties"/&gt;
+&lt;module-option name="rolesProperties" value="jbossws-roles.properties"/&gt;
+&lt;/login-module&gt;
+&lt;/login-module-stack&gt;
+&lt;auth-module code="org.jboss.wsf.stack.cxf.jaspi.module.UsernameTokenServerAuthModule" login-module-stack-ref="jaas-lm-stack"/&gt;
+&lt;/authentication-jaspi&gt;
+&lt;/security-domain&gt;</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+For further information on configuring security domains in WildFly,
+please refer to
+<a href="https://docs.jboss.org/author/display/WFLY9/Security+subsystem+configuration">here</a>.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Here
+<code>org.jboss.wsf.stack.cxf.jaspi.module.UsernameTokenServerAuthModule</code> is
+the class implementing
+<code>javax.security.auth.message.module.ServerAuthModule</code>, which delegates
+to the proper login module to perform authentication using the
+credentials from WS-Security UsernameToken in the incoming SOAP message.
+Alternative implementations of <code>ServerAuthModule</code> can be implemented and
+configured.</p>
+</div>
+<div class="paragraph">
+<p>To enable JASPI authentication, the endpoint deployment needs to specify
+the security domain to use; that can be done in two different ways:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Setting the <code>jaspi.security.domain</code> property in the
+<code>jboss-webservices.xml</code> descriptor</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.1" encoding="UTF-8"?&gt;
+&lt;webservices
+xmlns="http://www.jboss.com/xml/ns/javaee"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+version="1.2"
+xsi:schemaLocation="http://www.jboss.com/xml/ns/javaee"&gt;
+ 
+&lt;property&gt;
+&lt;name&gt;jaspi.security.domain&lt;/name&gt;
+&lt;value&gt;jaspi&lt;/value&gt;
+&lt;/property&gt;
+ 
+&lt;/webservices&gt;</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Referencing (through <code>@EndpointConfig</code> annotation) an endpoint config
+that sets the <code>jaspi.security.domain</code> property</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@EndpointConfig(configFile = "WEB-INF/jaxws-endpoint-config.xml", configName = "jaspiSecurityDomain")
+public class ServiceEndpointImpl implements ServiceIface {</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>jaspi.security.domain</code> property is specified as follows in the
+referenced descriptor:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;jaxws-config xmlns="urn:jboss:jbossws-jaxws-config:4.0"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:javaee="http://java.sun.com/xml/ns/javaee"
+xsi:schemaLocation="urn:jboss:jbossws-jaxws-config:4.0 schema/jbossws-jaxws-config_4_0.xsd"&gt;
+&lt;endpoint-config&gt;
+&lt;config-name&gt;jaspiSecurityDomain&lt;/config-name&gt;
+&lt;property&gt;
+&lt;property-name&gt;jaspi.security.domain&lt;/property-name&gt;
+&lt;property-value&gt;jaspi&lt;/property-value&gt;
+&lt;/property&gt;
+&lt;/endpoint-config&gt;
+&lt;/jaxws-config&gt;</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+If the JASPI security domain is specified in both
+<code>jboss-webservices.xml</code> and config file referenced by <code>@EndpointConfig</code>
+annotation, the JASPI security domain specified in
+<code>jboss-webservices.xml</code> will take precedence.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

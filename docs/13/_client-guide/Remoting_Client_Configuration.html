@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Remoting Client Configuration | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Remoting Client Configuration" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_client-guide/Remoting_Client_Configuration.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_client-guide/Remoting_Client_Configuration.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_client-guide/Remoting_Client_Configuration.html","headline":"Remoting Client Configuration","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="sect1">
+<h2 id="endpoint-remoting-client">&lt;endpoint /&gt; - Remoting Client</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>You can use the <code>endpoint</code> element, which is in the <code>urn:jboss-remoting:5.0</code> namespace, to configure a JBoss Remoting client endpoint using the <code>wildfly-config.xml</code> file. This section describes how to configure a JBoss Remoting client using this element.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+
+&lt;configuration&gt;
+...
+    &lt;endpoint xmlns="urn:jboss-remoting:5.0"&gt;
+       ...
+    &lt;/endpoint&gt;
+...
+&lt;/configuration&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This section describes the child elements and attributes that can be configured within this element.</p>
+</div>
+<div class="paragraph">
+<p>The <em>&lt;endpoint /&gt;</em>&nbsp;element contains the following optional attribute:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Attribute Name</th>
+<th class="tableblock halign-left valign-top">Attribute Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>name</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The endpoint name.  If not given, an endpoint name will be derived from the system&#8217;s host name, if possible.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>The <em>&lt;endpoint /&gt;</em>&nbsp;element can optionally contain the following two child elements, as described in the next sections:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>&lt;providers /&gt;</strong></p>
+</li>
+<li>
+<p><strong>&lt;connections /&gt;</strong></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The configured endpoint will use the default XNIO configuration.</p>
+</div>
+<div class="sect2">
+<h3 id="providers">&lt;providers /&gt;</h3>
+<div class="paragraph">
+<p>This optional element specifies transport providers for the remote endpoint. It can contain any number of <em>&lt;provider /&gt;</em>&nbsp;sub-elements.</p>
+</div>
+<div class="sect3">
+<h4 id="provider">&lt;provider /&gt;</h4>
+<div class="paragraph">
+<p>This element defines a remote transport provider provider. It has the following attributes.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Attribute Name</th>
+<th class="tableblock halign-left valign-top">Attribute Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>scheme</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The primary URI scheme which corresponds to this provider. This attribute is required.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>aliases</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A space-separated list of other URI scheme names that are also recognized for this provider . This attribute is optional.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>module</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the module that contains the provider implementation.  This attribute is optional; if not given, the class loader of JBoss Remoting itself will be searched for the provider class.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>class</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the class that implements the transport provider.  This attribute is optional; if not given, the Java <code>java.util.ServiceLoader</code> facility will be used to search for the provider class.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>This element has no content.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="connections">&lt;connections /&gt;</h3>
+<div class="paragraph">
+<p>This optional element specifies connections for the remote endpoint. It can contain any number of [#connection] elements.</p>
+</div>
+<div class="sect3">
+<h4 id="connection">&lt;connection /&gt;</h4>
+<div class="paragraph">
+<p>This element defines a connection for the remote endpoint. It has the following attributes.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Attribute Name</th>
+<th class="tableblock halign-left valign-top">Attribute Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>destination</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The destination URI for the connection. This attribute is required.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>read-timeout</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The timeout, in seconds, for read operations on the corresponding socket. This attribute is optional, however it should only be given if a <code>heartbeat-interval</code> is defined.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>write-timeout</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The timeout, in seconds, for a write operation. This attribute is optional, however it should only be given if a <code>heartbeat-interval</code> is defined..</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ip-traffic-class</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Defines the numeric IP traffic class to use for this connection&#8217;s traffic.  This attribute is optional.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>tcp-keepalive</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Boolean setting that determines whether to use TCP keepalive. This attribute is optional.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>heartbeat-interval</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The interval, in milliseconds, to use when checking for a connection heartbeat. This attribute is optional.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="example-remoting-client-configuration-in-the-wildfly-config-xml-file">Example Remoting Client Configuration in the wildfly-config.xml File</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;configuration&gt;
+...
+    &lt;endpoint xmlns="urn:jboss-remoting:5.0"&gt;
+        &lt;connections&gt;
+            &lt;connection destination="remote+http://10.20.30.40:8080" read-timeout="50" write-timeout="50" heartbeat-interval="10000"/&gt;
+        &lt;/connections&gt;
+    &lt;/endpoint&gt;
+...
+&lt;/configuration&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

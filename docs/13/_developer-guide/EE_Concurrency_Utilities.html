@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>EE Concurrency Utilities | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="EE Concurrency Utilities" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_developer-guide/EE_Concurrency_Utilities.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_developer-guide/EE_Concurrency_Utilities.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_developer-guide/EE_Concurrency_Utilities.html","headline":"EE Concurrency Utilities","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div id="preamble">
+<div class="sectionbody">
+<div class="quoteblock abstract">
+<blockquote>
+EE Concurrency Utilities (JSR 236) is a technology introduced with Java
+EE 7, which adapts well known Java SE concurrency utilities to the Java
+EE application environment specifics. The Java EE application server is
+responsible for the creation (and shutdown) of every instance of the EE
+Concurrency Utilities, and provide these to the applications, ready to
+use.
+</blockquote>
+</div>
+<div class="paragraph">
+<p>The EE Concurrency Utilities support the propagation of the invocation
+context, capturing the existent context in the application threads to
+use in their own threads, the same way a logged-in user principal is
+propagated when a servlet invokes an EJB asynchronously. The propagation
+of the invocation context includes, by default, the class loading, JNDI
+and security contexts.</p>
+</div>
+<div class="paragraph">
+<p>WildFly creates a single default instance of each EE Concurrency Utility
+type in all configurations within the distribution, as mandated by the
+specification, but additional instances, perhaps customised to better
+serve a specific usage, may be created through WildFly&#8217;s EE Subsystem
+Configuration. To learn how to configure EE Concurrency Utilities please
+refer to <a href="Admin_Guide.html#EE_Concurrency_Utilities_Configuration">EE Concurrency
+Utilities Configuration</a>. Additionally, the EE subsystem configuration
+also includes the configuration of which instance should be considered
+the default instance mandated by the Java EE specification, and such
+configuration is covered by
+<a href="Default_EE_Bindings_Configuration.html">Default EE Bindings
+Configuration</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="context-service">Context Service</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The Context Service ( <code>javax.enterprise.concurrent.ContextService</code>) is a
+brand new concurrency utility, which applications may use to build
+contextual proxies from existing objects.</p>
+</div>
+<div class="paragraph">
+<p>A contextual proxy is an object that sets a invocation context, captured
+when created, whenever is invoked, before delegating the invocation to
+the original object.</p>
+</div>
+<div class="paragraph">
+<p>Usage example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">public void onGet(...) {
+  Runnable task = ...;
+  Runnable contextualTask = contextService.createContextualProxy(task, Runnable.class);
+  // ...
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>WildFly default configurations creates a single default instance of a
+Context Service, which may be retrieved through <code>@Resource</code> injection:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@Resource
+private ContextService contextService;</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+To retrieve instead a non default Context Service instance,
+<code>@Resource&#8217;s `lookup</code> attribute needs to specify the JNDI name used in
+the wanted instance configuration. WildFly will always inject the
+default instance, no matter what&#8217;s the <code>name</code> attribute value, if the
+<code>lookup</code> attribute is not defined.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Applications may alternatively use instead the standard JNDI API:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">ContextService contextService = InitialContext.doLookup("java:comp/DefaultContextService");</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+As mandated by the Java EE specification, the default Context Service
+instance&#8217;s JNDI name is <code>java:comp/DefaultContextService</code>.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="managed-thread-factory">Managed Thread Factory</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The Managed Thread Factory (
+<code>javax.enterprise.concurrent.ManagedThreadFactory</code>) allows Java EE
+applications to create Java threads. It is an extension of Java SE&#8217;s
+Thread Factory ( <code>java.util.concurrent.ThreadFactory</code>) adapted to the
+Java EE platform specifics.</p>
+</div>
+<div class="paragraph">
+<p>Managed Thread Factory instances are managed by the application server,
+thus Java EE applications are forbidden to invoke any lifecycle related
+method.</p>
+</div>
+<div class="paragraph">
+<p>In case the Managed Thread Factory is configured to use a Context
+Service, the application&#8217;s thread context is captured when a thread
+creation is requested, and such context is propagated to the thread&#8217;s
+Runnable execution.</p>
+</div>
+<div class="paragraph">
+<p>Managed Thread Factory threads implement
+<code>javax.enterprise.concurrent.ManageableThread</code>, which allows an
+application to learn about termination status.</p>
+</div>
+<div class="paragraph">
+<p>Usage example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">public void onGet(...) {
+  Runnable task = ...;
+  Thread thread = managedThreadFactory.newThread(task);
+  thread.start();
+    // ...
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>WildFly default configurations creates a single default instance of a
+Managed Thread Factory, which may be retrieved through <code>@Resource</code>
+injection:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@Resource
+private ManagedThreadFactory managedThreadFactory;</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+To retrieve instead a non default Managed Thread Factory instance,
+<code>@Resource&#8217;s `lookup</code> attribute needs to specify the JNDI name used in
+the wanted instance configuration. WildFly will always inject the
+default instance, no matter what&#8217;s the <code>name</code> attribute value, in case
+the <code>lookup</code> attribute is not defined.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Applications may alternatively use instead the standard JNDI API:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">ManagedThreadFactory managedThreadFactory = InitialContext.doLookup("java:comp/DefaultManagedThreadFactory");</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+As mandated by the Java EE specification, the default Managed Thread
+Factory instance&#8217;s JNDI name is <code>java:comp/DefaultManagedThreadFactory</code>.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="managed-executor-service">Managed Executor Service</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The Managed Executor Service (
+<code>javax.enterprise.concurrent.ManagedExecutorService</code>) allows Java EE
+applications to submit tasks for asynchronous execution. It is an
+extension of Java SE&#8217;s Executor Service (
+<code>java.util.concurrent.ExecutorService</code>) adapted to the Java EE platform
+requirements.</p>
+</div>
+<div class="paragraph">
+<p>Managed Executor Service instances are managed by the application
+server, thus Java EE applications are forbidden to invoke any lifecycle
+related method.</p>
+</div>
+<div class="paragraph">
+<p>In case the Managed Executor Service is configured to use a Context
+Service, the application&#8217;s thread context is captured when the task is
+submitted, and propagated to the executor thread responsible for the
+task execution.</p>
+</div>
+<div class="paragraph">
+<p>Usage example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">public void onGet(...) {
+    Runnable task = ...;
+    Future future = managedExecutorService.submit(task);
+    // ...
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>WildFly default configurations creates a single default instance of a
+Managed Executor Service, which may be retrieved through <code>@Resource</code>
+injection:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@Resource
+private ManagedExecutorService managedExecutorService;</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+To retrieve instead a non default Managed Executor Service instance,
+<code>@Resource&#8217;s `lookup</code> attribute needs to specify the JNDI name used in
+the wanted instance configuration. WildFly will always inject the
+default instance, no matter what&#8217;s the <code>name</code> attribute value, in case
+the <code>lookup</code> attribute is not defined.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Applications may alternatively use instead the standard JNDI API:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">ManagedExecutorService managedExecutorService = InitialContext.doLookup("java:comp/DefaultManagedExecutorService");</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+As mandated by the Java EE specification, the default Managed Executor
+Service instance&#8217;s JNDI name is
+<code>java:comp/DefaultManagedExecutorService</code>.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="managed-scheduled-executor-service">Managed Scheduled Executor Service</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The Managed Scheduled Executor Service (
+<code>javax.enterprise.concurrent.ManagedScheduledExecutorService</code>) allows
+Java EE applications to schedule tasks for asynchronous execution. It is
+an extension of Java SE&#8217;s Executor Service (
+<code>java.util.concurrent.ScheduledExecutorService</code>) adapted to the Java EE
+platform requirements.</p>
+</div>
+<div class="paragraph">
+<p>Managed Scheduled Executor Service instances are managed by the
+application server, thus Java EE applications are forbidden to invoke
+any lifecycle related method.</p>
+</div>
+<div class="paragraph">
+<p>In case the Managed Scheduled Executor Service is configured to use a
+Context Service, the application&#8217;s thread context is captured when the
+task is scheduled, and propagated to the executor thread responsible for
+the task execution.</p>
+</div>
+<div class="paragraph">
+<p>Usage example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">public void onGet(...) {
+    Runnable task = ...;
+    ScheduledFuture future = managedScheduledExecutorService.schedule(task, 60, TimeUnit.SECONDS);
+    // ...
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>WildFly default configurations creates a single default instance of a
+Managed Scheduled Executor Service, which may be retrieved through
+<code>@Resource</code> injection:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@Resource
+private ManagedScheduledExecutorService managedScheduledExecutorService;</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+To retrieve instead a non default Managed Scheduled Executor Service
+instance, <code>@Resource&#8217;s `lookup</code> attribute needs to specify the JNDI
+name used in the wanted instance configuration. WildFly will always
+inject the default instance, no matter what&#8217;s the <code>name</code> attribute
+value, in case the <code>lookup</code> attribute is not defined.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Applications may alternatively use instead the standard JNDI API:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">ManagedScheduledExecutorService managedScheduledExecutorService = InitialContext.doLookup("java:comp/DefaultManagedScheduledExecutorService");</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+As mandated by the Java EE specification, the default Managed Scheduled
+Executor Service instance&#8217;s JNDI name is
+<code>java:comp/DefaultManagedScheduledExecutorService</code>.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

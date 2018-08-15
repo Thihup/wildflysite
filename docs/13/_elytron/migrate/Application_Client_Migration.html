@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Application Client Migration | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Application Client Migration" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_elytron/migrate/Application_Client_Migration.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_elytron/migrate/Application_Client_Migration.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_elytron/migrate/Application_Client_Migration.html","headline":"Application Client Migration","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="sect1">
+<h2 id="naming-client">Naming Client</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This migration example assumes a client application performs a remote
+JNDI lookup using an ﻿﻿ <code>InitialContext</code> backed by the
+<code>org.jboss.naming.remote.client.InitialContextFactory</code> class.</p>
+</div>
+<div class="sect2">
+<h3 id="original-configuration">Original Configuration</h3>
+<div class="paragraph">
+<p>An <code>InitialContext</code> backed by the
+<code>org.jboss.naming.remote.client.InitialContextFactory</code> class can be
+created by specifying properties that contain the URL of the naming
+provider to connect to along with appropriate user credentials:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">Properties properties = new Properties();
+properties.put(Context.INITIAL_CONTEXT_FACTORY, "org.jboss.naming.remote.client.InitialContextFactory");
+properties.put(Context.PROVIDER_URL, "http-remoting://127.0.0.1:8080");
+properties.put(Context.SECURITY_PRINCIPAL, "bob");
+properties.put(Context.SECURITY_CREDENTIALS, "secret");
+InitialContext context = new InitialContext(properties);
+Bar bar = (Bar) context.lookup("foo/bar");
+...</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="migrated-configuration">Migrated Configuration</h3>
+<div class="paragraph">
+<p>An <code>InitialContext</code> backed by the
+<code>org.wildfly.naming.client.WildFlyInitialContextFactory</code> class can be
+created by specifying a property that contains the URL of the naming
+provider to connect to. The user credentials can be specified using a
+WildFly client configuration file or programmatically.</p>
+</div>
+<div class="sect3">
+<h4 id="configuration-file-approach">Configuration File Approach</h4>
+<div class="paragraph">
+<p>A <code>wildfly-config.xml</code> file that contains the user credentials to use
+when establishing a connection to the naming provider can be added to
+the client application&#8217;s <code>META-INF</code> directory:</p>
+</div>
+<div class="paragraph">
+<p><strong>wildfly-config.xml</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;configuration&gt;
+    &lt;authentication-client xmlns="urn:elytron:1.0"&gt;
+        &lt;authentication-rules&gt;
+            &lt;rule use-configuration="namingConfig"&gt;
+                &lt;match-host name="127.0.0.1"/&gt;
+            &lt;/rule&gt;
+        &lt;/authentication-rules&gt;
+        &lt;authentication-configurations&gt;
+            &lt;configuration name="namingConfig"&gt;
+                &lt;set-user-name name="bob"/&gt;
+                &lt;credentials&gt;
+                    &lt;clear-password password="secret"/&gt;
+                &lt;/credentials&gt;
+            &lt;/configuration&gt;
+        &lt;/authentication-configurations&gt;
+    &lt;/authentication-client&gt;
+&lt;/configuration&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>An <code>InitialContext</code> can then be created as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">Properties properties = new Properties();
+properties.put(Context.INITIAL_CONTEXT_FACTORY, "org.wildfly.naming.client.WildFlyInitialContextFactory");
+properties.put(Context.PROVIDER_URL, "remote+http://127.0.0.1:8080");
+InitialContext context = new InitialContext(properties);
+Bar bar = (Bar) context.lookup("foo/bar");
+...</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="programmatic-approach">Programmatic Approach</h4>
+<div class="paragraph">
+<p>The user credentials to use when establishing a connection to the naming
+provider can be specified directly in the client application&#8217;s code:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">// create your authentication configuration
+AuthenticationConfiguration namingConfig = AuthenticationConfiguration.empty().useName("bob").usePassword("secret");
+ 
+// create your authentication context
+AuthenticationContext context = AuthenticationContext.empty().with(MatchRule.ALL.matchHost("127.0.0.1"), namingConfig);
+ 
+// create a callable that creates and uses an InitialContext
+Callable&lt;Void&gt; callable = () -&gt; {
+    Properties properties = new Properties();
+    properties.put(Context.INITIAL_CONTEXT_FACTORY, "org.wildfly.naming.client.WildFlyInitialContextFactory");
+    properties.put(Context.PROVIDER_URL, "remote+http://127.0.0.1:8080");
+    InitialContext context = new InitialContext(properties);
+    Bar bar = (Bar) context.lookup("foo/bar");
+    ...
+    return null;
+};
+ 
+// use your authentication context to run your callable
+context.runCallable(callable);</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="ejb-client">EJB Client</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This migration example assumes a client application is configured to
+invoke an EJB deployed on a remote server using a
+<code>jboss-ejb-client.properties</code> file.</p>
+</div>
+<div class="sect2">
+<h3 id="original-configuration-1">Original Configuration</h3>
+<div class="paragraph">
+<p>A <code>jboss-ejb-client.properties</code> file that contains the information
+needed to connect to the remote server can be specified in a client
+application&#8217;s <code>META-INF</code> directory:</p>
+</div>
+<div class="paragraph">
+<p><strong>jboss-ejb-client.properties</strong></p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>remote.connectionprovider.create.options.org.xnio.Options.SSL_ENABLED=false
+remote.connections=default
+remote.connection.default.host=127.0.0.1
+remote.connection.default.port = 8080
+remote.connection.default.username=bob
+remote.connection.default.password=secret</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>An EJB can then be looked up and a method can be invoked on it as
+follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">// create an InitialContext
+Properties properties = new Properties();
+properties.put(Context.INITIAL_CONTEXT_FACTORY, "org.jboss.naming.remote.client.InitialContextFactory");
+properties.put(Context.URL_PKG_PREFIXES, "org.jboss.ejb.client.naming");
+InitialContext context = new InitialContext(properties);
+ 
+// look up an EJB and invoke one of its methods
+RemoteCalculator statelessRemoteCalculator = (RemoteCalculator) context.lookup(
+    "ejb:/ejb-remote-server-side//CalculatorBean!" + RemoteCalculator.class.getName());
+int sum = statelessRemoteCalculator.add(101, 202);</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="migrated-configuration-1">Migrated Configuration</h3>
+<div class="paragraph">
+<p>The information needed to connect to the remote server can be specified
+using a WildFly client configuration file or programmatically.</p>
+</div>
+<div class="sect3">
+<h4 id="configuration-file-approach-1">Configuration File Approach</h4>
+<div class="paragraph">
+<p>A <code>wildfly-config.xml</code> file that contains the information needed to
+connect to the remote server can be added to the client application&#8217;s
+<code>META-INF</code> directory:</p>
+</div>
+<div class="paragraph">
+<p><strong>wildfly-config.xml</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;configuration&gt;
+    &lt;authentication-client xmlns="urn:elytron:1.0"&gt;
+        &lt;authentication-rules&gt;
+            &lt;rule use-configuration="ejbConfig"&gt;
+                &lt;match-host name="127.0.0.1"/&gt;
+            &lt;/rule&gt;
+        &lt;/authentication-rules&gt;
+        &lt;authentication-configurations&gt;
+            &lt;configuration name="ejbConfig"&gt;
+                &lt;set-user-name name="bob"/&gt;
+                &lt;credentials&gt;
+                    &lt;clear-password password="secret"/&gt;
+                &lt;/credentials&gt;
+            &lt;/configuration&gt;
+        &lt;/authentication-configurations&gt;
+    &lt;/authentication-client&gt;
+    &lt;jboss-ejb-client xmlns="urn:jboss:wildfly-client-ejb:3.0"&gt;
+        &lt;connections&gt;
+            &lt;connection uri="remote+http://127.0.0.1:8080" /&gt;
+        &lt;/connections&gt;
+    &lt;/jboss-ejb-client&gt;
+&lt;/configuration&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>An EJB can then be looked up and a method can be invoked on it as
+follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">// create an InitialContext
+Properties properties = new Properties();
+properties.put(Context.INITIAL_CONTEXT_FACTORY, "org.wildfly.naming.client.WildFlyInitialContextFactory");
+InitialContext context = new InitialContext(properties);
+ 
+// look up an EJB and invoke one of its methods (same as before)
+RemoteCalculator statelessRemoteCalculator = (RemoteCalculator) context.lookup(
+    "ejb:/ejb-remote-server-side//CalculatorBean!" + RemoteCalculator.class.getName());
+int sum = statelessRemoteCalculator.add(101, 202);</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="programmatic-approach-1">Programmatic Approach</h4>
+<div class="paragraph">
+<p>The information needed to connect to the remote server can be specified
+directly in the client application&#8217;s code:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">// create your authentication configuration
+AuthenticationConfiguration ejbConfig = AuthenticationConfiguration.empty().useName("bob").usePassword("secret");
+ 
+// create your authentication context
+AuthenticationContext context = AuthenticationContext.empty().with(MatchRule.ALL.matchHost("127.0.0.1"), ejbConfig);
+ 
+// create a callable that invokes an EJB
+Callable&lt;Void&gt; callable = () -&gt; {
+ 
+    // create an InitialContext
+    Properties properties = new Properties();
+    properties.put(Context.INITIAL_CONTEXT_FACTORY, "org.wildfly.naming.client.WildFlyInitialContextFactory");
+    properties.put(Context.PROVIDER_URL, "remote+http://127.0.0.1:8080");
+    InitialContext context = new InitialContext(properties);
+ 
+    // look up an EJB and invoke one of its methods (same as before)
+    RemoteCalculator statelessRemoteCalculator = (RemoteCalculator) context.lookup(
+        "ejb:/ejb-remote-server-side//CalculatorBean!" + RemoteCalculator.class.getName());
+    int sum = statelessRemoteCalculator.add(101, 202);
+    ...
+    return null;
+};
+ 
+// use your authentication context to run your callable
+context.runCallable(callable);</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

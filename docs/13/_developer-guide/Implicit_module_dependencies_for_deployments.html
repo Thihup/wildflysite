@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Implicit module dependencies for deployments | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Implicit module dependencies for deployments" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_developer-guide/Implicit_module_dependencies_for_deployments.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_developer-guide/Implicit_module_dependencies_for_deployments.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_developer-guide/Implicit_module_dependencies_for_deployments.html","headline":"Implicit module dependencies for deployments","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>As explained in the <a href="#Class_Loading_in_WildFly">Class Loading in WildFly</a> article,
+WildFly {wildflyVersion} is based on module classloading. A class within a module B
+isn&#8217;t visible to a class within a module A, unless module B adds a
+dependency on module A. Module dependencies can be explicitly (as
+explained in that classloading article) or can be "implicit". This
+article will explain what implicit module dependencies mean and how,
+when and which modules are added as implicit dependencies.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="whats-an-implicit-module-dependency">What&#8217;s an implicit module dependency?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Consider an application deployment which contains EJBs. EJBs typically
+need access to classes from the javax.ejb.* package and other Java EE
+API packages. The jars containing these packages are already shipped in
+WildFly and are available as "modules". The module which contains the
+javax.ejb.* classes has a specific name and so does the module which
+contains all the Java EE API classes. For an application to be able to
+use these classes, it has to add a dependency on the relevant modules.
+Forcing the application developers to add module dependencies like these
+(i.e. dependencies which can be "inferred") isn&#8217;t a productive approach.
+Hence, whenever an application is being deployed, the deployers within
+the server, which are processing this deployment "implicitly" add these
+module dependencies to the deployment so that these classes are visible
+to the deployment at runtime. This way the application developer doesn&#8217;t
+have to worry about adding them explicitly. How and when these implicit
+dependencies are added is explained in the next section.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="how-and-when-is-an-implicit-module-dependency-added">How and when is an implicit module dependency added?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>When a deployment is being processed by the server, it goes through a
+chain of "deployment processors". Each of these processors will have a
+way to check if the deployment meets a certain criteria and if it does,
+the deployment processor adds a implicit module dependency to that
+deployment. Let&#8217;s take an example - Consider (again) an EJB3 deployment
+which has the following class:</p>
+</div>
+<div class="listingblock">
+<div class="title">MySuperDuperBean.java</div>
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@Stateless
+public class MySuperDuperBean {
+ 
+...
+ 
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As can be seen, we have a simple @Stateless EJB. When the deployment
+containing this class is being processed, the EJB deployment processor
+will see that the deployment contains a class with the @Stateless
+annotation and thus identifies this as a EJB deployment. <strong>This is just
+one of the several ways, various deployment processors can identify a
+deployment of some specific type.</strong> The EJB deployment processor will
+then add an implicit dependency on the Java EE API module, so that all
+the Java EE API classes are visible to the deployment.</p>
+</div>
+<div class="paragraph">
+<p>Some subsystems will always add a API classes, even if the trigger
+condition is not met. These are listed separately below.</p>
+</div>
+<div class="paragraph">
+<p>In the next section, we&#8217;ll list down the implicit module dependencies
+that are added to a deployment, by various deployers within WildFly.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="which-are-the-implicit-module-dependencies">Which are the implicit module dependencies?</h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Subsystem responsible for adding the implicit dependency</th>
+<th class="tableblock halign-left valign-top">Dependencies
+that are always added</th>
+<th class="tableblock halign-left valign-top">Dependencies that are added if a trigger
+condition is met</th>
+<th class="tableblock halign-left valign-top">Trigger which leads to the implicit module dependency
+being added</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Core Server</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">javax.api sun.jdk org.jboss.vfs</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Batch Subsystem</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">javax.batch.api</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">EE Subsystem</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">javaee.api</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">EJB3 subsystem</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">javaee.api</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The presence of ejb-jar.xml (in valid
+locations in the deployment, as specified by spec) or the presence of
+annotation based EJBs (ex: @Stateless, @Stateful, @MessageDriven etc)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JAX-RS (Resteasy) subsystem</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">javax.xml.bind.api</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">org.jboss.resteasy.resteasy-atom-provider
+org.jboss.resteasy.resteasy-cdi org.jboss.resteasy.resteasy-jaxrs
+org.jboss.resteasy.resteasy-jaxb-provider
+org.jboss.resteasy.resteasy-jackson-provider
+org.jboss.resteasy.resteasy-jsapi
+org.jboss.resteasy.resteasy-multipart-provider
+org.jboss.resteasy.async-http-servlet-30</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The presence of JAX-RS
+annotations in the deployment</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JCA subsystem</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">javax.resource.api</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">javax.jms.api javax.validation.api
+org.jboss.logging org.jboss.ironjacamar.api org.jboss.ironjacamar.impl
+org.hibernate.validator</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If the deployment is a resource adaptor (RAR)
+deployment.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JPA (Hibernate) subsystem</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">javax.persistence.api</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">javaee.api
+org.jboss.as.jpa org.hibernate</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The presence of an @PersistenceUnit or
+@PersistenceContext annotation, or a &lt;persistence-unit-ref&gt; or
+&lt;persistence-context-ref&gt; in a deployment descriptor..</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Logging Subsystem</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">org.jboss.logging org.apache.commons.logging
+org.apache.log4j org.slf4j org.jboss.logging.jul-to-slf4j-stub</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SAR Subsystem</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">org.jboss.logging org.jboss.modules</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The deployment
+is a SAR archive</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Security Subsystem</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">org.picketbox</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Web Subsystem</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">javaee.api com.sun.jsf-impl org.hibernate.validator
+org.jboss.as.web org.jboss.logging</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The deployment is a WAR archive. JSF
+is only added if used. Multiple version options exist for mojarra.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Web Services Subsystem</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">org.jboss.ws.api org.jboss.ws.spi</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Weld (CDI) Subsystem</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">javax.persistence.api javaee.api org.javassist
+org.jboss.interceptor org.jboss.as.weld org.jboss.logging
+org.jboss.weld.core org.jboss.weld.api org.jboss.weld.spi</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If a
+beans.xml file is detected in the deployment</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

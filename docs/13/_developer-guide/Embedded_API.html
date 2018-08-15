@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Embedded API | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Embedded API" />
+<meta name="author" content="James R. Perkins" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_developer-guide/Embedded_API.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_developer-guide/Embedded_API.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_developer-guide/Embedded_API.html","headline":"Embedded API","author":{"@type":"Person","name":"James R. Perkins"},"@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>The embedded API can be used to launch WildFly within a currently running process.</p>
+</div>
+<div class="paragraph">
+<p>The embedded server can be reinitialized with a different JBoss Home. However the module directory, <code>module.path</code>
+system property, and the modules system packages, <code>jboss.modules.system.pkgs</code> system property, are effectively static.
+This means that creating a new embedded server or host controller within the same VM will not allow overriding the
+modules directory or the system packages.</p>
+</div>
+<div class="paragraph">
+<p>You can also set a hint to indicate which log manager is being used. The hint attempts to ensure that JBoss Logging
+will bind to the correct log manager. It also adds the hinted logging package to the modules system packages.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="standalone-api">Standalone API</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A standalone server allows you to manage the lifecycle of a server within the currently running process. The server
+can be configured in admin-only mode or fully started and applications can be deployed.</p>
+</div>
+<div class="sect2">
+<h3 id="examples">Examples</h3>
+<div class="listingblock">
+<div class="title">Simple Example</div>
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">final StandaloneServer server = EmbeddedProcessFactory.createStandaloneServer(Configuration.Builder.of(jbossHome).build());
+server.start();
+
+try {
+    // Print the listening address
+    final ModelControllerClient client = server.getModelControllerClient();
+    final ModelNode address = Operations.createAddress("interface", "public");
+    final ModelNode op = Operations.createReadAttributeOperation(address, "inet-address");
+    op.get("resolve-expressions").set(true);
+    final ModelNode result = client.execute(op);
+    if (!Operations.isSuccessfulOutcome((result))) {
+        throw new RuntimeException("Failed to get the public inet-address: " + Operations.getFailureDescription(result));
+    }
+    System.out.printf("Listening on %s%n", Operations.readResult(result).asString());
+} finally {
+    server.stop();
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Server in admin-only Example</div>
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">final StandaloneServer server = EmbeddedProcessFactory.createStandaloneServer(
+    Configuration.Builder.of(jbossHome)
+        .addCommandArgument("--admin-only")
+        .build());
+server.start();
+
+try {
+    // Print the listening address
+    final ModelControllerClient client = server.getModelControllerClient();
+    final ModelNode address = Operations.createAddress();
+    final ModelNode op = Operations.createReadAttributeOperation(address, "running-mode");
+    op.get("resolve-expressions").set(true);
+    final ModelNode result = client.execute(op);
+    if (!Operations.isSuccessfulOutcome((result))) {
+        throw new RuntimeException("Failed to get the running-mode: " + Operations.getFailureDescription(result));
+    }
+    System.out.printf("Running mode is %s%n", Operations.readResult(result).asString());
+} finally {
+    server.stop();
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">log4j2 Hint</div>
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">final StandaloneServer server = EmbeddedProcessFactory.createStandaloneServer(Configuration.Builder.of(jbossHome)
+        .setLoggerHint(Configuration.LoggerHint.LOG4J2)
+        .build()
+);
+server.start();
+
+try {
+    // Print the listening address
+    final ModelControllerClient client = server.getModelControllerClient();
+    final ModelNode address = Operations.createAddress("interface", "public");
+    final ModelNode op = Operations.createReadAttributeOperation(address, "inet-address");
+    op.get("resolve-expressions").set(true);
+    final ModelNode result = client.execute(op);
+    if (!Operations.isSuccessfulOutcome((result))) {
+        throw new RuntimeException("Failed to get the public inet-address: " + Operations.getFailureDescription(result));
+    }
+    org.apache.logging.log4j.LogManager.getFormatterLogger(Main.class).info("Listening on %s%n", Operations.readResult(result).asString());
+} finally {
+    server.stop();
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="host-controller-api">Host Controller API</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The host controller API creates a host controller in the current process. The host controller is started in <code>admin-only</code>
+mode therefore servers within the domain cannot be started. However the server configuration can be altered via
+management operations.</p>
+</div>
+<div class="sect2">
+<h3 id="example">Example</h3>
+<div class="listingblock">
+<div class="title">Simple Example</div>
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">final HostController server = EmbeddedProcessFactory.createHostController(Configuration.Builder.of(jbossHome).build());
+server.start();
+
+try {
+    // Print the listening address
+    final ModelControllerClient client = server.getModelControllerClient();
+    final ModelNode address = new ModelNode().setEmptyList();
+    final ModelNode op = Operations.createOperation(ClientConstants.READ_CHILDREN_NAMES_OPERATION, address);
+    op.get(ClientConstants.CHILD_TYPE).set(ClientConstants.SERVER_GROUP);
+    final ModelNode result = client.execute(op);
+    if (!Operations.isSuccessfulOutcome(result)) {
+        throw new RuntimeException("Failed to get the public inet-address: " + Operations.getFailureDescription(result));
+    }
+    System.out.println("Available server groups:");
+    for (ModelNode value : Operations.readResult(result).asList()) {
+        System.out.printf("\t%s%n", value.asString());
+    }
+} finally {
+    server.stop();
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

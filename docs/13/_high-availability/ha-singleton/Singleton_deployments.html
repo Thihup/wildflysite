@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Singleton_deployments | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Singleton_deployments" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Singleton deployments" />
+<meta property="og:description" content="Singleton deployments" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_high-availability/ha-singleton/Singleton_deployments.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_high-availability/ha-singleton/Singleton_deployments.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_high-availability/ha-singleton/Singleton_deployments.html","headline":"Singleton_deployments","description":"Singleton deployments","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="sect1">
+<h2 id="Singleton_deployments">Singleton deployments</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>WildFly 10 resurrected the ability to start a given deployment on a
+single node in the cluster at any given time. If that node shuts down,
+or fails, the application will automatically start on another node on
+which the given deployment exists. Long time users of JBoss AS will
+recognize this functionality as being akin to the
+<a href="https://docs.jboss.org/jbossclustering/cluster_guide/5.1/html/deployment.chapt.html#d0e1220">HASingletonDeployer</a>,
+a.k.a. "
+<a href="https://docs.jboss.org/jbossclustering/cluster_guide/5.1/html/deployment.chapt.html#d0e1220">deploy-hasingleton</a>",
+feature of AS6 and earlier.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="usage">Usage</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A deployment indicates that it should be deployed as a singleton via a
+deployment descriptor. This can either be a standalone
+<code>/META-INF/singleton-deployment.xml</code> file or embedded within an existing
+jboss-all.xml descriptor. This descriptor may be applied to any
+deployment type, e.g. JAR, WAR, EAR, etc., with the exception of a
+subdeployment within an EAR.<br>
+e.g.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;singleton-deployment xmlns="urn:jboss:singleton-deployment:1.0" policy="foo"/&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The singleton deployment descriptor defines which
+<a href="#Singleton_subsystem">singleton policy</a> should be used to deploy the
+application. If undefined, the default singleton policy is used, as
+defined by the singleton subsystem.</p>
+</div>
+<div class="paragraph">
+<p>Using a standalone descriptor is often preferable, since it may be
+overlaid onto an existing deployment archive.<br>
+e.g.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>deployment-overlay add --name=singleton-policy-foo --content=/META-INF/singleton-deployment.xml=/path/to/singleton-deployment.xml --deployments=my-app.jar --redeploy-affected</code></pre>
+</div>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

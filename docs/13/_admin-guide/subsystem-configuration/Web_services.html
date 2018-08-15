@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Web services configuration | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Web services configuration" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_admin-guide/subsystem-configuration/Web_services.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_admin-guide/subsystem-configuration/Web_services.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_admin-guide/subsystem-configuration/Web_services.html","headline":"Web services configuration","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>JBossWS components are provided to the application server through the
+webservices subsystem. JBossWS components handle the processing of WS
+endpoints. The subsystem supports the configuration of published
+endpoint addresses, and endpoint handler chains. A default webservice
+subsystem is provided in the server&#8217;s domain and standalone
+configuration files.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="structure-of-the-webservices-subsystem">Structure of the webservices subsystem</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="published-endpoint-address">Published endpoint address</h3>
+<div class="paragraph">
+<p>JBossWS supports the rewriting of the <code>&lt;soap:address&gt;</code> element of
+endpoints published in WSDL contracts. This feature is useful for
+controlling the server address that is advertised to clients for each
+endpoint.</p>
+</div>
+<div class="paragraph">
+<p>The following elements are available and can be modified (all are
+optional):</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">modify-wsdl-address</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This boolean enables and disables the
+address rewrite functionality.When modify-wsdl-address is set to true
+and the content of &lt;soap:address&gt; is a valid URL, JBossWS will rewrite
+the URL using the values of wsdl-host and wsdl-port or
+wsdl-secure-port.When modify-wsdl-address is set to false and the
+content of &lt;soap:address&gt; is a valid URL, JBossWS will not rewrite the
+URL. The &lt;soap:address&gt; URL will be used.When the content of
+&lt;soap:address&gt; is not a valid URL, JBossWS will rewrite it no matter
+what the setting of modify-wsdl-address.If modify-wsdl-address is set to
+true and wsdl-host is not defined or explicitly set to
+'jbossws.undefined.host' the content of &lt;soap:address&gt; URL is use.
+JBossWS uses the requester&#8217;s host when rewriting the &lt;soap:address&gt;When
+modify-wsdl-address is not defined JBossWS uses a default value of true.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">wsdl-host</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The hostname / IP address to be used for rewriting
+&lt;soap:address&gt;.If wsdl-host is set to jbossws.undefined.host, JBossWS
+uses the requester&#8217;s host when rewriting the &lt;soap:address&gt;When
+wsdl-host is not defined JBossWS uses a default value of
+'jbossws.undefined.host'.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">wsdl-port</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Set this property to explicitly define the HTTP port
+that will be used for rewriting the SOAP address.Otherwise the HTTP port
+will be identified by querying the list of installed HTTP connectors.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">wsdl-secure-port</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Set this property to explicitly define the HTTPS
+port that will be used for rewriting the SOAP address.Otherwise the
+HTTPS port will be identified by querying the list of installed HTTPS
+connectors.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">wsdl-uri-scheme</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This property explicitly sets the URI scheme
+to use for rewriting &lt;soap:address&gt; . Valid values are http and https.
+This configuration overrides scheme computed by processing the endpoint
+(even if a transport guaranteeis specified). The provided values for
+wsdl-port and wsdl-secure-port (or their default values) are used
+depending on specified scheme.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">wsdl-path-rewrite-rule</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This string defines a SED substitution
+command (e.g., 's/regexp/replacement/g') that JBossWS executes against
+the path component of each &lt;soap:address&gt; URL published from the
+server.When wsdl-path-rewrite-rule is not defined, JBossWS retains the
+original path component of each &lt;soap:address&gt; URL.When
+'modify-wsdl-address' is set to "false" this element is ignored.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="predefined-endpoint-configurations">Predefined endpoint configurations</h3>
+<div class="paragraph">
+<p>JBossWS enables extra setup configuration data to be predefined and
+associated with an endpoint implementation. Predefined endpoint
+configurations can be used for JAX-WS client and JAX-WS endpoint setup.
+Endpoint configurations can include JAX-WS handlers and key/value
+properties declarations. This feature provides a convenient way to add
+handlers to WS endpoints and to set key/value properties that control
+JBossWS and Apache CXF internals (
+<a href="https://docs.jboss.org/author/display/JBWS/Apache+CXF+integration#ApacheCXFintegration-Deploymentdescriptorproperties">see
+Apache CXF configuration</a>).</p>
+</div>
+<div class="paragraph">
+<p>The webservices subsystem provides
+<a href="http://www.jboss.org/schema/jbossas/jboss-as-webservices_1_2.xsd">schema</a>
+to support the definition of named sets of endpoint configuration data.
+Annotation, <em>org.jboss.ws.api.annotation.EndpointConfig</em> is provided to
+map the named configuration to the endpoint implementation.</p>
+</div>
+<div class="paragraph">
+<p>There is no limit to the number of endpoint configurations that can be
+defined within the webservices subsystem. Each endpoint configuration
+must have a name that is unique within the webservices subsystem.
+Endpoint configurations defined in the webservices subsystem are
+available for reference by name through the annotation to any endpoint
+in a deployed application.</p>
+</div>
+<div class="paragraph">
+<p>WildFly ships with two predefined endpoint configurations.
+Standard-Endpoint-Config is the default configuration.
+Recording-Endpoint-Config is an example of custom endpoint configuration
+and includes a recording handler.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9999 /] /subsystem=webservices:read-resource
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; {
+        "endpoint" =&gt; {},
+        "modify-wsdl-address" =&gt; true,
+        "wsdl-host" =&gt; expression "${jboss.bind.address:127.0.0.1}",
+        "endpoint-config" =&gt; {
+            "Standard-Endpoint-Config" =&gt; undefined,
+            "Recording-Endpoint-Config" =&gt; undefined
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+The <code>Standard-Endpoint-Config</code> is a special endpoint configuration. It
+is used for any endpoint that does not have an explicitly assigned
+endpoint configuration.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect3">
+<h4 id="endpoint-configs">Endpoint configs</h4>
+<div class="paragraph">
+<p>Endpoint configs are defined using <code>the endpoint-config</code> element. Each
+endpoint configuration may include properties and handlers set to the
+endpoints associated to the configuration.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9999 /] /subsystem=webservices/endpoint-config=Recording-Endpoint-Config:read-resource
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; {
+        "post-handler-chain" =&gt; undefined,
+        "property" =&gt; undefined,
+        "pre-handler-chain" =&gt; {"recording-handlers" =&gt; undefined}
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A new endpoint configuration can be added as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9999 /] /subsystem=webservices/endpoint-config=My-Endpoint-Config:add
+{
+    "outcome" =&gt; "success",
+    "response-headers" =&gt; {
+        "operation-requires-restart" =&gt; true,
+        "process-state" =&gt; "restart-required"
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="handler-chains">Handler chains</h4>
+<div class="paragraph">
+<p>Each endpoint configuration may be associated with zero or more PRE and
+POST handler chains. Each handler chain may include JAXWS handlers. For
+outbound messages the PRE handler chains are executed before any handler
+that is attached to the endpoint using the standard means, such as with
+annotation @HandlerChain, and POST handler chains are executed after
+those objects have executed. For inbound messages the POST handler
+chains are executed before any handler that is attached to the endpoint
+using the standard means and the PRE handler chains are executed after
+those objects have executed.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>* Server inbound messages
+Client --&gt; ... --&gt; POST HANDLER --&gt; ENDPOINT HANDLERS --&gt; PRE HANDLERS --&gt; Endpoint
+
+* Server outbound messages
+Endpoint --&gt; PRE HANDLER --&gt; ENDPOINT HANDLERS --&gt; POST HANDLERS --&gt; ... --&gt; Client</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The protocol-binding attribute must be used to set the protocols for
+which the chain will be triggered.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9999 /] /subsystem=webservices/endpoint-config=Recording-Endpoint-Config/pre-handler-chain=recording-handlers:read-resource
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; {
+        "protocol-bindings" =&gt; "##SOAP11_HTTP ##SOAP11_HTTP_MTOM ##SOAP12_HTTP ##SOAP12_HTTP_MTOM",
+        "handler" =&gt; {"RecordingHandler" =&gt; undefined}
+    },
+    "response-headers" =&gt; {"process-state" =&gt; "restart-required"}
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A new handler chain can be added as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9999 /] /subsystem=webservices/endpoint-config=My-Endpoint-Config/post-handler-chain=my-handlers:add(protocol-bindings="##SOAP11_HTTP")
+{
+    "outcome" =&gt; "success",
+    "response-headers" =&gt; {
+        "operation-requires-restart" =&gt; true,
+        "process-state" =&gt; "restart-required"
+    }
+}
+[standalone@localhost:9999 /] /subsystem=webservices/endpoint-config=My-Endpoint-Config/post-handler-chain=my-handlers:read-resource
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; {
+        "handler" =&gt; undefined,
+        "protocol-bindings" =&gt; "##SOAP11_HTTP"
+    },
+    "response-headers" =&gt; {"process-state" =&gt; "restart-required"}
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="jaxws-handlers">Handlers</h4>
+<div class="paragraph">
+<p>JAXWS handler can be added in handler chains:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9999 /] /subsystem=webservices/endpoint-config=Recording-Endpoint-Config/pre-handler-chain=recording-handlers/handler=RecordingHandler:read-resource
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; {"class" =&gt; "org.jboss.ws.common.invocation.RecordingServerHandler"},
+    "response-headers" =&gt; {"process-state" =&gt; "restart-required"}
+}
+[standalone@localhost:9999 /] /subsystem=webservices/endpoint-config=My-Endpoint-Config/post-handler-chain=my-handlers/handler=foo-handler:add(class="org.jboss.ws.common.invocation.RecordingServerHandler")
+{
+    "outcome" =&gt; "success",
+    "response-headers" =&gt; {
+        "operation-requires-restart" =&gt; true,
+        "process-state" =&gt; "restart-required"
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Endpoint-config handler classloading</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+The <code>class</code> attribute is used to provide the fully qualified class name
+of the handler. At deploy time, an instance of the class is created for
+each referencing deployment. For class creation to succeed, the
+deployment classloader must to be able to load the handler class.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="runtime-information">Runtime information</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Each web service endpoint is exposed through the deployment that
+provides the endpoint implementation. Each endpoint can be queried as a
+deployment resource. For further information please consult the chapter
+"Application Deployment". Each web service endpoint specifies a web
+context and a WSDL Url:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9999 /] /deployment="*"/subsystem=webservices/endpoint="*":read-resource
+{
+   "outcome" =&gt; "success",
+   "result" =&gt; [{
+       "address" =&gt; [
+           ("deployment" =&gt; "jaxws-samples-handlerchain.war"),
+           ("subsystem" =&gt; "webservices"),
+           ("endpoint" =&gt; "jaxws-samples-handlerchain:TestService")
+       ],
+       "outcome" =&gt; "success",
+       "result" =&gt; {
+           "class" =&gt; "org.jboss.test.ws.jaxws.samples.handlerchain.EndpointImpl",
+           "context" =&gt; "jaxws-samples-handlerchain",
+           "name" =&gt; "TestService",
+           "type" =&gt; "JAXWS_JSE",
+           "wsdl-url" =&gt; "http://localhost:8080/jaxws-samples-handlerchain?wsdl"
+       }
+   }]
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="ws-component-reference">Component Reference</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The web service subsystem is provided by the JBossWS project. For a
+detailed description of the available configuration properties, please
+consult the project documentation.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="ulist">
+<ul>
+<li>
+<p>JBossWS homepage: <a href="http://www.jboss.org/jbossws" class="bare">http://www.jboss.org/jbossws</a></p>
+</li>
+<li>
+<p>Project Documentation: <a href="https://docs.jboss.org/author/display/JBWS" class="bare">https://docs.jboss.org/author/display/JBWS</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

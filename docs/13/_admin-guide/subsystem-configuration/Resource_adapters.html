@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Resource adapters | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Resource adapters" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_admin-guide/subsystem-configuration/Resource_adapters.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_admin-guide/subsystem-configuration/Resource_adapters.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_admin-guide/subsystem-configuration/Resource_adapters.html","headline":"Resource adapters","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Resource adapters are configured through the <em>resource-adapters</em>
+subsystem. Declaring a new resource adapter consists of two separate
+steps: You would need to deploy the .rar archive and define a resource
+adapter entry in the subsystem.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="resource-adapter-definitions">Resource Adapter Definitions</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The resource adapter itself is defined within the subsystem
+<em>resource-adapters</em>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;subsystem xmlns="urn:jboss:domain:resource-adapters:1.0"&gt;
+    &lt;resource-adapters&gt;
+       &lt;resource-adapter&gt;
+          &lt;archive&gt;eis.rar&lt;/archive&gt;
+          &lt;!-- Resource adapter level config-property --&gt;
+          &lt;config-property name="Server"&gt;localhost&lt;/config-property&gt;
+          &lt;config-property name="Port"&gt;19000&lt;/config-property&gt;
+          &lt;transaction-support&gt;XATransaction&lt;/transaction-support&gt;
+          &lt;connection-definitions&gt;
+             &lt;connection-definition class-name="com.acme.eis.ra.EISManagedConnectionFactory"
+                                    jndi-name="java:/eis/AcmeConnectionFactory"
+                                    pool-name="AcmeConnectionFactory"&gt;
+                &lt;!-- Managed connection factory level config-property --&gt;
+                &lt;config-property name="Name"&gt;Acme Inc&lt;/config-property&gt;
+                &lt;pool&gt;
+                   &lt;min-pool-size&gt;10&lt;/min-pool-size&gt;
+                   &lt;max-pool-size&gt;100&lt;/max-pool-size&gt;
+                &lt;/pool&gt;
+                &lt;security&gt;
+                   &lt;application/&gt;
+                &lt;/security&gt;
+             &lt;/connection-definition&gt;
+         &lt;/connection-definitions&gt;
+         &lt;admin-objects&gt;
+             &lt;admin-object class-name="com.acme.eis.ra.EISAdminObjectImpl"
+                           jndi-name="java:/eis/AcmeAdminObject"&gt;
+                &lt;config-property name="Threshold"&gt;10&lt;/config-property&gt;
+             &lt;/admin-object&gt;
+         &lt;/admin-objects&gt;
+       &lt;/resource-adapter&gt;
+    &lt;/resource-adapters&gt;
+&lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note, that only JNDI bindings under java:/ or java:jboss/ are supported.</p>
+</div>
+<div class="paragraph">
+<p><sub>(See</sub> <code>standalone/configuration/standalone.xml</code> <sub>)</sub></p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="ra-using-security-domains">Using security domains</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Information about using security domains can be found at
+<a href="https://community.jboss.org/wiki/JBossAS7SecurityDomainModel" class="bare">https://community.jboss.org/wiki/JBossAS7SecurityDomainModel</a></p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="automatic-activation-of-resource-adapter-archives">Automatic activation of resource adapter archives</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A resource adapter archive can be automatically activated with a
+configuration by including an META-INF/ironjacamar.xml in the archive.</p>
+</div>
+<div class="paragraph">
+<p>The schema can be found at
+<a href="http://docs.jboss.org/ironjacamar/schema/ironjacamar_1_0.xsd" class="bare">http://docs.jboss.org/ironjacamar/schema/ironjacamar_1_0.xsd</a></p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="ra-component-reference">Component Reference</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The resource adapter subsystem is provided by the
+<a href="http://www.jboss.org/ironjacamar">IronJacamar</a> project. For a detailed
+description of the available configuration properties, please consult
+the project documentation.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>IronJacamar homepage: <a href="http://www.jboss.org/ironjacamar" class="bare">http://www.jboss.org/ironjacamar</a></p>
+</li>
+<li>
+<p>Project Documentation: <a href="http://www.jboss.org/ironjacamar/docs" class="bare">http://www.jboss.org/ironjacamar/docs</a></p>
+</li>
+<li>
+<p>Schema description:
+<a href="http://docs.jboss.org/ironjacamar/userguide/1.0/en-US/html/deployment.html#deployingra_descriptor" class="bare">http://docs.jboss.org/ironjacamar/userguide/1.0/en-US/html/deployment.html#deployingra_descriptor</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

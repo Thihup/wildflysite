@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Jgroups_subsystem | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Jgroups_subsystem" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="JGroups Subsystem" />
+<meta property="og:description" content="JGroups Subsystem" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_high-availability/subsystem-support/JGroups_Subsystem.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_high-availability/subsystem-support/JGroups_Subsystem.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_high-availability/subsystem-support/JGroups_Subsystem.html","headline":"Jgroups_subsystem","description":"JGroups Subsystem","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="sect1">
+<h2 id="JGroups_Subsystem">JGroups Subsystem</h2>
+<div class="sectionbody">
+
+</div>
+</div>
+<div class="sect1">
+<h2 id="jgroups-purpose">Purpose</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The JGroups subsystem provides group communication support for HA
+services in the form of JGroups channels.</p>
+</div>
+<div class="paragraph">
+<p>Named channel instances permit application peers in a cluster to
+communicate as a group and in such a way that the communication
+satisfies defined properties (e.g. reliable, ordered,
+failure-sensitive). Communication properties are configurable for each
+channel and are defined by the protocol stack used to create the
+channel. Protocol stacks consist of a base transport layer (used to
+transport messages around the cluster) together with a user-defined,
+ordered stack of protocol layers, where each protocol layer supports a
+given communication property.</p>
+</div>
+<div class="paragraph">
+<p>The JGroups subsystem provides the following features:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>allows definition of named protocol stacks</p>
+</li>
+<li>
+<p>view run-time metrics associated with channels</p>
+</li>
+<li>
+<p>specify a default stack for general use</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>In the following sections, we describe the JGroups subsystem.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+JGroups channels are created transparently as part of the clustering
+functionality (e.g. on clustered application deployment, channels will
+be created behind the scenes to support clustered features such as
+session replication or transmission of SSO contexts around the cluster).
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="jgroups-configuration-example">Configuration example</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>What follows is a sample JGroups subsystem configuration showing all of
+the possible elements and attributes which may be configured. We shall
+use this example to explain the meaning of the various elements and
+attributes.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+The schema for the subsystem, describing all valid elements and
+attributes, can be found in the WildFly distribution, in the <code>docs/schema</code>
+directory.
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;subsystem xmlns="urn:jboss:domain:jgroups:6.0"&gt;
+    &lt;channels default="ee"&gt;
+        &lt;channel name="ee" stack="udp" cluster="ejb"/&gt;
+    &lt;/channels&gt;
+    &lt;stacks&gt;
+        &lt;stack name="udp"&gt;
+            &lt;transport type="UDP" socket-binding="jgroups-udp"/&gt;
+            &lt;protocol type="PING"/&gt;
+            &lt;protocol type="MERGE3"/&gt;
+            &lt;protocol type="FD_SOCK"/&gt;
+            &lt;protocol type="FD_ALL"/&gt;
+            &lt;protocol type="VERIFY_SUSPECT"/&gt;
+            &lt;protocol type="pbcast.NAKACK2"/&gt;
+            &lt;protocol type="UNICAST3"/&gt;
+            &lt;protocol type="pbcast.STABLE"/&gt;
+            &lt;protocol type="pbcast.GMS"/&gt;
+            &lt;protocol type="UFC"/&gt;
+            &lt;protocol type="MFC"/&gt;
+            &lt;protocol type="FRAG3"/&gt;
+        &lt;/stack&gt;
+        &lt;stack name="tcp"&gt;
+            &lt;transport type="TCP" socket-binding="jgroups-tcp"/&gt;
+            &lt;socket-protocol type="MPING" socket-binding="jgroups-mping"/&gt;
+            &lt;protocol type="MERGE3"/&gt;
+            &lt;protocol type="FD_SOCK"/&gt;
+            &lt;protocol type="FD_ALL"/&gt;
+            &lt;protocol type="VERIFY_SUSPECT"/&gt;
+            &lt;protocol type="pbcast.NAKACK2"/&gt;
+            &lt;protocol type="UNICAST3"/&gt;
+            &lt;protocol type="pbcast.STABLE"/&gt;
+            &lt;protocol type="pbcast.GMS"/&gt;
+            &lt;protocol type="MFC"/&gt;
+            &lt;protocol type="FRAG3"/&gt;
+        &lt;/stack&gt;
+    &lt;/stacks&gt;
+&lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="subsystem">&lt;subsystem&gt;</h3>
+<div class="paragraph">
+<p>This element is used to configure the subsystem within a WildFly system
+profile.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>xmlns</code> This attribute specifies the XML namespace of the JGroups
+subsystem and, in particular, its version.</p>
+</li>
+<li>
+<p><code>default-stack</code> This attribute is used to specify a default stack for
+the JGroups subsystem. This default stack will be used whenever a stack
+is required but no stack is specified.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="stack">&lt;stack&gt;</h3>
+<div class="paragraph">
+<p>This element is used to configure a JGroups protocol stack.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>name</code> This attribute is used to specify the name of the stack.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="jgroups-transport">&lt;transport&gt;</h3>
+<div class="paragraph">
+<p>This element is used to configure the transport layer (required) of the
+protocol stack.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>type</code> This attribute specifies the transport type (e.g. UDP, TCP,
+TCPGOSSIP)</p>
+</li>
+<li>
+<p><code>socket-binding</code> This attribute references a defined socket binding in
+the server profile. It is used when JGroups needs to create general
+sockets internally.</p>
+</li>
+<li>
+<p><code>diagnostics-socket-binding</code> This attribute references a defined
+socket binding in the server profile. It is used when JGroups needs to
+create sockets for use with the diagnostics program. For more about the
+use of diagnostics, see the JGroups documentation for probe.sh.</p>
+</li>
+<li>
+<p><code>default-executor</code> This attribute references a defined thread pool
+executor in the threads subsystem. It governs the allocation and
+execution of runnable tasks to handle incoming JGroups messages.</p>
+</li>
+<li>
+<p><code>oob-executor</code> This attribute references a defined thread pool
+executor in the threads subsystem. It governs the allocation and
+execution of runnable tasks to handle incoming JGroups OOB
+(out-of-bound) messages.</p>
+</li>
+<li>
+<p><code>timer-executor</code> This attribute references a defined thread pool
+executor in the threads subsystem. It governs the allocation and
+execution of runnable timer-related tasks.</p>
+</li>
+<li>
+<p><code>shared</code> This attribute indicates whether or not this transport is
+shared amongst several JGroups stacks or not.</p>
+</li>
+<li>
+<p><code>thread-factory</code> This attribute references a defined thread factory in
+the threads subsystem. It governs the allocation of threads for running
+tasks which are not handled by the executors above.</p>
+</li>
+<li>
+<p><code>site</code> This attribute defines a site (data centre) id for this node.</p>
+</li>
+<li>
+<p><code>rack</code> This attribute defines a rack (server rack) id for this node.</p>
+</li>
+<li>
+<p><code>machine</code> This attribute defines a machine (host) is for this node.</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+site, rack and machine ids are used by the Infinispan topology-aware
+consistent hash function, which when using dist mode, prevents dist mode
+replicas from being stored on the same host, rack or site
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>.</p>
+</div>
+<div class="sect3">
+<h4 id="property">&lt;property&gt;</h4>
+<div class="paragraph">
+<p>This element is used to configure a transport property.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>name</code> This attribute specifies the name of the protocol property. The
+value is provided as text for the property element.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="protocol">&lt;protocol&gt;</h3>
+<div class="paragraph">
+<p>This element is used to configure a (non-transport) protocol layer in
+the JGroups stack. Protocol layers are ordered within the stack.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>type</code> This attribute specifies the name of the JGroups protocol
+implementation (e.g. MPING, pbcast.GMS), with the package prefix
+org.jgroups.protocols removed.</p>
+</li>
+<li>
+<p><code>socket-binding</code> This attribute references a defined socket binding in
+the server profile. It is used when JGroups needs to create general
+sockets internally for this protocol instance.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="relay">&lt;relay&gt;</h3>
+<div class="paragraph">
+<p>This element is used to configure the RELAY protocol for a JGroups
+stack. RELAY is a protocol which provides cross-site replication between
+defined sites (data centres). In the RELAY protocol, defined sites
+specify the names of remote sites (backup sites) to which their data
+should be backed up. Channels are defined between sites to permit the
+RELAY protocol to transport the data from the current site to a backup
+site.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>site</code> This attribute specifies the name of the current site. Site
+names can be referenced elsewhere (e.g. in the JGroups remote-site
+configuration elements, as well as backup configuration elements in the
+Infinispan subsystem)</p>
+</li>
+</ul>
+</div>
+<div class="sect3">
+<h4 id="remote-site">&lt;remote-site&gt;</h4>
+<div class="paragraph">
+<p>This element is used to configure a remote site for the RELAY protocol.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>name</code> This attribute specifies the name of the remote site to which
+this configuration applies.</p>
+</li>
+<li>
+<p><code>stack</code> This attribute specifies a JGroups protocol stack to use for
+communication between this site and the remote site.</p>
+</li>
+<li>
+<p><code>cluster</code> This attribute specifies the name of the JGroups channel to
+use for communication between this site and the remote site.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="jgroups-use-cases">Use Cases</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In many cases, channels will be configured via XML as in the example
+above, so that the channels will be available upon server startup.
+However, channels may also be added, removed or have their
+configurations changed in a running server by making use of the WildFly
+management API command-line interface (CLI). In this section, we present
+some key use cases for the JGroups management API.</p>
+</div>
+<div class="paragraph">
+<p>The key use cases covered are:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>adding a stack</p>
+</li>
+<li>
+<p>adding a protocol to an existing stack</p>
+</li>
+<li>
+<p>adding a property to a protocol</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+The WildFly management API command-line interface (CLI) itself can be
+used to provide extensive information on the attributes and commands
+available in the JGroups subsystem interface used in these examples.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="add-a-stack">Add a stack</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>/subsystem=jgroups/stack=mystack:add(transport={}, protocols={})</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="add-a-protocol-to-a-stack">Add a protocol to a stack</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>/subsystem=jgroups/stack=mystack/transport=TRANSPORT:add(type=&lt;type&gt;, socket-binding=&lt;socketbinding&gt;)</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>/subsystem=jgroups/stack=mystack:add-protocol(type=&lt;type&gt;, socket-binding=&lt;socketbinding&gt;)</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="add-a-property-to-a-protocol">Add a property to a protocol</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>/subsystem=jgroups/stack=mystack/transport=TRANSPORT/property=&lt;property&gt;:add(value=&lt;value&gt;)</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

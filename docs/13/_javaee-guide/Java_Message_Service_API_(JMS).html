@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Java_message_service_api_(jms) | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Java_message_service_api_(jms)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="[[Java_Message_Service_API_(JMS)]] = Java Message Service API (JMS)" />
+<meta property="og:description" content="[[Java_Message_Service_API_(JMS)]] = Java Message Service API (JMS)" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_javaee-guide/Java_Message_Service_API_(JMS).html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_javaee-guide/Java_Message_Service_API_(JMS).html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_javaee-guide/Java_Message_Service_API_(JMS).html","headline":"Java_message_service_api_(jms)","description":"[[Java_Message_Service_API_(JMS)]] = Java Message Service API (JMS)","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="paragraph">
+<p>[[Java_Message_Service_API_(JMS)]]
+= Java Message Service API (JMS)</p>
+</div>
+<div class="paragraph">
+<p>Coming Soon</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+This guide is still under development, check back soon!
+</td>
+</tr>
+</table>
+</div>
+<div class="sect1">
+<h2 id="configure-jbossas-for-messaging">Configure JBossAS for Messaging</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Currently, the default configuration does not include the JMS subsystem.
+To enable JMS in the standalone server you need to add these
+configuration items to standalone.xml or simply use standalone-full.xml.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">&lt;extension module="org.jboss.as.messaging"/&gt;
+ 
+&lt;subsystem xmlns="urn:jboss:domain:messaging:1.0"&gt;
+    &lt;!-- Default journal file size is 10Mb, reduced here to 100k for faster first boot --&gt;
+    &lt;journal-file-size&gt;102400&lt;/journal-file-size&gt;
+    &lt;journal-min-files&gt;2&lt;/journal-min-files&gt;
+    &lt;journal-type&gt;NIO&lt;/journal-type&gt;
+    &lt;!-- disable messaging persistence --&gt;
+    &lt;persistence-enabled&gt;false&lt;/persistence-enabled&gt;
+ 
+    &lt;connectors&gt;
+       &lt;netty-connector name="netty" socket-binding="messaging" /&gt;
+       &lt;netty-connector name="netty-throughput" socket-binding="messaging-throughput"&gt;
+          &lt;param key="batch-delay" value="50"/&gt;
+       &lt;/netty-connector&gt;
+       &lt;in-vm-connector name="in-vm" server-id="0" /&gt;
+    &lt;/connectors&gt;
+ 
+    &lt;acceptors&gt;
+       &lt;netty-acceptor name="netty" socket-binding="messaging" /&gt;
+       &lt;netty-acceptor name="netty-throughput" socket-binding="messaging-throughput"&gt;
+          &lt;param key="batch-delay" value="50"/&gt;
+          &lt;param key="direct-deliver" value="false"/&gt;
+       &lt;/netty-acceptor&gt;
+        &lt;acceptor name="stomp-acceptor"&gt;
+         &lt;factory-class&gt;org.hornetq.core.remoting.impl.netty.NettyAcceptorFactory&lt;/factory-class&gt;
+         &lt;param key="protocol" value="stomp" /&gt;
+         &lt;param key="port" value="61613" /&gt;
+       &lt;/acceptor&gt;
+       &lt;in-vm-acceptor name="in-vm" server-id="0" /&gt;
+    &lt;/acceptors&gt;
+ 
+    &lt;security-settings&gt;
+       &lt;security-setting match="#"&gt;
+           &lt;permission type="createNonDurableQueue" roles="guest"/&gt;
+           &lt;permission type="deleteNonDurableQueue" roles="guest"/&gt;
+            &lt;permission type="consume" roles="guest"/&gt;
+            &lt;permission type="send" roles="guest"/&gt;
+       &lt;/security-setting&gt;
+    &lt;/security-settings&gt;
+ 
+    &lt;address-settings&gt;
+       &lt;!--default for catch all--&gt;
+       &lt;address-setting match="#"&gt;
+          &lt;dead-letter-address&gt;jms.queue.DLQ&lt;/dead-letter-address&gt;
+          &lt;expiry-address&gt;jms.queue.ExpiryQueue&lt;/expiry-address&gt;
+          &lt;redelivery-delay&gt;0&lt;/redelivery-delay&gt;
+          &lt;max-size-bytes&gt;10485760&lt;/max-size-bytes&gt;
+          &lt;message-counter-history-day-limit&gt;10&lt;/message-counter-history-day-limit&gt;
+          &lt;address-full-policy&gt;BLOCK&lt;/address-full-policy&gt;
+       &lt;/address-setting&gt;
+    &lt;/address-settings&gt;
+ 
+    &lt;!--JMS Stuff--&gt;
+   &lt;jms-connection-factories&gt;
+      &lt;connection-factory name="InVmConnectionFactory"&gt;
+         &lt;connectors&gt;
+            &lt;connector-ref connector-name="in-vm"/&gt;
+         &lt;/connectors&gt;
+         &lt;entries&gt;
+            &lt;entry name="java:/ConnectionFactory"/&gt;
+         &lt;/entries&gt;
+      &lt;/connection-factory&gt;
+      &lt;connection-factory name="RemoteConnectionFactory"&gt;
+         &lt;connectors&gt;
+            &lt;connector-ref connector-name="netty"/&gt;
+         &lt;/connectors&gt;
+         &lt;entries&gt;
+            &lt;entry name="RemoteConnectionFactory"/&gt;
+         &lt;/entries&gt;
+      &lt;/connection-factory&gt;
+      &lt;pooled-connection-factory name="hornetq-ra"&gt;
+         &lt;transaction mode="xa"/&gt;
+         &lt;connectors&gt;
+            &lt;connector-ref connector-name="in-vm"/&gt;
+         &lt;/connectors&gt;
+         &lt;entries&gt;
+            &lt;entry name="java:/JmsXA"/&gt;
+            &lt;!-- Global JNDI entry used to provide a default JMS Connection factory to EE application --&gt;
+            &lt;entry name="java:jboss/DefaultJMSConnectionFactory"/&gt;
+         &lt;/entries&gt;
+      &lt;/pooled-connection-factory&gt;
+   &lt;/jms-connection-factories&gt;
+ 
+   &lt;jms-destinations&gt;
+      &lt;jms-queue name="testQueue"&gt;
+         &lt;entry name="queue/test"/&gt;
+      &lt;/jms-queue&gt;
+      &lt;jms-topic name="testTopic"&gt;
+         &lt;entry name="topic/test"/&gt;
+      &lt;/jms-topic&gt;
+   &lt;/jms-destinations&gt;
+&lt;/subsystem&gt;
+ 
+&lt;socket-binding name="messaging" port="5445" /&gt;
+&lt;socket-binding name="messaging-throughput" port="5455"/&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Alternatively run the server using the preview configuration</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">$ bin/standalone.sh --server-config=standalone-preview.xml</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="adding-the-message-destinations">Adding the message destinations</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>For this tutorial we use two message destinations</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>BidQueue - The queue that receives the client bids</p>
+</li>
+<li>
+<p>AuctionTopic - The topic that publishes the start of a new auction</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>You can either add the message destinations by using the Command Line
+Interface (CLI)</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">$ bin/jboss-admin.sh --connect
+Connected to standalone controller at localhost:9999
+[standalone@localhost:9999 /] jms-queue add --queue-address=BidQueue --entries=queue/bid
+[standalone@localhost:9999 /] jms-topic add --topic-address=AuctionTopic --entries=topic/auction
+[standalone@localhost:9999 /] exit
+Closed connection to localhost:9999</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or by adding them to the subsytem configuration as shown above.</p>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

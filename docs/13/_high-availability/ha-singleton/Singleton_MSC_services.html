@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Singleton_msc_services | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Singleton_msc_services" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Singleton MSC services" />
+<meta property="og:description" content="Singleton MSC services" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_high-availability/ha-singleton/Singleton_MSC_services.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_high-availability/ha-singleton/Singleton_MSC_services.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_high-availability/ha-singleton/Singleton_MSC_services.html","headline":"Singleton_msc_services","description":"Singleton MSC services","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="sect1">
+<h2 id="Singleton_MSC_services">Singleton MSC services</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The singleton service facility exposes a mechanism for installing an MSC service such that the service only starts on a single member of a cluster at a time.
+If the member providing the singleton service is shutdown or crashes, the facility automatically elects a new primary provider and starts the service on that node.
+In general, a singleton election happens in response to any change of membership, where the membership is defined as the set of cluster nodes on which the given service was installed.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="installing-an-msc-service-using-an-existing-singleton-policy">Installing an MSC service using an existing singleton policy</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>While singleton MSC services have been around since AS7, WildFly adds the ability to leverage the singleton subsystem to create singleton MSC services from existing singleton policies.</p>
+</div>
+<div class="paragraph">
+<p>The singleton subsystem exposes capabilities for each singleton policy it defines.</p>
+</div>
+<div class="paragraph">
+<p>These policies, encapsulated by the <code>org.wildfly.clustering.singleton.service.SingletonPolicy</code> interface, can be referenced via the following capability name:
+"org.wildfly.clustering.singleton.policy" + <em>policy-name</em></p>
+</div>
+<div class="paragraph">
+<p>You can reference the default singleton policy of the server via the name:
+"org.wildfly.clustering.singleton.default-policy"
+e.g.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">public class MyServiceActivator implements ServiceActivator {
+    @Override
+    public void activate(ServiceActivatorContext context) {
+        ServiceName name = ServiceName.parse("my.service.name");
+        // Use default singleton policy
+        Supplier&lt;SingletonPolicy&gt; policy = new ActiveServiceSupplier&lt;&gt;(context.getServiceTarget(), ServiceName.parse(SingletonDefaultRequirement.SINGLETON_POLICY.getName()));
+        ServiceBuilder&lt;?&gt; builder = policy.get().createSingletonServiceConfigurator(name).build(context.getServiceTarget());
+        Service service = new MyService();
+        builder.setInstance(service).install();
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="installing-an-msc-service-using-dynamic-singleton-policy">Installing an MSC service using dynamic singleton policy</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Alternatively, you can configure a singleton policy dynamically, which is particularly useful if you want to use a custom singleton election policy.
+<code>org.wildfly.clustering.singleton.service.SingletonPolicy</code> is a generalization of the <code>org.wildfly.clustering.singleton.service.SingletonServiceConfiguratorFactory</code> interface,
+which includes support for specifying an election policy and, optionally, a quorum.</p>
+</div>
+<div class="paragraph">
+<p>The 'SingletonServiceConfiguratorFactory' capability may be references using the following capability name:
+"org.wildfly.clustering.cache.singleton-service-configurator-factory" + <em>container-name</em> + "." + <em>cache-name</em></p>
+</div>
+<div class="paragraph">
+<p>You can reference a 'SingletonServiceConfiguratorFactory' using the default cache of a given cache container via the name:
+"org.wildfly.clustering.cache.default-singleton-service-configurator-factory" + <em>container-name</em></p>
+</div>
+<div class="paragraph">
+<p>e.g.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">public class MyServiceActivator implements ServiceActivator {
+    @Override
+    public void activate(ServiceActivatorContext context) {
+        String containerName = "foo";
+        ElectionPolicy policy = new MySingletonElectionPolicy();
+        int quorum = 3;
+        ServiceName name = ServiceName.parse("my.service.name");
+        // Use a SingletonServiceConfiguratorFactory backed by default cache of "foo" container
+        Supplier&lt;SingletonServiceConfiguratorFactory&gt; factory = new ActiveServiceSupplier&lt;&gt;(context.getServiceTarget(), ServiceName.parse(SingletonDefaultCacheRequirement.SINGLETON_SERVICE_CONFIGURATOR_FACTORY.resolve(containerName).getName()));
+        ServiceBuilder&lt;?&gt; builder = factory.get().createSingletonServiceConfigurator(name)
+                .electionPolicy(policy)
+                .requireQuorum(quorum)
+        		.build(context.getServiceTarget());
+        Service service = new MyService();
+        builder.setInstance(service).install();
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

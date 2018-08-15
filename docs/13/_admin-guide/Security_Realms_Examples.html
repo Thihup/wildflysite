@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Examples | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Examples" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="[Unknown]: localhost" />
+<meta property="og:description" content="[Unknown]: localhost" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_admin-guide/Security_Realms_Examples.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_admin-guide/Security_Realms_Examples.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_admin-guide/Security_Realms_Examples.html","headline":"Examples","description":"[Unknown]: localhost","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>This section of the document contains a couple of examples for the most
+common scenarios likely to be used with the security realms, please feel
+free to raise Jira issues requesting additional scenarios or if you have
+configured something not covered here please feel free to add your own
+examples - this document is editable after all <span class="icon yellow"><i class="fa fa-smile-o"></i></span></p>
+</div>
+<div class="paragraph">
+<p>At the moment these examples are making use of the ' `ManagementRealm&#8217;
+however the same can apply to the ' `ApplicationRealm&#8217; or any custom
+realm you create for yourselves.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="ldap-authentication">LDAP Authentication</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The following example demonstrates an example configuration making use
+of Active Directory to verify the users username and password.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;management&gt;
+  &lt;security-realms&gt;
+    &lt;security-realm name="ManagementRealm"&gt;
+      &lt;authentication&gt;
+        &lt;ldap connection="EC2" base-dn="CN=Users,DC=darranl,DC=jboss,DC=org"&gt;
+          &lt;username-filter attribute="sAMAccountName" /&gt;
+        &lt;/ldap&gt;
+      &lt;/authentication&gt;
+    &lt;/security-realm&gt;
+ 
+  &lt;/security-realms&gt;
+ 
+  &lt;outbound-connections&gt;
+    &lt;ldap name="EC2" url="ldap://127.0.0.1:9797" search-dn="CN=wf8,CN=Users,DC=darranl,DC=jboss,DC=org" search-credential="password"/&gt;
+  &lt;/outbound-connections&gt;
+ 
+  ...
+ 
+&lt;/management&gt;</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+For simplicity the <code>&lt;local/&gt;</code> configuration has been removed from this
+example, however there it is fine to leave that in place for local
+authentication to remain possible.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="enable-ssl">Enable SSL</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The first step is the creation of the key, by default this is going to
+be used for both the native management interface and the http management
+interface - to create the key we can use the <code>keyTool</code>, the following
+example will create a key valid for one year.</p>
+</div>
+<div class="paragraph">
+<p>Open a terminal window in the folder \{
+<code>jboss.home}/standalone/configuration</code> and enter the following command:
+-</p>
+</div>
+<div class="paragraph">
+<p><code>keytool -genkey -alias server -keyalg RSA -keystore server.keystore -validity 365</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">Enter keystore password:
+Re-enter new password:</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In this example I choose ' `keystore_password&#8217;.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>What is your first and last name?
+  [Unknown]:  localhost</pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Of all of the questions asked this is the most important and should
+match the host name that will be entered into the web browser to connect
+to the admin console.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Answer the remaining questions as you see fit and at the end for the
+purpose of this example I set the key password to ' `key_password&#8217;.</p>
+</div>
+<div class="paragraph">
+<p>The following example shows how this newly created keystore will be
+referenced to enable SSL.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;security-realm name="ManagementRealm"&gt;
+  &lt;server-identities&gt;
+    &lt;ssl&gt;
+      &lt;keystore path="server.keystore" relative-to="jboss.server.config.dir" keystore-password="keystore_password" alias="server" key-password="key_password" /&gt;
+    &lt;/ssl&gt;
+  &lt;/server-identities&gt;
+  &lt;authentication&gt;
+    ...
+  &lt;/authentication&gt;
+&lt;/security-realm&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The contents of the <code>&lt;authentication /&gt;</code> have not been changed in this
+example so authentication still occurs using either the local mechanism
+or username/password authentication using Digest.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="add-client-cert-to-ssl">Add Client-Cert to SSL</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To enable Client-Cert style authentication we just now need to add a
+<code>&lt;truststore /&gt;</code> element to the <code>&lt;authentication /&gt;</code> element referencing
+a trust store that has had the certificates or trusted clients imported.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;security-realm name="ManagementRealm"&gt;
+  &lt;server-identities&gt;
+    &lt;ssl&gt;
+      &lt;keystore path="server.keystore" relative-to="jboss.server.config.dir" keystore-password="keystore_password" alias="server" key-password="key_password" /&gt;
+    &lt;/ssl&gt;
+  &lt;/server-identities&gt;
+  &lt;authentication&gt;
+    &lt;truststore path="server.truststore" relative-to="jboss.server.config.dir" keystore-password="truststore_password" /&gt;
+    &lt;local default-user="$local"/&gt;
+    &lt;properties path="mgmt-users.properties" relative-to="jboss.server.config.dir"/&gt;
+  &lt;/authentication&gt;
+&lt;/security-realm&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In this scenario if Client-Cert authentication does not occur clients
+can fall back to use either the local mechanism or username/password
+authentication. To make Client-Cert based authentication mandatory just
+remove the <code>&lt;local /&gt;</code> and <code>&lt;properties /&gt;</code> elements.</p>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

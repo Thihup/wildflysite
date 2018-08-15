@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Wildfly_testsuite_harness_developer_guide | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Wildfly_testsuite_harness_developer_guide" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="WildFly Testsuite Harness Developer Guide" />
+<meta property="og:description" content="WildFly Testsuite Harness Developer Guide" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_testsuite/WildFly_Testsuite_Harness_Developer_Guide.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_testsuite/WildFly_Testsuite_Harness_Developer_Guide.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_testsuite/WildFly_Testsuite_Harness_Developer_Guide.html","headline":"Wildfly_testsuite_harness_developer_guide","description":"WildFly Testsuite Harness Developer Guide","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="sect1">
+<h2 id="WildFly_Testsuite_Harness_Developer_Guide">WildFly Testsuite Harness Developer Guide</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><strong>Audience:</strong> Whoever wants to change the testsuite harness</p>
+</div>
+<div class="paragraph">
+<p><strong>JIRA</strong>: <a href="https://issues.jboss.org/browse/WFLY-576">WFLY-576</a></p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="testsuite-requirements">Testsuite requirements</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="http://community.jboss.org/wiki/ASTestsuiteRequirements" class="bare">http://community.jboss.org/wiki/ASTestsuiteRequirements</a> will probably be
+merged here later.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="adding-a-new-maven-plugin">Adding a new maven plugin</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The plugin version needs to be specified in jboss-parent. See
+<a href="https://github.com/jboss/jboss-parent-pom/blob/master/pom.xml#L65" class="bare">https://github.com/jboss/jboss-parent-pom/blob/master/pom.xml#L65</a> .</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="shortened-maven-run-overview">Shortened Maven run overview</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>See <a href="#Shortened_Maven_Run_Overview">Shortened Maven Run Overview</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="how-the-as-instance-is-built">How the AS instance is built</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>See <a href="#How_the_server_is_built_and_configured_for_testsuite_modules">How the JBoss AS instance is built and configured
+for testsuite modules.</a></p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="properties-and-their-propagation">Properties and their propagation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>﻿Propagated to tests through arquillian.xml:<br>
+<code>&lt;property name="javaVmArguments"&gt;${server.jvm.args}&lt;/property&gt;</code><br>
+TBD: <a href="https://issues.jboss.org/browse/ARQ-647" class="bare">https://issues.jboss.org/browse/ARQ-647</a></p>
+</div>
+<div class="sect2">
+<h3 id="jboss-as-instance-dir">JBoss AS instance dir</h3>
+<div class="paragraph">
+<p><strong>integration/pom.xml</strong></p>
+</div>
+<div class="paragraph">
+<p>(currently nothing)</p>
+</div>
+<div class="paragraph">
+<p><strong>*-arquillian.xml</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;container qualifier="jboss" default="true"&gt;
+    &lt;configuration&gt;
+        &lt;property name="jbossHome"&gt;${basedir}/target/jbossas&lt;/property&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="server-jvm-arguments">Server JVM arguments</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;surefire.memory.args&gt;-Xmx512m -XX:MaxPermSize=256m&lt;/surefire.memory.args&gt;
+    &lt;surefire.jpda.args&gt;&lt;/surefire.jpda.args&gt;
+    &lt;surefire.system.args&gt;${surefire.memory.args} ${surefire.jpda.args}&lt;/surefire.system.args&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="ip-settings">IP settings</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><code>${ip.server.stack</code> <strong>}</strong> - used in
+<code>&lt;systemPropertyVariables&gt; / &lt;server.jvm.args&gt;</code> which is used in
+<code>*-arquillian.xml</code>.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="testsuite-directories">Testsuite directories</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><code>${jbossas.ts.integ.dir</code>}</p>
+</li>
+<li>
+<p><code>${jbossas.ts.dir</code>}</p>
+</li>
+<li>
+<p><code>${jbossas.project.dir</code>}</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="clustering-properties">Clustering properties</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>node0</p>
+</li>
+<li>
+<p>node1</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="debug-parameters-propagation">Debug parameters propagation</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;surefire.jpda.args&gt;&lt;/surefire.jpda.args&gt;       - default
+
+&lt;surefire.jpda.args&gt;-Xrunjdwp:transport=dt_socket,address=${as.debug.port},server=y,suspend=y&lt;/surefire.jpda.args&gt; - activated by -Ddebug or -Djpda
+
+
+testsuite/pom.xml:        &lt;surefire.system.args&gt;... ${surefire.jpda.args} ...&lt;/surefire.system.args&gt;
+testsuite/pom.xml:                        &lt;jboss.options&gt;${surefire.system.args}&lt;/jboss.options&gt;
+
+testsuite/integration/pom.xml:     &lt;server.jvm.args&gt;${surefire.system.args} ${jvm.args.ip.server} ${jvm.args.security} ${jvm.args.timeouts} -Dnode0=${node0} -Dnode1=
+
+
+integration/pom.xml:
+&lt;server.jvm.args&gt;${surefire.system.args} ${jvm.args.ip.server} ${jvm.args.security} ${jvm.args.timeouts} -Dnode0=${node0} -Dnode1=${node1} -DudpGroup=${udpGroup} ${jvm.args.dirs}&lt;/server.jvm.args&gt;
+
+arquillian.xml:
+&lt;property name="javaVmArguments"&gt;${server.jvm.args} -Djboss.inst=${basedir}/target/jbossas&lt;/property&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="How_the_server_is_built_and_configured_for_testsuite_modules">How the WildFly is built and configured for testsuite modules.</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Refer to <a href="#Shortened_Maven_Run_Overview">Shortened Maven Run Overview</a> to see the
+mentioned build steps.</p>
+</div>
+<div class="paragraph">
+<p>\1) AS instance is copied from <code>${jboss.dist</code>} to
+<code>testsuite/target/jbossas</code>.<br>
+Defaults to AS which is built by the project (
+<code>build/target/jboss-as-*</code>).</p>
+</div>
+<div class="paragraph">
+<p>2)</p>
+</div>
+<div class="paragraph">
+<p><strong>testsuite/pom.xml:</strong></p>
+</div>
+<div class="paragraph">
+<p>from $\{jboss.home} to ${basedir}/target/jbossas<br>
+phase generate-test-resources: resource-plugin, goal copy-resources</p>
+</div>
+<div class="paragraph">
+<p><strong>testsuite/integration/pom.xml:</strong></p>
+</div>
+<div class="paragraph">
+<p>phase process-test-resources: antrun-plugin:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;ant antfile="$\{basedir}/src/test/scripts/basic-integration-build.xml"&gt;
+    &lt;target name="build-basic-integration"/&gt;
+    &lt;target name="build-basic-integration-jts"/&gt;
+&lt;/ant&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Which invokes</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;target name="build-basic-integration" description="Builds server configuration for basic-integration tests"&gt;
+      &lt;build-server-config name="jbossas"/&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Which invokes</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;!-- Copy the base distribution. --&gt;
+&lt;!-- We exclude modules and bundles as they are read-only and we locate the via sys props. --&gt;
+&lt;copy todir="@{output.dir}/@{name}"&gt;
+    &lt;fileset dir="@{jboss.dist}"&gt;
+        &lt;exclude name="**/modules/**"/&gt;
+        &lt;exclude name="**/bundles/**"/&gt;
+    &lt;/fileset&gt;
+&lt;/copy&gt;
+ 
+&lt;!-- overwrite with configs from test-configs and apply property filtering --&gt;
+&lt;copy todir="@{output.dir}/@{name}" overwrite="true" failonerror="false"&gt;
+    &lt;fileset dir="@{test.configs.dir}/@{name}"/&gt;
+    &lt;filterset begintoken="${" endtoken="}"&gt;
+        &lt;filter token="node0" value="${node0}"/&gt;
+        &lt;filter token="node1" value="${node1}"/&gt;
+        &lt;filter token="udpGroup" value="${udpGroup}"/&gt;
+        &lt;filter-elements/&gt;
+    &lt;/filterset&gt;
+&lt;/copy&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="arquillian-config-file-location">Arquillian config file location</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">-Darquillian.xml=some-file-or-classpath-resource.xml</code></pre>
+</div>
+</div>
+</div>
+</div>
+<h1 id="Plugin_executions_matrix" class="sect0">Plugin executions matrix</h1>
+<div class="paragraph">
+<p>x - runs in this module<br>
+xx - runs in this and all successive modules<br>
+x! - runs but should not.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 9.0909%;">
+<col style="width: 9.0909%;">
+<col style="width: 9.0909%;">
+<col style="width: 9.0909%;">
+<col style="width: 9.0909%;">
+<col style="width: 9.0909%;">
+<col style="width: 9.0909%;">
+<col style="width: 9.0909%;">
+<col style="width: 9.0909%;">
+<col style="width: 9.0909%;">
+<col style="width: 9.091%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top"> </th>
+<th class="tableblock halign-left valign-top">TS</th>
+<th class="tableblock halign-left valign-top">integ</th>
+<th class="tableblock halign-left valign-top">smoke</th>
+<th class="tableblock halign-left valign-top">basic</th>
+<th class="tableblock halign-left valign-top">clust</th>
+<th class="tableblock halign-left valign-top">iiop</th>
+<th class="tableblock halign-left valign-top">comp</th>
+<th class="tableblock halign-left valign-top">domain</th>
+<th class="tableblock halign-left valign-top">bench</th>
+<th class="tableblock halign-left valign-top">stress</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">initialize</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maven-help-plugin</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">xx</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">properties-maven-plugin:write-project-properties</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maven-antrun-plugin:1.6:run (banner)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">process-resources</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maven-resources-plugin:2.5:resources (default-resources)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">xx</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maven-dependency-plugin:2.3:copy (copy-annotations-endorsed)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">xx!</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">compile</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maven-compiler-plugin:2.3.2:compile (default-compile)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">xx</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">generate-test-resources</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maven-resources-plugin:2.5:copy-resources (build-jbossas.server)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">xx!</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Should be:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maven-resources-plugin:2.5:copy-resources (ts.copy-jbossas)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maven-resources-plugin:2.5:copy-resources (ts.copy-jbossas.groups)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">?</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">?</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">?</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">!</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Should be:</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">xx</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">process-test-resources</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maven-resources-plugin:2.5:testResources (default-testResources)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">xx</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maven-antrun-plugin:1.6:run (build-smoke.server)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maven-antrun-plugin:1.6:run (prepare-jars-basic-integration.server)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maven-antrun-plugin:1.6:run (build-clustering.server)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x!?</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">test-compile</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maven-compiler-plugin:2.3.2:testCompile (default-testCompile)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">xx</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">xml-maven-plugin:1.0:transform (update-ip-addresses-jbossas.server)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maven-antrun-plugin:1.6:run (build-jars)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">test</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maven-surefire-plugin:2.10:test (smoke-full.surefire)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maven-surefire-plugin:2.10:test (smoke-web.surefire)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maven-surefire-plugin:2.10:test (default-test)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maven-surefire-plugin:2.10:test
+(basic-integration-default-full.surefire)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maven-surefire-plugin:2.10:test
+(basic-integration-default-web.surefire)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maven-surefire-plugin:2.10:test (basic-integration-2nd.surefire)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maven-surefire-plugin:2.10:test (tests-clust-multi-node-unm&#8230;&#8203;surefire)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maven-surefire-plugin:2.10:test (tests-clustering-single-node.surefire)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maven-surefire-plugin:2.10:test (tests-clustering-multi-node.surefire)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maven-surefire-plugin:2.10:test (tests-iiop-multi-node.surefire)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">package</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maven-jar-plugin:2.3.1:jar (default-jar)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">xx!</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maven-source-plugin:2.1.2:jar-no-fork (attach-sources)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">install</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maven-install-plugin:2.3.1:install (default-install)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">xx!</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">integ</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">smoke</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">basic</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">clust</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">iiop</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">comp</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">domain</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">bench</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">stress</p></td>
+</tr>
+</tbody>
+</table>
+<div class="sect1">
+<h2 id="Shortened_Maven_Run_Overview">Shortened Maven Run Overview</h2>
+<div class="sectionbody">
+
+</div>
+</div>
+<div class="sect1">
+<h2 id="how-to-get-it">How to get it</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">./integration-tests.sh clean install -DallTests | tee TS.txt | testsuite/tools/runSummary.sh</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="how-its-done">How it&#8217;s done</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Run this script on the output of the AS7 testsuite run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">##  Cat the file or stdin if no args,
+##  filter only interesting lines - plugin executions and modules separators,
+##  plus Test runs summaries,
+##  and remove the boring plugins like enforcer etc.
+ 
+cat $1 \
+ | egrep ' --- |Building| ---------|Tests run: | T E S T S' \
+ | grep -v 'Time elapsed'
+ | sed 's|Tests run:|                Tests run:|' \
+ | grep -v maven-clean-plugin \
+ | grep -v maven-enforcer-plugin \
+ | grep -v buildnumber-maven-plugin \
+ | grep -v maven-help-plugin \
+ | grep -v properties-maven-plugin:.*:write-project-properties \
+;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You&#8217;ll get an overview of the run.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="example-output-with-comments.">Example output with comments.</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">ondra@ondra-redhat: ~/work/AS7/ozizka-as7 $  ./integration-tests.sh clean install -DallTests | tee TS.txt | testsuite/tools/runSummary.sh
+[INFO] ------------------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] Building JBoss Application Server Test Suite: Aggregator 7.1.0.CR1-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] --- maven-dependency-plugin:2.3:copy (copy-annotations-endorsed) @ jboss-as-testsuite ---
+              Copies org.jboss.spec.javax.annotation:jboss-annotations-api_1.1_spec to ${project.build.directory}/endorsed .
+              Inherited - needed for compilation of all submodules.
+ 
+[INFO] --- maven-resources-plugin:2.5:copy-resources (build-jbossas.server) @ jboss-as-testsuite ---
+              Copies ${jboss.home} to target/jbossas .  TODO: Should be jboss.dist.
+ 
+[INFO] --- xml-maven-plugin:1.0:transform (update-ip-addresses-jbossas.server) @ jboss-as-testsuite ---
+              Changes IP addresses used in server config files -
+              applies ${xslt.scripts.dir}/changeIPAddresses.xsl on ${basedir}/target/jbossas/standalone/configuration/standalone-*.xml
+              Currently inherited, IMO should not be.
+ 
+[INFO] --- maven-source-plugin:2.1.2:jar-no-fork (attach-sources) @ jboss-as-testsuite ---
+              TODO: Remove
+ 
+[INFO] --- maven-install-plugin:2.3.1:install (default-install) @ jboss-as-testsuite ---
+ 
+[INFO] ------------------------------------------------------------------------
+[INFO] Building JBoss Application Server Test Suite: Integration Aggregator 7.1.0.CR1-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] --- maven-dependency-plugin:2.3:copy (copy-annotations-endorsed) @ jboss-as-testsuite-integration-agg ---
+[INFO] --- maven-resources-plugin:2.5:copy-resources (build-jbossas.server) @ jboss-as-testsuite-integration-agg ---
+              TODO: Remove
+[INFO] --- maven-resources-plugin:2.5:copy-resources (ts.copy-jbossas) @ jboss-as-testsuite-integration-agg ---
+[INFO] --- maven-resources-plugin:2.5:copy-resources (ts.copy-jbossas.groups) @ jboss-as-testsuite-integration-agg ---
+[INFO] --- xml-maven-plugin:1.0:transform (update-ip-addresses-jbossas.server) @ jboss-as-testsuite-integration-agg ---
+              TODO: Remove
+[INFO] --- maven-source-plugin:2.1.2:jar-no-fork (attach-sources) @ jboss-as-testsuite-integration-agg ---
+              TODO: Remove
+[INFO] --- maven-install-plugin:2.3.1:install (default-install) @ jboss-as-testsuite-integration-agg ---
+[INFO] ------------------------------------------------------------------------
+[INFO] Building JBoss AS Test Suite: Integration - Smoke 7.1.0.CR1-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] --- maven-dependency-plugin:2.3:copy (copy-annotations-endorsed) @ jboss-as-testsuite-integration-smoke ---
+[INFO] --- maven-resources-plugin:2.5:resources (default-resources) @ jboss-as-testsuite-integration-smoke ---
+              TODO: Remove
+[INFO] --- maven-compiler-plugin:2.3.2:compile (default-compile) @ jboss-as-testsuite-integration-smoke ---
+[INFO] --- maven-resources-plugin:2.5:copy-resources (build-jbossas.server) @ jboss-as-testsuite-integration-smoke ---
+[INFO] --- maven-resources-plugin:2.5:copy-resources (ts.copy-jbossas.groups) @ jboss-as-testsuite-integration-smoke ---
+[INFO] --- maven-resources-plugin:2.5:testResources (default-testResources) @ jboss-as-testsuite-integration-smoke ---
+[INFO] --- xml-maven-plugin:1.0:transform (update-ip-addresses-jbossas.server) @ jboss-as-testsuite-integration-smoke ---
+              TODO: Remove
+ 
+[INFO] --- maven-antrun-plugin:1.6:run (build-smoke.server) @ jboss-as-testsuite-integration-smoke ---
+     [echo] Building AS instance "smoke" from /home/ondra/work/EAP/EAP6-DR9 to /home/ondra/work/AS7/ozizka-as7/testsuite/integration/smoke/target
+              TODO: Should be running one level above!
+ 
+[INFO] --- maven-compiler-plugin:2.3.2:testCompile (default-testCompile) @ jboss-as-testsuite-integration-smoke ---
+[INFO] --- maven-surefire-plugin:2.10:test (smoke-full.surefire) @ jboss-as-testsuite-integration-smoke ---
+ T E S T S
+                Tests run: 4, Failures: 0, Errors: 4, Skipped: 0</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="example-output-unchanged">Example output, unchanged</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">ondra@lenovo:~/work/AS7/ozizka-git$ ./integration-tests.sh clean install -DallTests | tee TS.txt | testsuite/tools/runSummary.sh
+SSCmeetingWestfordJan     [copy] Warning: /home/ondra/work/AS7/ozizka-git/testsuite/integration/src/test/resources/test-configs/smoke does not exist.
+     [copy] Warning: /home/ondra/work/AS7/ozizka-git/testsuite/integration/src/test/resources/test-configs/clustering-udp-0 does not exist.
+     [copy] Warning: /home/ondra/work/AS7/ozizka-git/testsuite/integration/src/test/resources/test-configs/clustering-udp-1 does not exist.
+     [copy] Warning: /home/ondra/work/AS7/ozizka-git/testsuite/integration/src/test/resources/test-configs/iiop-client does not exist.
+     [copy] Warning: /home/ondra/work/AS7/ozizka-git/testsuite/integration/src/test/resources/test-configs/iiop-server does not exist.
+[INFO] ------------------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] Building JBoss Application Server Test Suite: Aggregator 7.1.0.Final-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] --- maven-antrun-plugin:1.6:run (banner) @ jboss-as-testsuite ---
+[INFO] --- maven-dependency-plugin:2.3:copy (copy-annotations-endorsed) @ jboss-as-testsuite ---
+[INFO] --- maven-resources-plugin:2.5:copy-resources (build-jbossas.server) @ jboss-as-testsuite ---
+[INFO] --- xml-maven-plugin:1.0:transform (update-ip-addresses-jbossas.server) @ jboss-as-testsuite ---
+[INFO] --- maven-install-plugin:2.3.1:install (default-install) @ jboss-as-testsuite ---
+[INFO] ------------------------------------------------------------------------
+[INFO] Building JBoss Application Server Test Suite: Integration 7.1.0.Final-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] --- maven-dependency-plugin:2.3:copy (copy-annotations-endorsed) @ jboss-as-testsuite-integration-agg ---
+[INFO] --- maven-resources-plugin:2.5:copy-resources (build-jbossas.server) @ jboss-as-testsuite-integration-agg ---
+[INFO] --- maven-resources-plugin:2.5:copy-resources (ts.copy-jbossas) @ jboss-as-testsuite-integration-agg ---
+[INFO] --- maven-resources-plugin:2.5:copy-resources (ts.copy-jbossas.groups) @ jboss-as-testsuite-integration-agg ---
+[INFO] --- maven-install-plugin:2.3.1:install (default-install) @ jboss-as-testsuite-integration-agg ---
+[INFO] ------------------------------------------------------------------------
+[INFO] Building JBoss Application Server Test Suite: Integration - Smoke 7.1.0.Final-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] --- maven-dependency-plugin:2.3:copy (copy-annotations-endorsed) @ jboss-as-testsuite-integration-smoke ---
+[INFO] --- maven-resources-plugin:2.5:resources (default-resources) @ jboss-as-testsuite-integration-smoke ---
+[INFO] --- maven-compiler-plugin:2.3.2:compile (default-compile) @ jboss-as-testsuite-integration-smoke ---
+[INFO] --- maven-resources-plugin:2.5:copy-resources (build-jbossas.server) @ jboss-as-testsuite-integration-smoke ---
+[INFO] --- maven-resources-plugin:2.5:copy-resources (ts.copy-jbossas.groups) @ jboss-as-testsuite-integration-smoke ---
+[INFO] --- maven-resources-plugin:2.5:testResources (default-testResources) @ jboss-as-testsuite-integration-smoke ---
+[INFO] --- maven-antrun-plugin:1.6:run (build-smoke.server) @ jboss-as-testsuite-integration-smoke ---
+     [echo] Building AS instance "smoke" from /home/ondra/work/AS7/ozizka-git/testsuite/integration/smoke/../../../build/target/jboss-as-7.1.0.Final-SNAPSHOT to /home/ondra/work/AS7/ozizka-git/testsuite/integration/smoke/target
+[INFO] --- maven-compiler-plugin:2.3.2:testCompile (default-testCompile) @ jboss-as-testsuite-integration-smoke ---
+[INFO] --- maven-surefire-plugin:2.10:test (smoke-full.surefire) @ jboss-as-testsuite-integration-smoke ---
+ T E S T S
+                Tests run: 4, Failures: 0, Errors: 0, Skipped: 0
+[INFO] --- maven-surefire-plugin:2.10:test (smoke-web.surefire) @ jboss-as-testsuite-integration-smoke ---
+ T E S T S
+                Tests run: 116, Failures: 0, Errors: 0, Skipped: 6
+[INFO] --- maven-jar-plugin:2.3.1:jar (default-jar) @ jboss-as-testsuite-integration-smoke ---
+[INFO] Building jar: /home/ondra/work/AS7/ozizka-git/testsuite/integration/smoke/target/jboss-as-testsuite-integration-smoke-7.1.0.Final-SNAPSHOT.jar
+[INFO] --- maven-install-plugin:2.3.1:install (default-install) @ jboss-as-testsuite-integration-smoke ---
+[INFO] ------------------------------------------------------------------------
+[INFO] Building JBoss Application Server Test Suite: Integration - Basic 7.1.0.Final-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] --- maven-dependency-plugin:2.3:copy (copy-annotations-endorsed) @ jboss-as-testsuite-integration-basic ---
+[INFO] --- maven-resources-plugin:2.5:resources (default-resources) @ jboss-as-testsuite-integration-basic ---
+[INFO] --- maven-compiler-plugin:2.3.2:compile (default-compile) @ jboss-as-testsuite-integration-basic ---
+[INFO] --- maven-resources-plugin:2.5:copy-resources (build-jbossas.server) @ jboss-as-testsuite-integration-basic ---
+[INFO] --- maven-resources-plugin:2.5:copy-resources (ts.copy-jbossas.groups) @ jboss-as-testsuite-integration-basic ---
+[INFO] --- maven-resources-plugin:2.5:testResources (default-testResources) @ jboss-as-testsuite-integration-basic ---
+[INFO] --- maven-antrun-plugin:1.6:run (prepare-jars-basic-integration.server) @ jboss-as-testsuite-integration-basic ---
+[INFO] --- maven-compiler-plugin:2.3.2:testCompile (default-testCompile) @ jboss-as-testsuite-integration-basic ---
+[INFO] --- maven-surefire-plugin:2.10:test (basic-integration-default-full.surefire) @ jboss-as-testsuite-integration-basic ---
+ T E S T S
+                Tests run: 323, Failures: 0, Errors: 4, Skipped: 30
+[INFO] ------------------------------------------------------------------------
+[INFO] Building JBoss Application Server Test Suite: Integration - Clustering 7.1.0.Final-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] --- maven-dependency-plugin:2.3:copy (copy-annotations-endorsed) @ jboss-as-testsuite-integration-clust ---
+[INFO] --- maven-resources-plugin:2.5:resources (default-resources) @ jboss-as-testsuite-integration-clust ---
+[INFO] --- maven-compiler-plugin:2.3.2:compile (default-compile) @ jboss-as-testsuite-integration-clust ---
+[INFO] --- maven-resources-plugin:2.5:copy-resources (build-jbossas.server) @ jboss-as-testsuite-integration-clust ---
+[INFO] --- maven-resources-plugin:2.5:copy-resources (ts.copy-jbossas.groups) @ jboss-as-testsuite-integration-clust ---
+[INFO] --- maven-resources-plugin:2.5:testResources (default-testResources) @ jboss-as-testsuite-integration-clust ---
+[INFO] --- maven-antrun-plugin:1.6:run (build-clustering.server) @ jboss-as-testsuite-integration-clust ---
+     [echo] Building config clustering-udp-0
+     [echo] Building AS instance "clustering-udp-0" from /home/ondra/work/AS7/ozizka-git/testsuite/integration/clust/../../../build/target/jboss-as-7.1.0.Final-SNAPSHOT to /home/ondra/work/AS7/ozizka-git/testsuite/integration/clust/target
+     [echo] Building config clustering-udp-1
+     [echo] Building AS instance "clustering-udp-1" from /home/ondra/work/AS7/ozizka-git/testsuite/integration/clust/../../../build/target/jboss-as-7.1.0.Final-SNAPSHOT to /home/ondra/work/AS7/ozizka-git/testsuite/integration/clust/target
+[INFO] --- maven-compiler-plugin:2.3.2:testCompile (default-testCompile) @ jboss-as-testsuite-integration-clust ---
+[INFO] --- maven-surefire-plugin:2.10:test (tests-clustering-multi-node-unmanaged.surefire) @ jboss-as-testsuite-integration-clust ---
+ T E S T S
+                Tests run: 9, Failures: 0, Errors: 0, Skipped: 0
+[INFO] --- maven-surefire-plugin:2.10:test (tests-clustering-single-node.surefire) @ jboss-as-testsuite-integration-clust ---
+ T E S T S
+                Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+[INFO] --- maven-surefire-plugin:2.10:test (tests-clustering-multi-node.surefire) @ jboss-as-testsuite-integration-clust ---
+ T E S T S
+                Tests run: 8, Failures: 0, Errors: 0, Skipped: 0
+[INFO] --- maven-jar-plugin:2.3.1:jar (default-jar) @ jboss-as-testsuite-integration-clust ---
+[INFO] Building jar: /home/ondra/work/AS7/ozizka-git/testsuite/integration/clust/target/jboss-as-testsuite-integration-clust-7.1.0.Final-SNAPSHOT.jar
+[INFO] --- maven-install-plugin:2.3.1:install (default-install) @ jboss-as-testsuite-integration-clust ---
+[INFO] ------------------------------------------------------------------------
+[INFO] Building JBoss Application Server Test Suite: Integration - IIOP 7.1.0.Final-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] --- maven-dependency-plugin:2.3:copy (copy-annotations-endorsed) @ jboss-as-testsuite-integration-iiop ---
+[INFO] --- maven-resources-plugin:2.5:resources (default-resources) @ jboss-as-testsuite-integration-iiop ---
+[INFO] --- maven-compiler-plugin:2.3.2:compile (default-compile) @ jboss-as-testsuite-integration-iiop ---
+[INFO] --- maven-resources-plugin:2.5:copy-resources (build-jbossas.server) @ jboss-as-testsuite-integration-iiop ---
+[INFO] --- maven-resources-plugin:2.5:copy-resources (ts.copy-jbossas.groups) @ jboss-as-testsuite-integration-iiop ---
+[INFO] --- maven-resources-plugin:2.5:testResources (default-testResources) @ jboss-as-testsuite-integration-iiop ---
+[INFO] --- maven-antrun-plugin:1.6:run (build-clustering.server) @ jboss-as-testsuite-integration-iiop ---
+     [echo] Building config iiop-client
+     [echo] Building AS instance "iiop-client" from /home/ondra/work/AS7/ozizka-git/testsuite/integration/iiop/../../../build/target/jboss-as-7.1.0.Final-SNAPSHOT to /home/ondra/work/AS7/ozizka-git/testsuite/integration/iiop/target
+     [echo] Building config iiop-server
+     [echo] Building AS instance "iiop-server" from /home/ondra/work/AS7/ozizka-git/testsuite/integration/iiop/../../../build/target/jboss-as-7.1.0.Final-SNAPSHOT to /home/ondra/work/AS7/ozizka-git/testsuite/integration/iiop/target
+[INFO] --- maven-compiler-plugin:2.3.2:testCompile (default-testCompile) @ jboss-as-testsuite-integration-iiop ---
+[INFO] --- maven-surefire-plugin:2.10:test (tests-iiop-multi-node.surefire) @ jboss-as-testsuite-integration-iiop ---
+ T E S T S
+                Tests run: 12, Failures: 0, Errors: 0, Skipped: 0
+[INFO] --- maven-jar-plugin:2.3.1:jar (default-jar) @ jboss-as-testsuite-integration-iiop ---
+[INFO] Building jar: /home/ondra/work/AS7/ozizka-git/testsuite/integration/iiop/target/jboss-as-testsuite-integration-iiop-7.1.0.Final-SNAPSHOT.jar
+[INFO] --- maven-install-plugin:2.3.1:install (default-install) @ jboss-as-testsuite-integration-iiop ---
+[INFO] ------------------------------------------------------------------------
+[INFO] Building JBoss Application Server Test Suite: Compatibility Tests 7.1.0.Final-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] --- maven-dependency-plugin:2.3:copy (copy-annotations-endorsed) @ jboss-as-testsuite-integration-compat ---
+[INFO] --- maven-resources-plugin:2.5:resources (default-resources) @ jboss-as-testsuite-integration-compat ---
+[INFO] --- maven-compiler-plugin:2.3.2:compile (default-compile) @ jboss-as-testsuite-integration-compat ---
+[INFO] --- maven-resources-plugin:2.5:copy-resources (build-jbossas.server) @ jboss-as-testsuite-integration-compat ---
+[INFO] --- maven-resources-plugin:2.5:testResources (default-testResources) @ jboss-as-testsuite-integration-compat ---
+[INFO] --- maven-compiler-plugin:2.3.2:testCompile (default-testCompile) @ jboss-as-testsuite-integration-compat ---
+[INFO] --- maven-antrun-plugin:1.6:run (build-jars) @ jboss-as-testsuite-integration-compat ---
+[INFO] --- maven-surefire-plugin:2.10:test (default-test) @ jboss-as-testsuite-integration-compat ---
+ T E S T S
+                Tests run: 7, Failures: 0, Errors: 4, Skipped: 3
+[INFO] ------------------------------------------------------------------------
+[INFO] Building JBoss Application Server Test Suite: Domain Mode Integration Tests 7.1.0.Final-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] --- maven-dependency-plugin:2.3:copy (copy-annotations-endorsed) @ jboss-as-testsuite-integration-domain ---
+[INFO] --- maven-resources-plugin:2.5:resources (default-resources) @ jboss-as-testsuite-integration-domain ---
+[INFO] --- maven-compiler-plugin:2.3.2:compile (default-compile) @ jboss-as-testsuite-integration-domain ---
+[INFO] --- maven-resources-plugin:2.5:copy-resources (build-jbossas.server) @ jboss-as-testsuite-integration-domain ---
+[INFO] --- maven-resources-plugin:2.5:testResources (default-testResources) @ jboss-as-testsuite-integration-domain ---
+[INFO] --- maven-compiler-plugin:2.3.2:testCompile (default-testCompile) @ jboss-as-testsuite-integration-domain ---
+[INFO] --- maven-surefire-plugin:2.10:test (default-test) @ jboss-as-testsuite-integration-domain ---
+ T E S T S
+                Tests run: 89, Failures: 0, Errors: 0, Skipped: 4
+[INFO] --- maven-jar-plugin:2.3.1:jar (default-jar) @ jboss-as-testsuite-integration-domain ---
+[INFO] Building jar: /home/ondra/work/AS7/ozizka-git/testsuite/domain/target/jboss-as-testsuite-integration-domain-7.1.0.Final-SNAPSHOT.jar
+[INFO] --- maven-install-plugin:2.3.1:install (default-install) @ jboss-as-testsuite-integration-domain ---
+[INFO] ------------------------------------------------------------------------
+[INFO] Building JBoss Application Server Test Suite: Benchmark Tests 7.1.0.Final-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] --- maven-dependency-plugin:2.3:copy (copy-annotations-endorsed) @ jboss-as-testsuite-benchmark ---
+[INFO] --- maven-resources-plugin:2.5:resources (default-resources) @ jboss-as-testsuite-benchmark ---
+[INFO] --- maven-compiler-plugin:2.3.2:compile (default-compile) @ jboss-as-testsuite-benchmark ---
+[INFO] --- maven-resources-plugin:2.5:copy-resources (build-jbossas.server) @ jboss-as-testsuite-benchmark ---
+[INFO] --- maven-resources-plugin:2.5:testResources (default-testResources) @ jboss-as-testsuite-benchmark ---
+[INFO] --- maven-compiler-plugin:2.3.2:testCompile (default-testCompile) @ jboss-as-testsuite-benchmark ---
+[INFO] --- maven-surefire-plugin:2.10:test (default-test) @ jboss-as-testsuite-benchmark ---
+ T E S T S
+                Tests run: 0, Failures: 0, Errors: 0, Skipped: 0
+[INFO] --- maven-jar-plugin:2.3.1:jar (default-jar) @ jboss-as-testsuite-benchmark ---
+[INFO] Building jar: /home/ondra/work/AS7/ozizka-git/testsuite/benchmark/target/jboss-as-testsuite-benchmark-7.1.0.Final-SNAPSHOT.jar
+[INFO] --- maven-install-plugin:2.3.1:install (default-install) @ jboss-as-testsuite-benchmark ---
+[INFO] ------------------------------------------------------------------------
+[INFO] Building JBoss Application Server Test Suite: Stress Tests 7.1.0.Final-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] --- maven-dependency-plugin:2.3:copy (copy-annotations-endorsed) @ jboss-as-testsuite-stress ---
+[INFO] --- maven-resources-plugin:2.5:resources (default-resources) @ jboss-as-testsuite-stress ---
+[INFO] --- maven-compiler-plugin:2.3.2:compile (default-compile) @ jboss-as-testsuite-stress ---
+[INFO] --- maven-resources-plugin:2.5:copy-resources (build-jbossas.server) @ jboss-as-testsuite-stress ---
+[INFO] --- maven-resources-plugin:2.5:testResources (default-testResources) @ jboss-as-testsuite-stress ---
+[INFO] --- maven-compiler-plugin:2.3.2:testCompile (default-testCompile) @ jboss-as-testsuite-stress ---
+[INFO] --- maven-surefire-plugin:2.10:test (default-test) @ jboss-as-testsuite-stress ---
+ T E S T S
+                Tests run: 0, Failures: 0, Errors: 0, Skipped: 0
+[INFO] --- maven-jar-plugin:2.3.1:jar (default-jar) @ jboss-as-testsuite-stress ---
+[INFO] Building jar: /home/ondra/work/AS7/ozizka-git/testsuite/stress/target/jboss-as-testsuite-stress-7.1.0.Final-SNAPSHOT.jar
+[INFO] --- maven-install-plugin:2.3.1:install (default-install) @ jboss-as-testsuite-stress ---
+[INFO] ------------------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------</code></pre>
+</div>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

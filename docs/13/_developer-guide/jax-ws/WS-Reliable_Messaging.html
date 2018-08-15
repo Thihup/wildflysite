@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>WS-Reliable Messaging | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="WS-Reliable Messaging" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_developer-guide/jax-ws/WS-Reliable_Messaging.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_developer-guide/jax-ws/WS-Reliable_Messaging.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_developer-guide/jax-ws/WS-Reliable_Messaging.html","headline":"WS-Reliable Messaging","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>JBoss Web Services inherits full WS-Reliable Messaging capabilities from
+the underlying Apache CXF implementation. At the time of writing, Apache
+CXF provides support for the
+<a href="http://schemas.xmlsoap.org/ws/2005/02/rm/">WS-Reliable Messaging 1.0</a>
+(February 2005) version of the specification.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="enabling-ws-reliable-messaging">Enabling WS-Reliable Messaging</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>WS-Reliable Messaging is implemented internally in Apache CXF through a
+set of interceptors that deal with the low level requirements of the
+reliable messaging protocol. In order for enabling WS-Reliable
+Messaging, users need to either:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>consume a WSDL contract that specifies proper WS-Reliable Messaging
+policies / assertions</p>
+</li>
+<li>
+<p>manually add / configure the reliable messaging interceptors</p>
+</li>
+<li>
+<p>specify the reliable messaging policies in an optional CXF Spring XML
+descriptor</p>
+</li>
+<li>
+<p>specify the Apache CXF reliable messaging feature in an optional CXF
+Spring XML descriptor</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The former approach relies on the Apache CXF WS-Policy engine and is the
+only portable one. The other approaches are Apache CXF proprietary ones,
+however they allow for fine-grained configuration of protocol aspects
+that are not covered by the WS-Reliable Messaging Policy. More details
+are available in the
+<a href="http://cxf.apache.org/docs/wsrmconfiguration.html">Apache CXF
+documentation</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="example">Example</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this example we configure WS-Reliable Messaging endpoint and client
+through the WS-Policy support.</p>
+</div>
+<div class="sect2">
+<h3 id="endpoint">Endpoint</h3>
+<div class="paragraph">
+<p>We go with a contract-first approach, so we start by creating a proper
+WSDL contract, containing the WS-Reliable Messaging and WS-Addressing
+policies (the latter is a requirement of the former):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;wsdl:definitions name="SimpleService" targetNamespace="http://www.jboss.org/jbossws/ws-extensions/wsrm"
+  xmlns:tns="http://www.jboss.org/jbossws/ws-extensions/wsrm" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+  xmlns:wsp="http://www.w3.org/2006/07/ws-policy"&gt;
+ 
+  &lt;wsdl:types&gt;
+&lt;xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.jboss.org/jbossws/ws-extensions/wsrm"
+  attributeFormDefault="unqualified" elementFormDefault="unqualified"
+  targetNamespace="http://www.jboss.org/jbossws/ws-extensions/wsrm"&gt;
+&lt;xsd:element name="ping" type="tns:ping"/&gt;
+&lt;xsd:complexType name="ping"&gt;
+&lt;xsd:sequence/&gt;
+&lt;/xsd:complexType&gt;
+&lt;xsd:element name="echo" type="tns:echo"/&gt;
+&lt;xsd:complexType name="echo"&gt;
+&lt;xsd:sequence&gt;
+&lt;xsd:element minOccurs="0" name="arg0" type="xsd:string"/&gt;
+&lt;/xsd:sequence&gt;
+&lt;/xsd:complexType&gt;
+&lt;xsd:element name="echoResponse" type="tns:echoResponse"/&gt;
+&lt;xsd:complexType name="echoResponse"&gt;
+&lt;xsd:sequence&gt;
+&lt;xsd:element minOccurs="0" name="return" type="xsd:string"/&gt;
+&lt;/xsd:sequence&gt;
+&lt;/xsd:complexType&gt;
+&lt;/xsd:schema&gt;
+  &lt;/wsdl:types&gt;
+  &lt;wsdl:message name="echoResponse"&gt;
+    &lt;wsdl:part name="parameters" element="tns:echoResponse"&gt;
+    &lt;/wsdl:part&gt;
+  &lt;/wsdl:message&gt;
+  &lt;wsdl:message name="echo"&gt;
+    &lt;wsdl:part name="parameters" element="tns:echo"&gt;
+    &lt;/wsdl:part&gt;
+  &lt;/wsdl:message&gt;
+  &lt;wsdl:message name="ping"&gt;
+    &lt;wsdl:part name="parameters" element="tns:ping"&gt;
+    &lt;/wsdl:part&gt;
+  &lt;/wsdl:message&gt;
+  &lt;wsdl:portType name="SimpleService"&gt;
+    &lt;wsdl:operation name="ping"&gt;
+      &lt;wsdl:input name="ping" message="tns:ping"&gt;
+    &lt;/wsdl:input&gt;
+    &lt;/wsdl:operation&gt;
+    &lt;wsdl:operation name="echo"&gt;
+      &lt;wsdl:input name="echo" message="tns:echo"&gt;
+    &lt;/wsdl:input&gt;
+      &lt;wsdl:output name="echoResponse" message="tns:echoResponse"&gt;
+    &lt;/wsdl:output&gt;
+    &lt;/wsdl:operation&gt;
+  &lt;/wsdl:portType&gt;
+  &lt;wsdl:binding name="SimpleServiceSoapBinding" type="tns:SimpleService"&gt;
+    &lt;wsp:Policy&gt;
+      &lt;!-- WS-Addressing and basic WS-Reliable Messaging policy assertions --&gt;
+      &lt;wswa:UsingAddressing xmlns:wswa="http://www.w3.org/2006/05/addressing/wsdl"/&gt;
+      &lt;wsrmp:RMAssertion xmlns:wsrmp="http://schemas.xmlsoap.org/ws/2005/02/rm/policy"/&gt;
+      &lt;!-- --------------------------------------------------------------- --&gt;
+    &lt;/wsp:Policy&gt;
+    &lt;soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/&gt;
+    &lt;wsdl:operation name="ping"&gt;
+      &lt;soap:operation soapAction="" style="document"/&gt;
+      &lt;wsdl:input name="ping"&gt;
+        &lt;soap:body use="literal"/&gt;
+      &lt;/wsdl:input&gt;
+    &lt;/wsdl:operation&gt;
+    &lt;wsdl:operation name="echo"&gt;
+      &lt;soap:operation soapAction="" style="document"/&gt;
+      &lt;wsdl:input name="echo"&gt;
+        &lt;soap:body use="literal"/&gt;
+      &lt;/wsdl:input&gt;
+      &lt;wsdl:output name="echoResponse"&gt;
+        &lt;soap:body use="literal"/&gt;
+      &lt;/wsdl:output&gt;
+    &lt;/wsdl:operation&gt;
+  &lt;/wsdl:binding&gt;
+  &lt;wsdl:service name="SimpleService"&gt;
+    &lt;wsdl:port name="SimpleServicePort" binding="tns:SimpleServiceSoapBinding"&gt;
+      &lt;soap:address location="http://localhost:8080/jaxws-samples-wsrm-api"/&gt;
+    &lt;/wsdl:port&gt;
+  &lt;/wsdl:service&gt;
+&lt;/wsdl:definitions&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then we use the <em>wsconsume</em> tool to generate both standard JAX-WS client
+and endpoint.</p>
+</div>
+<div class="paragraph">
+<p>We provide a basic JAX-WS implementation for the endpoint, nothing
+special in it:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">package org.jboss.test.ws.jaxws.samples.wsrm.service;
+ 
+import javax.jws.Oneway;
+import javax.jws.WebMethod;
+import javax.jws.WebService;
+ 
+@WebService
+(
+   name = "SimpleService",
+   serviceName = "SimpleService",
+   wsdlLocation = "WEB-INF/wsdl/SimpleService.wsdl",
+   targetNamespace = "http://www.jboss.org/jbossws/ws-extensions/wsrm"
+)
+public class SimpleServiceImpl
+{
+   @Oneway
+   @WebMethod
+   public void ping()
+   {
+      System.out.println("ping()");
+   }
+ 
+   @WebMethod
+   public String echo(String s)
+   {
+      System.out.println("echo(" + s + ")");
+      return s;
+   }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Finally we package the generated POJO endpoint together with a basic
+web.xml the usual way and deploy to the application server. The
+webservices stack automatically detects the policies and enables
+WS-Reliable Messaging.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="client">Client</h3>
+<div class="paragraph">
+<p>The endpoint advertises his RM capabilities (and requirements) through
+the published WSDL and the client is required to also enable WS-RM for
+successfully exchanging messages with the server.</p>
+</div>
+<div class="paragraph">
+<p>So a regular JAX WS client is enough if the user does not need to tune
+any specific detail of the RM subsystem.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">QName serviceName = new QName("http://www.jboss.org/jbossws/ws-extensions/wsrm", "SimpleService");
+URL wsdlURL = new URL("http://localhost:8080/jaxws-samples-wsrm-api?wsdl");
+Service service = Service.create(wsdlURL, serviceName);
+proxy = (SimpleService)service.getPort(SimpleService.class);
+proxy.echo("Hello World!");</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="additional-configuration">Additional configuration</h3>
+<div class="paragraph">
+<p>Fine-grained tuning of WS-Reliable Messaging engine requires setting up
+proper RM features and attach them for instance to the client proxy.
+Here is an example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">package org.jboss.test.ws.jaxws.samples.wsrm.client;
+ 
+//...
+import javax.xml.ws.Service;
+import org.apache.cxf.ws.rm.feature.RMFeature;
+import org.apache.cxf.ws.rm.manager.AcksPolicyType;
+import org.apache.cxf.ws.rm.manager.DestinationPolicyType;
+import org.jboss.test.ws.jaxws.samples.wsrm.generated.SimpleService;
+ 
+// ...
+Service service = Service.create(wsdlURL, serviceName);
+ 
+RMFeature feature = new RMFeature();
+RMAssertion rma = new RMAssertion();
+RMAssertion.BaseRetransmissionInterval bri = new RMAssertion.BaseRetransmissionInterval();
+bri.setMilliseconds(4000L);
+rma.setBaseRetransmissionInterval(bri);
+AcknowledgementInterval ai = new AcknowledgementInterval();
+ai.setMilliseconds(2000L);
+rma.setAcknowledgementInterval(ai);
+feature.setRMAssertion(rma);
+DestinationPolicyType dp = new DestinationPolicyType();
+AcksPolicyType ap = new AcksPolicyType();
+ap.setIntraMessageThreshold(0);
+dp.setAcksPolicy(ap);
+feature.setDestinationPolicy(dp);
+ 
+SimpleService proxy = (SimpleService)service.getPort(SimpleService.class, feature);
+proxy.echo("Hello World");</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The same can of course be achieved by factoring the feature into a
+custom pojo extending <code>org.apache.cxf.ws.rm.feature.RMFeature</code> and
+setting the obtained property in a client configuration:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">package org.jboss.test.ws.jaxws.samples.wsrm.client;
+ 
+import org.apache.cxf.ws.rm.feature.RMFeature;
+import org.apache.cxf.ws.rm.manager.AcksPolicyType;
+import org.apache.cxf.ws.rm.manager.DestinationPolicyType;
+import org.apache.cxf.ws.rmp.v200502.RMAssertion;
+import org.apache.cxf.ws.rmp.v200502.RMAssertion.AcknowledgementInterval;
+ 
+public class CustomRMFeature extends RMFeature
+{
+  public CustomRMFeature() {
+    super();
+    RMAssertion rma = new RMAssertion();
+    RMAssertion.BaseRetransmissionInterval bri = new RMAssertion.BaseRetransmissionInterval();
+    bri.setMilliseconds(4000L);
+    rma.setBaseRetransmissionInterval(bri);
+    AcknowledgementInterval ai = new AcknowledgementInterval();
+    ai.setMilliseconds(2000L);
+    rma.setAcknowledgementInterval(ai);
+    super.setRMAssertion(rma);
+    DestinationPolicyType dp = new DestinationPolicyType();
+    AcksPolicyType ap = new AcksPolicyType();
+    ap.setIntraMessageThreshold(0);
+    dp.setAcksPolicy(ap);
+    super.setDestinationPolicy(dp);
+  }
+}</code></pre>
+</div>
+</div>
+<div class="olist lowerroman">
+<ol class="lowerroman" type="i">
+<li>
+<p>this is how the <code>jaxws-client-config.xml</code> descriptor would look:</p>
+</li>
+</ol>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+ 
+&lt;jaxws-config xmlns="urn:jboss:jbossws-jaxws-config:4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:javaee="http://java.sun.com/xml/ns/javaee"
+xsi:schemaLocation="urn:jboss:jbossws-jaxws-config:4.0 schema/jbossws-jaxws-config_4_0.xsd"&gt;
+ 
+&lt;client-config&gt;
+&lt;config-name&gt;Custom Client Config&lt;/config-name&gt;
+&lt;property&gt;
+&lt;property-name&gt;cxf.features&lt;/property-name&gt;
+&lt;property-value&gt;org.jboss.test.ws.jaxws.samples.wsrm.client.CustomRMFeature&lt;/property-value&gt;
+&lt;/property&gt;
+&lt;/client-config&gt;
+ 
+&lt;/jaxws-config&gt;</code></pre>
+</div>
+</div>
+<div class="olist lowerroman">
+<ol class="lowerroman" type="i">
+<li>
+<p>and this is how the client would set the configuration:</p>
+</li>
+</ol>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">import org.jboss.ws.api.configuration.ClientConfigUtil;
+import org.jboss.ws.api.configuration.ClientConfigurer;
+ 
+//...
+Service service = Service.create(wsdlURL, serviceName);
+SimpleService proxy = (SimpleService)service.getPort(SimpleService.class);
+ 
+ClientConfigurer configurer = ClientConfigUtil.resolveClientConfigurer();
+configurer.setConfigProperties(proxy, "META-INF/jaxws-client-config.xml", "Custom Client Config");
+proxy.echo("Hello World!");</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

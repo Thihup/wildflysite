@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Application Client Reference | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Application Client Reference" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_developer-guide/Application_Client_Reference.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_developer-guide/Application_Client_Reference.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_developer-guide/Application_Client_Reference.html","headline":"Application Client Reference","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>As a Java EE6 compliant server, WildFly {wildflyVersion} contains an application
+client. An application client is essentially a cut down server instance,
+that allow you to use EE features such as injection in a client side
+program.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+This article is not a tutorial on application client development, rather
+it covers the specifics of the WildFly application client. There are
+tutorials available elsewhere that cover application client basics, such
+as
+<a href="http://blogs.steeplesoft.com/2011/02/java-ees-buried-treasure-the-application-client-container/">this
+one</a>.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+Note that the application client is different to the EJB client
+libraries, it is perfectly possible to write client application that do
+not use the application client, but instead use the jboss-ejb-client
+library directly.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="getting-started">Getting Started</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To launch the application client use the <code>appclient.sh</code> or
+<code>appclient.bat</code> script in the bin directory. For example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">./appclient.sh --host=10.0.0.1 myear.ear#appClient.jar arg1</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>--host</code> argument tells the appclient the server to connect to. The
+next argument is the application client deployment to use, application
+clients can only run a single deployment, and this deployment must also
+be deployed on the full server instance that the client is connecting
+too.</p>
+</div>
+<div class="paragraph">
+<p>Any arguments after the deployment to use are passed directly through to
+the application clients <code>main</code> function.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="connecting-to-more-than-one-host">Connecting to more than one host</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If you want to connect to more than one host or make use of the
+clustering functionality then you need to specify a
+jboss-ejb-client.properties file rather than a host:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">./appclient.sh --ejb-client-properties=my-jboss-ejb-client.properties myear.ear#appClient.jar arg1</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="example">Example</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A simple example how to package an application client and use it with
+WildFly can be within the quickstart
+<a href="https://github.com/wildfly/quickstart/tree/master/app-client">appclient</a>
+which is located on Github .</p>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="">
+  <link rel="shortcut icon" type="image/png" href="/wildflysite/favicon.ico" >
+  <link rel="stylesheet" href="/wildflysite/assets/css/main.css" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+
+
+</head>
+
+<body class="Whats New In Hal">
+  <div class="content">
+    <div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+
+    <div class="post-page grid-wrapper">
+  <!-- <div class="grid__item width-12-12"><h1 class="title">Whats New In Hal</h1></div> -->
+  <!-- <div class="grid__item width-2-12 doc-toc"><ul class="inline_toc">
+  <li><a href="#whats-new-in-wildfly-management-console">What’s New in WildFly Management Console</a></li>
+  <li><a href="#finder">Finder</a></li>
+  <li><a href="#applications">Applications</a></li>
+  <li><a href="#deployments">Deployments</a></li>
+  <li><a href="#topology">Topology</a></li>
+  <li><a href="#runtime">Runtime</a></li>
+  <li><a href="#monitor">Monitor</a></li>
+  <li><a href="#get-involved">Get Involved</a></li>
+</ul></div> -->
+  <div class="grid__item width-10-12 doc-content"><div class="sect1">
+<h2 id="whats-new-in-wildfly-management-console">What&#8217;s New in WildFly Management Console</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>hpehl
+2018-06-01</p>
+</div>
+<div class="paragraph">
+<p><a href="{base_url}/news/2018/05/30/WildFly13-Final-Released/">WildFly 13</a> comes with a management console (HAL) which has been rewritten from scratch. HAL still uses a similar technical stack (GWT) and user experience, but now fully adopts <a href="https://www.patternfly.org/">PatternFly</a>.</p>
+</div>
+<div class="paragraph">
+<p>More important we enhanced the existing features and added support for many new subsystems and attributes. The following sections show some highlights of the latest version. For more details about the new features see the release notes for <a href="https://hal.github.io/releases/3.0.0.final/">HAL 3.0.0.Final</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="finder">Finder</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The column based navigation (finder) has been greatly improved. You can now use the cursor keys for navigation inside and across columns. To open an application view press ↵ (enter), to go back press ⌫ (backspace). Items in one column are now ordered alphabetically by default. You can pin frequently used items to stay at the top. Most columns offer a filter which can be used to quickly find the items you&#8217;re looking for. Finally the previews have been enriched and provide detailed documentation or the main attributes of the selected item. If appropriate the previews contain action links for the most common tasks.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/wildflysite/assets/img/posts/hal/finder.png" alt="Finder">
+</div>
+<div class="title">Figure 1. Finder</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="applications">Applications</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Applications provide a new breadcrumb at the top to quickly switch between items of the same kind. More complex applications can include a vertical navigation. Finally most applications can be easily opened in an external window and provide an expert mode which uses the generic model browser.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/wildflysite/assets/img/posts/hal/application.png" alt="Applications">
+</div>
+<div class="title">Figure 2. Applications</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="deployments">Deployments</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Many new features have been added to the deployment section:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Use drag and drop to deploy artifacts</p>
+</li>
+<li>
+<p>Content browser with preview for text and images</p>
+</li>
+<li>
+<p>Create exploded deployments</p>
+</li>
+<li>
+<p>CRUD support for exploded deployments:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Add empty files</p>
+</li>
+<li>
+<p>Upload content</p>
+</li>
+<li>
+<p>Modify content</p>
+</li>
+<li>
+<p>Remove content</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Download complete deployments or deployment content</p>
+</li>
+</ul>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/wildflysite/assets/img/posts/hal/deployment.png" alt="Deployments">
+</div>
+<div class="title">Figure 3. Deployments</div>
+</div>
+<hr>
+<div class="imageblock">
+<div class="content">
+<img src="/wildflysite/assets/img/posts/hal/deployment-model.png" alt="Deployment Model">
+</div>
+<div class="title">Figure 4. Deployment Model</div>
+</div>
+<hr>
+<div class="imageblock">
+<div class="content">
+<img src="/wildflysite/assets/img/posts/hal/deployment-content.png" alt="Content Browser">
+</div>
+<div class="title">Figure 5. Content Browser</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="topology">Topology</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The topology view has been reintroduced to the management console. It was removed in the last versions due to performance issues with large domains. But thanks to new management operations, we were able to add this useful tool again.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/wildflysite/assets/img/posts/hal/topology.png" alt="Topology">
+</div>
+<div class="title">Figure 6. Topology</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="runtime">Runtime</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The lifecycle operations for hosts, server groups and servers have been improved. New operations are available for hosts and disconnected hosts are now shown in the finder columns. For servers you can specify custom URLs which is extremely useful when running WildFly inside a docker container.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/wildflysite/assets/img/posts/hal/runtime.png" alt="Runtime">
+</div>
+<div class="title">Figure 7. Runtime</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="monitor">Monitor</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The existing screens have been improved and many new subsystems have been added to the monitoring section. Some of the new and enhanced subsystems are:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Batch</p>
+</li>
+<li>
+<p>EJB</p>
+</li>
+<li>
+<p>IO</p>
+</li>
+<li>
+<p>JAX-RS</p>
+</li>
+<li>
+<p>Messaging</p>
+</li>
+<li>
+<p>Web (Undertow)</p>
+</li>
+</ul>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/wildflysite/assets/img/posts/hal/monitor-server.png" alt="Monitor Server">
+</div>
+<div class="title">Figure 8. Monitor Server</div>
+</div>
+<hr>
+<div class="imageblock">
+<div class="content">
+<img src="/wildflysite/assets/img/posts/hal/monitor-ejb.png" alt="EJB Subsystem">
+</div>
+<div class="title">Figure 9. EJB Subsystem</div>
+</div>
+<hr>
+<div class="imageblock">
+<div class="content">
+<img src="/wildflysite/assets/img/posts/hal/monitor-jaxrs.png" alt="JAX-RS Resources">
+</div>
+<div class="title">Figure 10. JAX-RS Resources</div>
+</div>
+<hr>
+<div class="imageblock">
+<div class="content">
+<img src="/wildflysite/assets/img/posts/hal/monitor-undertow.png" alt="Undertow Listener Statistics">
+</div>
+<div class="title">Figure 11. Undertow Listener Statistics</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="get-involved">Get Involved</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If you want to learn more about HAL, head over to <a href="https://hal.github.io/" class="bare">https://hal.github.io/</a>. The new website contains both end user and technical documentation. Read about HAL&#8217;s architecture, building blocks and how you can build, run and debug the console. HAL is an open source project and we love to receive <a href="https://hal.github.io/contribute/">contributions</a> from our community — you!</p>
+</div>
+</div>
+</div></div>
+</div>
+
+
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">WildFly is open. All dependencies of this project are available under the <a href='https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html' class='dark-background' target='_blank'>LGPL 2.1</a> or compatible license.<br/><br/>This website was built with <a href='https://jekyllrb.com/' class='dark-background' target='_blank'>Jekyll</a> is hosted on <a href='https://pages.github.com/' class='dark-background' target='_blank'>Github Pages</a> and is completely open source. If you want to make it better, <a href='https://github.com/wildfly/wildfly.org/fork' class='dark-background' target='_blank'>fork it</a> and show us what you’ve got.</p>
+
+    
+      <div class="width-1-12 project-links">
+        <strong>Navigation</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="/wildflysite/downloads" class="dark-background">Downloads</a></li>
+          
+            <li><a href="/wildflysitef/docs" class="dark-background">Docs</a></li>
+          
+            <li><a href="https://github.com/wildfly/wildfly" class="dark-background">Github</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <strong>Contribute</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="https://issues.jboss.org/browse/WFLY" class="dark-background">Submit a bug</a></li>
+          
+            <li><a href="https://community.jboss.org/en/wildfly?view=discussion" class="dark-background">Join the forum</a></li>
+          
+            <li><a href="https://github.com/wildfly/wildfly/fork" class="dark-background">Fork WildFly</a></li>
+          
+            <li><a href="https://twitter.com/WildFlyAS" class="dark-background">Follow us</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <strong>Get Help</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="https://community.jboss.org/en/wildfly?view=discussion" class="dark-background">Join the forum</a></li>
+          
+            <li><a href="https://www.hipchat.com/gFOhnVQke" class="dark-background">Join HipChat</a></li>
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-6-12 more-links">
+        <strong>Find more Red Hat Middleware Community Projects</strong>
+        <ul class="footer-links">
+          
+            <li><a href="https://www.apiman.io/" class="dark-background">APIMan</a></li>
+          
+            <li><a href="http://arquillian.org" class="dark-background">Arquillian</a></li>
+          
+            <li><a href="http://byteman.jboss.org/" class="dark-background">Byteman</a></li>
+          
+            <li><a href="http://capedwarf.org/" class="dark-background">CapeDwarf</a></li>
+          
+            <li><a href="https://github.com/alechenninger/chronicler" class="dark-background">Chronicler</a></li>
+          
+            <li><a href="https://github.com/darcy-framework" class="dark-background">Darcy</a></li>
+          
+            <li><a href="http://debezium.io/" class="dark-background">Debezium</a></li>
+          
+            <li><a href="https://www.drools.org/" class="dark-background">Drools</a></li>
+          
+            <li><a href="http://gatein.jboss.org/" class="dark-background">GateIn</a></li>
+          
+            <li><a href="http://www.hawkular.org/" class="dark-background">Hawkular</a></li>
+          
+            <li><a href="http://hawt.io/" class="dark-background">Hawtio</a></li>
+          
+            <li><a href="http://hibernate.org/" class="dark-background">Hibernate</a></li>
+          
+            <li><a href="http://www.infinispan.org/" class="dark-background">Infinispan</a></li>
+          
+            <li><a href="https://devstudio.jboss.com/" class="dark-background">JBoss DevStudio</a></li>
+          
+            <li><a href="http://forge.jboss.org/" class="dark-background">JBoss Forge</a></li>
+          
+            <li><a href="https://github.com/jboss-logging" class="dark-background">JBoss Logging</a></li>
+          
+            <li><a href="http://jbossremoting.jboss.org/" class="dark-background">JBoss Remoting</a></li>
+          
+            <li><a href="https://www.jbpm.org/" class="dark-background">jBPM</a></li>
+          
+            <li><a href="https://jsfunit.jboss.org/" class="dark-background">JSFUnit</a></li>
+          
+            <li><a href="https://www.keycloak.org/" class="dark-background">Keycloak</a></li>
+          
+            <li><a href="http://modcluster.io/" class="dark-background">Mod Cluster</a></li>
+          
+            <li><a href="http://modeshape.jboss.org/" class="dark-background">ModeShape</a></li>
+          
+            <li><a href="https://www.optaplanner.org/" class="dark-background">OptaPlanner</a></li>
+          
+            <li><a href="https://picketbox.jboss.org/" class="dark-background">Picketbox</a></li>
+          
+            <li><a href="http://resteasy.jboss.org/" class="dark-background">RESTEasy</a></li>
+          
+            <li><a href="https://riftsaw.jboss.org/" class="dark-background">Riftsaw</a></li>
+          
+            <li><a href="http://savara.jboss.org/" class="dark-background">Savara</a></li>
+          
+            <li><a href="http://seamframework.org/" class="dark-background">Seam</a></li>
+          
+            <li><a href="http://arquillian.org/" class="dark-background">Shrinkwrap</a></li>
+          
+            <li><a href="http://snowdrop.jboss.org/" class="dark-background">Snowdrop</a></li>
+          
+            <li><a href="https://switchyard.jboss.org/" class="dark-background">Switchyard</a></li>
+          
+            <li><a href="https://tattletale.jboss.org/" class="dark-background">Tattletale</a></li>
+          
+            <li><a href="http://teiid.jboss.org/" class="dark-background">Teiid</a></li>
+          
+            <li><a href="http://wildfly-swarm.io/" class="dark-background">WildFly Swarm</a></li>
+          
+            <li><a href="http://wise.jboss.org/" class="dark-background">Wise</a></li>
+          
+            <li><a href="https://xnio.jboss.org/" class="dark-background">XNIO</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" class="dark-background" target="_blank">CC by 3.0</a>
+    </span>
+    <span class="redhat">
+      a Red Hat sponsored project   
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/"><img src="/wildflysite/assets/img/RHLogo_white.svg"></a>
+    </span>
+  </div>
+</div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script type="text/javascript" src="/wildflysite/assets/javascript/mobile-nav.js"></script>
+</body>
+
+</html>

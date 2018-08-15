@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>How To | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="How To" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_admin-guide/subsystem-configuration/Logging_How_To.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_admin-guide/subsystem-configuration/Logging_How_To.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_admin-guide/subsystem-configuration/Logging_How_To.html","headline":"How To","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="sect1">
+<h2 id="how-do-i-add-a-log-category">How do I add a log category?</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">/subsystem=logging/logger=com.your.category:add</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="how-do-i-change-a-log-level">How do I change a log level?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To change a handlers log level:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">/subsystem=logging/console-handler=CONSOLE:write-attribute(name=level,value=DEBUG)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Changing the level on a log category is the same:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">/subsystem=logging/logger=com.your.category:write-attribute(name=level,value=ALL)</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="how-do-i-log-my-applications-messages-to-their-own-file">How do I log my applications messages to their own file?</h2>
+<div class="sectionbody">
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Create a file handler. There are 3 different types of file handlers
+to choose from; <code>file-handler</code>, <code>periodic-rotating-file-handler</code> and
+<code>size-rotating-file-handler</code>. In this example we&#8217;ll just use a simple
+<code>file-handler</code>.</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">/subsystem=logging/file-handler=fh:add(level=INFO, file={"relative-to"=&gt;"jboss.server.log.dir", "path"=&gt;"fh.log"}, append=false, autoflush=true)</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Now create the log category.</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">/subsystem=logging/logger=org.your.company:add(use-parent-handlers=false,handlers=["fh"])</code></pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="how-do-i-use-log4j.properties-or-log4j.xml-instead-of-using-the-logging-subsystem-configuration">How do I use log4j.properties or log4j.xml instead of using the</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>logging subsystem configuration?</p>
+</div>
+<div class="paragraph">
+<p>First note that if you choose to use a log4j configuration file, you
+will no longer be able to make runtime logging changes to your
+deployments logging configuration.</p>
+</div>
+<div class="paragraph">
+<p>If that is acceptable you can use
+<a href="Logging_Configuration.html#src-557095_LoggingConfiguration-Per-deploymentLogging">per-deployment
+logging</a> and just include a configuration file in your deployment.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="how-do-i-use-my-own-version-of-log4j">How do I use my own version of log4j?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If you need/want to include your version of log4j then you need to do
+the following two steps.</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Disable the adding of the logging dependencies to all your
+deployments with the
+<a href="Logging_Configuration.html#src-557095_LoggingConfiguration-add-logging-api-dependencies">add-logging-api-dependencies</a>
+attribute and disable the
+<a href="Logging_Configuration.html#src-557095_LoggingConfiguration-use-deployment-logging-config">use-deployment-logging-config</a>
+attribute <strong>OR</strong> exclude the logging subsystem in a
+<a href="Class_Loading_in_WildFly.html#src-557206_ClassLoadinginWildFly-JBossDeploymentStructureFile">jboss-deployment-structure.xml</a>.</p>
+</li>
+<li>
+<p>Then need to include a log4j library in your deployment.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>This only works for logging in your deployment. Server logs will
+continue to use the logging subsystem configuration.</p>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

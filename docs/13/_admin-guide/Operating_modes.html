@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Operating mode | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Operating mode" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_admin-guide/Operating_modes.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_admin-guide/Operating_modes.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_admin-guide/Operating_modes.html","headline":"Operating mode","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>WildFly can be booted in two different modes. A <em>managed domain</em> allows
+you to run and manage a multi-server topology. Alternatively, you can
+run a <em>standalone server</em> instance.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="standalone-server">Standalone Server</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>For many use cases, the centralized management capability available via
+a managed domain is not necessary. For these use cases, a WildFly
+instance can be run as a "standalone server". A standalone server
+instance is an independent process, much like an JBoss Application
+Server 3, 4, 5, or 6 instance is. Standalone instances can be launched
+via the <code>standalone.sh</code> or <code>standalone.bat</code> launch scripts.</p>
+</div>
+<div class="paragraph">
+<p>If more than one standalone instance is launched and multi-server
+management is desired, it is the user&#8217;s responsibility to coordinate
+management across the servers. For example, to deploy an application
+across all of the standalone servers, the user would need to
+individually deploy the application on each server.</p>
+</div>
+<div class="paragraph">
+<p>It is perfectly possible to launch multiple standalone server instances
+and have them form an HA cluster, just like it was possible with JBoss
+Application Server 3, 4, 5 and 6.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="managed-domain">Managed Domain</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>One of the primary new features of WildFly is the ability to manage
+multiple WildFly instances from a single control point. A collection of
+such servers is referred to as the members of a "domain" with a single
+Domain Controller process acting as the central management control
+point. All of the WildFly instances in the domain share a common
+management policy, with the Domain Controller acting to ensure that each
+server is configured according to that policy. Domains can span multiple
+physical (or virtual) machines, with all WildFly instances on a given
+host under the control of a special Host Controller process. One Host
+Controller instance is configured to act as the central Domain
+Controller. The Host Controller on each host interacts with the Domain
+Controller to control the lifecycle of the application server instances
+running on its host and to assist the Domain Controller in managing
+them.</p>
+</div>
+<div class="paragraph">
+<p>When you launch a WildFly managed domain on a host (via the <code>domain.sh</code>
+or <code>domain.bat</code> launch scripts) your intent is to launch a Host
+Controller and usually at least one WildFly instance. On one of the
+hosts the Host Controller should be configured to act as the Domain
+Controller. See <a href="#Domain_Setup">Domain Setup</a> for details.</p>
+</div>
+<div class="paragraph">
+<p>The following is an example managed domain topology:</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="/wildflysite/assets/img/posts/images/DC-HC-Server.png" alt="DC-HC-Server"></span></p>
+</div>
+<div class="sect2">
+<h3 id="host">Host</h3>
+<div class="paragraph">
+<p>Each "Host" box in the above diagram represents a physical or virtual
+host. A physical host can contain zero, one or more server instances.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="host-controller">Host Controller</h3>
+<div class="paragraph">
+<p>When the domain.sh or domain.bat script is run on a host, a process
+known as a Host Controller is launched. The Host Controller is solely
+concerned with server management; it does not itself handle application
+server workloads. The Host Controller is responsible for starting and
+stopping the individual application server processes that run on its
+host, and interacts with the Domain Controller to help manage them.</p>
+</div>
+<div class="paragraph">
+<p>Each Host Controller by default reads its configuration from the
+<code>domain/configuration/host.xml</code> file located in the unzipped WildFly
+installation on its host&#8217;s filesystem. The <code>host.xml</code> file contains
+configuration information that is specific to the particular host.
+Primarily:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>the listing of the names of the actual WildFly instances that are
+meant to run off of this installation.</p>
+</li>
+<li>
+<p>configuration of how the Host Controller is to contact the Domain
+Controller to register itself and access the domain configuration. This
+may either be configuration of how to find and contact a remote Domain
+Controller, or a configuration telling the Host Controller to itself act
+as the Domain Controller.</p>
+</li>
+<li>
+<p>configuration of items that are specific to the local physical
+installation. For example, named interface definitions declared in
+<code>domain.xml</code> (see below) can be mapped to an actual machine-specific IP
+address in <code>host.xml</code>. Abstract path names in <code>domain.xml</code> can be mapped
+to actual filesystem paths in <code>host.xml</code>.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="domain-controller">Domain Controller</h3>
+<div class="paragraph">
+<p>One Host Controller instance is configured to act as the central
+management point for the entire domain, i.e. to be the Domain
+Controller. The primary responsibility of the Domain Controller is to
+maintain the domain&#8217;s central management policy, to ensure all Host
+Controllers are aware of its current contents, and to assist the Host
+Controllers in ensuring any running application server instances are
+configured in accordance with this policy. This central management
+policy is stored by default in the <code>domain/configuration/domain.xml</code>
+file in the unzipped WildFly installation on Domain Controller&#8217;s host&#8217;s
+filesystem.</p>
+</div>
+<div class="paragraph">
+<p>A <code>domain.xml</code> file must be located in the <code>domain/configuration</code>
+directory of an installation that&#8217;s meant to run the Domain Controller.
+It does not need to be present in installations that are not meant to
+run a Domain Controller; i.e. those whose Host Controller is configured
+to contact a remote Domain Controller. The presence of a <code>domain.xml</code>
+file on such a server does no harm.</p>
+</div>
+<div class="paragraph">
+<p>The <code>domain.xml</code> file includes, among other things, the configuration of
+the various "profiles" that WildFly instances in the domain can be
+configured to run. A profile configuration includes the detailed
+configuration of the various subsystems that comprise that profile (e.g.
+an embedded JBoss Web instance is a subsystem; a JBoss TS transaction
+manager is a subsystem, etc). The domain configuration also includes the
+definition of groups of sockets that those subsystems may open. The
+domain configuration also includes the definition of "server groups":</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="server-group">Server Group</h3>
+<div class="paragraph">
+<p>A server group is set of server instances that will be managed and
+configured as one. In a managed domain each application server instance
+is a member of a server group. (Even if the group only has a single
+server, the server is still a member of a group.) It is the
+responsibility of the Domain Controller and the Host Controllers to
+ensure that all servers in a server group have a consistent
+configuration. They should all be configured with the same profile and
+they should have the same deployment content deployed.</p>
+</div>
+<div class="paragraph">
+<p>The domain can have multiple server groups. The above diagram shows two
+server groups, "ServerGroupA" and "ServerGroupB". Different server
+groups can be configured with different profiles and deployments; for
+example in a domain with different tiers of servers ﻿providing different
+services. Different server groups can also run the same profile and have
+the same deployments; for example to support rolling application upgrade
+scenarios where a complete service outage is avoided by first upgrading
+the application on one server group and then upgrading a second server
+group.</p>
+</div>
+<div class="paragraph">
+<p>An example server group definition is as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;server-group name="main-server-group" profile="default"&gt;
+    &lt;socket-binding-group ref="standard-sockets"/&gt;
+    &lt;deployments&gt;
+        &lt;deployment name="foo.war_v1" runtime-name="foo.war" /&gt;
+        &lt;deployment name="bar.ear" runtime-name="bar.ear" /&gt;
+    &lt;/deployments&gt;
+&lt;/server-group&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A server-group configuration includes the following required attributes:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>name&#8201;&#8212;&#8201;the name of the server group</p>
+</li>
+<li>
+<p>profile&#8201;&#8212;&#8201;the name of the profile the servers in the group should run</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>In addition, the following optional elements are available:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>socket-binding-group&#8201;&#8212;&#8201;specifies the name of the default socket
+binding group to use on servers in the group. Can be overridden on a
+per-server basis in <code>host.xml</code>. If not provided in the <code>server-group</code>
+element, it must be provided for each server in <code>host.xml</code>.</p>
+</li>
+<li>
+<p>deployments&#8201;&#8212;&#8201;the deployment content that should be deployed on the
+servers in the group.</p>
+</li>
+<li>
+<p>deployment-overlays&#8201;&#8212;&#8201;the overlays and their associated deployments.</p>
+</li>
+<li>
+<p>system-properties&#8201;&#8212;&#8201;system properties that should be set on all
+servers in the group</p>
+</li>
+<li>
+<p>jvm&#8201;&#8212;&#8201;default jvm settings for all servers in the group. The Host
+Controller will merge these settings with any provided in <code>host.xml</code> to
+derive the settings to use to launch the server&#8217;s JVM. See
+<a href="#JVM_settings">JVM settings</a> for further details.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="server">Server</h3>
+<div class="paragraph">
+<p>Each "Server" in the above diagram represents an actual application
+server instance. The server runs in a separate JVM process from the Host
+Controller. The Host Controller is responsible for launching that
+process. (In a managed domain the end user cannot directly launch a
+server process from the command line.)</p>
+</div>
+<div class="paragraph">
+<p>The Host Controller synthesizes the server&#8217;s configuration by combining
+elements from the domain wide configuration (from <code>domain.xml</code> ) and the
+host-specific configuration (from <code>host.xml</code> ).</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="deciding-between-running-standalone-servers-or-a-managed-domain">Deciding between running standalone servers or a managed domain</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Which use cases are appropriate for managed domain and which are
+appropriate for standalone servers? A managed domain is all about
+coordinated multi-server management&#8201;&#8212;&#8201;with it WildFly provides a
+central point through which users can manage multiple servers, with rich
+capabilities to keep those servers' configurations consistent and the
+ability to roll out configuration changes (including deployments) to the
+servers in a coordinated fashion.</p>
+</div>
+<div class="paragraph">
+<p>It&#8217;s important to understand that the choice between a managed domain
+and standalone servers is all about how your servers are managed, not
+what capabilities they have to service end user requests. This
+distinction is particularly important when it comes to high availability
+clusters. It&#8217;s important to understand that HA functionality is
+orthogonal to running standalone servers or a managed domain. That is, a
+group of standalone servers can be configured to form an HA cluster. The
+domain and standalone modes determine how the servers are managed, not
+what capabilities they provide.</p>
+</div>
+<div class="paragraph">
+<p>So, given all that:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>A single server installation gains nothing from running in a managed
+domain, so running a standalone server is a better choice.</p>
+</li>
+<li>
+<p>For multi-server production environments, the choice of running a
+managed domain versus standalone servers comes down to whether the user
+wants to use the centralized management capabilities a managed domain
+provides. Some enterprises have developed their own sophisticated
+multi-server management capabilities and are comfortable coordinating
+changes across a number of independent WildFly instances. For these
+enterprises, a multi-server architecture comprised of individual
+standalone servers is a good option.</p>
+</li>
+<li>
+<p>Running a standalone server is better suited for most development
+scenarios. Any individual server configuration that can be achieved in a
+managed domain can also be achieved in a standalone server, so even if
+the application being developed will eventually run in production on a
+managed domain installation, much (probably most) development can be
+done using a standalone server.</p>
+</li>
+<li>
+<p>Running a managed domain mode can be helpful in some advanced
+development scenarios; i.e. those involving interaction between multiple
+WildFly instances. Developers may find that setting up various servers
+as members of a domain is an efficient way to launch a multi-server
+cluster.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

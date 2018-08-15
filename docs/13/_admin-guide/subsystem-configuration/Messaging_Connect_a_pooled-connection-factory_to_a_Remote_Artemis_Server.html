@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Connect a pooled-connection-factory to a Remote Artemis Server | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Connect a pooled-connection-factory to a Remote Artemis Server" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_admin-guide/subsystem-configuration/Messaging_Connect_a_pooled-connection-factory_to_a_Remote_Artemis_Server.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_admin-guide/subsystem-configuration/Messaging_Connect_a_pooled-connection-factory_to_a_Remote_Artemis_Server.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_admin-guide/subsystem-configuration/Messaging_Connect_a_pooled-connection-factory_to_a_Remote_Artemis_Server.html","headline":"Connect a pooled-connection-factory to a Remote Artemis Server","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>The <code>messaging-activemq</code> subsystem allows to configure a
+<code>pooled-connection-factory</code> resource to let a local client deployed in
+WildFly connect to a remote Artemis server.</p>
+</div>
+<div class="paragraph">
+<p>The configuration of such a <code>pooled-connection-factory</code> is done in 3
+steps:</p>
+</div>
+<div class="paragraph">
+<p>\1. create an outbound-socket-binding pointing to the remote messaging
+server:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">   /socket-binding-group=standard-sockets/remote-destination-outbound-socket-binding=remote-artemis:add(host=&lt;server host&gt;, port=61616)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>\2. create a remote-connector referencing the outbound-socket-binding
+created at step (1).</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">  /subsystem=messaging-activemq/server=default/remote-connector=remote-artemis:add(socket-binding=remote-artemis)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>\3. create a pooled-connection-factory referencing the remote-connector
+created at step (2).</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">  /subsystem=messaging-activemq/server=default/pooled-connection-factory=remote-artemis:add(connectors=[remote-artemis], entries=[java:/jms/remoteCF])</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuration-of-a-mdb-using-a-pooled-connection-factory">Configuration of a MDB using a pooled-connection-factory</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>When a <code>pooled-connection-factory</code> is configured to connect to a remote
+Artemis, it is possible to configure Message-Driven Beans (MDB) to have
+them consume messages from this remote server.</p>
+</div>
+<div class="paragraph">
+<p>The MDB must be annotated with the <code>@ResourceAdapter</code> annotation using
+the <strong>name</strong> of the <code>pooled-connection-factory resource</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">import org.jboss.ejb3.annotation.ResourceAdapter;
+ 
+  @ResourceAdapter("remote-artemis")
+  @MessageDriven(name = "MyMDB", activationConfig = {
+    ...
+})
+public class MyMDB implements MessageListener {
+      public void onMessage(Message message) {
+       ...
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If the MDB needs to produce messages to the remote server, it must
+inject the <code>pooled-connection-factory</code> by looking it up in JNDI using
+one of its <code>entries</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@Inject
+@JMSConnectionFactory("java:/jms/remoteCF")
+private JMSContext context;</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configuration-of-the-destination">Configuration of the destination</h3>
+<div class="paragraph">
+<p>A MDB must also specify which destination it will consume messages from.</p>
+</div>
+<div class="paragraph">
+<p>The standard way is to define a <code>destinationLookup</code> activation config
+property that corresponds to a JNDI lookup on the local server.<br>
+When the MDB is consuming from a remote Artemis server, there may not
+have such a JNDI binding in the local WildFly.<br>
+It is possible to use the naming subsystem to configure
+<a href="#Naming">external context federation</a> to have local JNDI
+bindings delegating to external bindings.</p>
+</div>
+<div class="paragraph">
+<p>However there is a simpler solution to configure the destination when
+using the Artemis Resource Adapter.<br>
+Instead of using JDNI to lookup the JMS Destination resource, you can
+just specify the <strong>name</strong> of the destination (as configured in the remote
+Artemis server) using the <code>destination</code> activation config property and
+set the <code>useJNDI</code> activation config property to false to let the Artemis
+Resource Adapter create automatically the JMS destination without
+requiring any JNDI lookup.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@ResourceAdapter("remote-artemis")
+@MessageDriven(name = "MyMDB", activationConfig = {
+    @ActivationConfigProperty(propertyName = "useJNDI",         propertyValue = "false"),
+    @ActivationConfigProperty(propertyName = "destination",     propertyValue = "myQueue"),
+    @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue"), 
+    @ActivationConfigProperty(propertyName = "acknowledgeMode", propertyValue = "Auto-acknowledge")
+})
+public class MyMDB implements MessageListener {
+    ...
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>These properties configure the MDB to consume messages from the JMS
+Queue named <code>myQueue</code> hosted on the remote Artemis server.<br>
+In most cases, such a MDB does not need to lookup other destinations to
+process the consumed messages and it can use the JMSReplyTo destination
+if it is defined on the message.<br>
+If the MDB needs any other JMS destinations defined on the remote
+server, it must use client-side JNDI by following the
+<a href="http://activemq.apache.org/artemis/docs/1.1.0/using-jms.html#jndi-configuration">Artemis
+documentation</a> or configure external configuration context in the naming
+subsystem (which allows to inject the JMS resources using the
+<code>@Resource</code> annotation).</p>
+</div>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

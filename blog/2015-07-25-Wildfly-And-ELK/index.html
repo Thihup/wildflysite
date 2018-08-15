@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="">
+  <link rel="shortcut icon" type="image/png" href="/wildflysite/favicon.ico" >
+  <link rel="stylesheet" href="/wildflysite/assets/css/main.css" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+
+
+</head>
+
+<body class="Centralized Logging for WildFly with the ELK Stack">
+  <div class="content">
+    <div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+
+    <div class="post-page grid-wrapper">
+  <!-- <div class="grid__item width-12-12"><h1 class="title">Centralized Logging for WildFly with the ELK Stack</h1></div> -->
+  <!-- <div class="grid__item width-2-12 doc-toc"><ul class="inline_toc">
+  <li><a href="#centralized-logging-for-wildfly-with-the-elk-stack">Centralized Logging for WildFly with the ELK Stack</a></li>
+  <li><a href="#download-and-configure-logstash">Download and Configure logstash</a></li>
+  <li><a href="#configure-wildfly">Configure WildFly</a></li>
+  <li><a href="#conclusion">Conclusion</a></li>
+</ul></div> -->
+  <div class="grid__item width-10-12 doc-content"><div class="sect1">
+<h2 id="centralized-logging-for-wildfly-with-the-elk-stack">Centralized Logging for WildFly with the ELK Stack</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>jperkins
+2015-07-25</p>
+</div>
+<div class="paragraph">
+<p>The ELK stack;  <a href="https://www.elastic.co/products/elasticsearch">elasticsearch</a>, <a href="https://www.elastic.co/products/logstash">logstash</a> and <a href="https://www.elastic.co/products/kibana">kibana</a> can be used for centralize logging. It&#8217;s not the intention of this post to be a tutorial on how to configure logstash. We will go through a basic logstash configuration then configure WildFly to send log messages to logstash.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="download-and-configure-logstash">Download and Configure logstash</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>First we need to <a href="https://download.elastic.co/logstash/logstash/logstash-1.5.3.zip">download logstash</a>. Once the download is complete simply extract logstash from the archive.</p>
+</div>
+<div class="paragraph">
+<p>Next we will need to create a configuraton file. In the logstash directory create a file called <code>logstash-wildfly.conf</code> and add the following content to the configuration file.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-yaml" data-lang="yaml">input {
+  tcp {
+    port =&gt; 8000
+  }
+}
+
+filter {
+  json {
+    source =&gt; "message"
+  }
+}
+
+output {
+
+  elasticsearch {
+    # Use the embedded elsasticsearch for convienence
+    embedded =&gt; true
+    protocol =&gt; "http"
+  }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Start logstash with the configuration file we just created <code>./bin/logstash agent -f logstash-wildfly.conf</code>. In the example configuration above logstash should be listening on port 8000. Make note of the port you use as we&#8217;ll need it later when configuring WildFly.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configure-wildfly">Configure WildFly</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If you don&#8217;t have a local install of WildFly you&#8217;ll want to <a href="http://wildfly.org/downloads/">download</a> a recent version. In my example I&#8217;ll be use <a href="http://download.jboss.org/wildfly/9.0.1.Final/wildfly-9.0.1.Final.zip">WildFly 9.0.1.Final</a>. However any other version should work the same.</p>
+</div>
+<div class="paragraph">
+<p>We also need to download the <a href="https://repository.jboss.org/nexus/service/local/repositories/releases/content/org/jboss/logmanager/jboss-logmanager-ext/1.0.0.Alpha3/jboss-logmanager-ext-1.0.0.Alpha3.jar">jboss-logmanager-ext</a> library so that we can install it as a module. This library includes the formatter and handler we&#8217;ll use for logging.</p>
+</div>
+<div class="paragraph">
+<p>Start up WildFly in admin-only mode so we can configure logging, <code>$JBOSS_HOME/bin/standalone.sh --admin-only</code>. Once the server is running start a CLI console, <code>$JBOSS_HOME/bin/jboss-cli.sh -c</code>, to install the module and configure logging. The following commands can be entered manually or placed in a CLI script.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>batch
+# Add the module, replace the directory on the resources attribute to the path where you downloaded the jboss-logmanager-ext library
+module add --name=org.jboss.logmanager.ext --dependencies=org.jboss.logmanager,javax.json.api,javax.xml.stream.api --resources=~/tmp/jboss-logmanager-ext-1.0.0.Alpha3.jar
+
+# Add the logstash formatter
+/subsystem=logging/custom-formatter=logstash:add(class=org.jboss.logmanager.ext.formatters.LogstashFormatter,module=org.jboss.logmanager.ext)
+
+# Add a socket-handler using the logstash formatter. Replace the hostname and port to the values needed for your logstash install
+/subsystem=logging/custom-handler=logstash-handler:add(class=org.jboss.logmanager.ext.handlers.SocketHandler,module=org.jboss.logmanager.ext,named-formatter=logstash,properties={hostname=localhost, port=8000})
+
+# Add the new handler to the root-logger
+/subsystem=logging/root-logger=ROOT:add-handler(name=logstash-handler)
+
+# Reload the server which will boot the server into normal mode as well as write messages to logstash
+:reload
+run-batch</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>With these changes WildFly should be writing to logstash. You can view the log messages from logstash with <a href="https://www.elastic.co/downloads/kibana">kibana</a>. With the defaults we used you should just be able to start kibana with <code>bin/kibana</code> and the default configuration. My dashboard looks like the following.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/wildflysite/assets/img/posts/2015-07-25-kibana.png" alt="kibana">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="conclusion">Conclusion</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If you&#8217;re already using the ELK stack for centralized logging adding WildFly to the aggregation is rather simple. If you&#8217;re just looking for a way to view and filter log messages using the ELK stack with WildFly could be a good fit as well.</p>
+</div>
+<div class="paragraph">
+<p>One thing to note is if you&#8217;re seeing performance issues or you&#8217;re writing to a remote logstash server you may want to use an async-handler.</p>
+</div>
+</div>
+</div></div>
+</div>
+
+
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">WildFly is open. All dependencies of this project are available under the <a href='https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html' class='dark-background' target='_blank'>LGPL 2.1</a> or compatible license.<br/><br/>This website was built with <a href='https://jekyllrb.com/' class='dark-background' target='_blank'>Jekyll</a> is hosted on <a href='https://pages.github.com/' class='dark-background' target='_blank'>Github Pages</a> and is completely open source. If you want to make it better, <a href='https://github.com/wildfly/wildfly.org/fork' class='dark-background' target='_blank'>fork it</a> and show us what you’ve got.</p>
+
+    
+      <div class="width-1-12 project-links">
+        <strong>Navigation</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="/wildflysite/downloads" class="dark-background">Downloads</a></li>
+          
+            <li><a href="/wildflysitef/docs" class="dark-background">Docs</a></li>
+          
+            <li><a href="https://github.com/wildfly/wildfly" class="dark-background">Github</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <strong>Contribute</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="https://issues.jboss.org/browse/WFLY" class="dark-background">Submit a bug</a></li>
+          
+            <li><a href="https://community.jboss.org/en/wildfly?view=discussion" class="dark-background">Join the forum</a></li>
+          
+            <li><a href="https://github.com/wildfly/wildfly/fork" class="dark-background">Fork WildFly</a></li>
+          
+            <li><a href="https://twitter.com/WildFlyAS" class="dark-background">Follow us</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <strong>Get Help</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="https://community.jboss.org/en/wildfly?view=discussion" class="dark-background">Join the forum</a></li>
+          
+            <li><a href="https://www.hipchat.com/gFOhnVQke" class="dark-background">Join HipChat</a></li>
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-6-12 more-links">
+        <strong>Find more Red Hat Middleware Community Projects</strong>
+        <ul class="footer-links">
+          
+            <li><a href="https://www.apiman.io/" class="dark-background">APIMan</a></li>
+          
+            <li><a href="http://arquillian.org" class="dark-background">Arquillian</a></li>
+          
+            <li><a href="http://byteman.jboss.org/" class="dark-background">Byteman</a></li>
+          
+            <li><a href="http://capedwarf.org/" class="dark-background">CapeDwarf</a></li>
+          
+            <li><a href="https://github.com/alechenninger/chronicler" class="dark-background">Chronicler</a></li>
+          
+            <li><a href="https://github.com/darcy-framework" class="dark-background">Darcy</a></li>
+          
+            <li><a href="http://debezium.io/" class="dark-background">Debezium</a></li>
+          
+            <li><a href="https://www.drools.org/" class="dark-background">Drools</a></li>
+          
+            <li><a href="http://gatein.jboss.org/" class="dark-background">GateIn</a></li>
+          
+            <li><a href="http://www.hawkular.org/" class="dark-background">Hawkular</a></li>
+          
+            <li><a href="http://hawt.io/" class="dark-background">Hawtio</a></li>
+          
+            <li><a href="http://hibernate.org/" class="dark-background">Hibernate</a></li>
+          
+            <li><a href="http://www.infinispan.org/" class="dark-background">Infinispan</a></li>
+          
+            <li><a href="https://devstudio.jboss.com/" class="dark-background">JBoss DevStudio</a></li>
+          
+            <li><a href="http://forge.jboss.org/" class="dark-background">JBoss Forge</a></li>
+          
+            <li><a href="https://github.com/jboss-logging" class="dark-background">JBoss Logging</a></li>
+          
+            <li><a href="http://jbossremoting.jboss.org/" class="dark-background">JBoss Remoting</a></li>
+          
+            <li><a href="https://www.jbpm.org/" class="dark-background">jBPM</a></li>
+          
+            <li><a href="https://jsfunit.jboss.org/" class="dark-background">JSFUnit</a></li>
+          
+            <li><a href="https://www.keycloak.org/" class="dark-background">Keycloak</a></li>
+          
+            <li><a href="http://modcluster.io/" class="dark-background">Mod Cluster</a></li>
+          
+            <li><a href="http://modeshape.jboss.org/" class="dark-background">ModeShape</a></li>
+          
+            <li><a href="https://www.optaplanner.org/" class="dark-background">OptaPlanner</a></li>
+          
+            <li><a href="https://picketbox.jboss.org/" class="dark-background">Picketbox</a></li>
+          
+            <li><a href="http://resteasy.jboss.org/" class="dark-background">RESTEasy</a></li>
+          
+            <li><a href="https://riftsaw.jboss.org/" class="dark-background">Riftsaw</a></li>
+          
+            <li><a href="http://savara.jboss.org/" class="dark-background">Savara</a></li>
+          
+            <li><a href="http://seamframework.org/" class="dark-background">Seam</a></li>
+          
+            <li><a href="http://arquillian.org/" class="dark-background">Shrinkwrap</a></li>
+          
+            <li><a href="http://snowdrop.jboss.org/" class="dark-background">Snowdrop</a></li>
+          
+            <li><a href="https://switchyard.jboss.org/" class="dark-background">Switchyard</a></li>
+          
+            <li><a href="https://tattletale.jboss.org/" class="dark-background">Tattletale</a></li>
+          
+            <li><a href="http://teiid.jboss.org/" class="dark-background">Teiid</a></li>
+          
+            <li><a href="http://wildfly-swarm.io/" class="dark-background">WildFly Swarm</a></li>
+          
+            <li><a href="http://wise.jboss.org/" class="dark-background">Wise</a></li>
+          
+            <li><a href="https://xnio.jboss.org/" class="dark-background">XNIO</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" class="dark-background" target="_blank">CC by 3.0</a>
+    </span>
+    <span class="redhat">
+      a Red Hat sponsored project   
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/"><img src="/wildflysite/assets/img/RHLogo_white.svg"></a>
+    </span>
+  </div>
+</div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script type="text/javascript" src="/wildflysite/assets/javascript/mobile-nav.js"></script>
+</body>
+
+</html>

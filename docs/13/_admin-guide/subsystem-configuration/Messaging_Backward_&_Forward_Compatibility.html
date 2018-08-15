@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Messaging_backward_&amp;_forward_compatibility | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Messaging_backward_&amp;_forward_compatibility" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="[[Messaging_Backward_&amp;_Forward_Compatibility]] = Backward &amp; Forward Compatibility" />
+<meta property="og:description" content="[[Messaging_Backward_&amp;_Forward_Compatibility]] = Backward &amp; Forward Compatibility" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_admin-guide/subsystem-configuration/Messaging_Backward_&_Forward_Compatibility.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_admin-guide/subsystem-configuration/Messaging_Backward_&_Forward_Compatibility.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_admin-guide/subsystem-configuration/Messaging_Backward_&_Forward_Compatibility.html","headline":"Messaging_backward_&amp;_forward_compatibility","description":"[[Messaging_Backward_&amp;_Forward_Compatibility]] = Backward &amp; Forward Compatibility","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="paragraph">
+<p>[[Messaging_Backward_&amp;_Forward_Compatibility]]
+= Backward &amp; Forward Compatibility</p>
+</div>
+<div class="paragraph">
+<p>WildFly 10 supports both backwards and forwards compatibility with
+legacy versions that were using HornetQ as their messaging brokers (such
+as JBoss AS7, WildFly {wildflyVersion} &amp; 9).<br>
+These two compatibility modes are provided by the ActiveMQ Artemis
+project that supports the HornetQ&#8217;s CORE protocol:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>backward compatibility: WildFly 10 JMS clients (using Artemis) can
+connect to legacy app server (running HornetQ)</p>
+</li>
+<li>
+<p>forward compatibility: legacy JMS clients (using HornetQ) can connect
+to WildFly 10 app server (running Artemis).</p>
+</li>
+</ul>
+</div>
+<div class="sect1">
+<h2 id="forward-compatibility">Forward Compatibility</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Forward compatibility requires no code change in legacy JMS clients. It
+is provided by WildFly 10 messaging-activemq subsystem and its
+resources.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>legacy-connection-factory</code> is a subresource of the
+<code>messaging-activemq&#8217;s `server</code> and can be used to store in JNDI a
+HornetQ-based JMS ConnectionFactory.</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;subsystem xmlns="urn:jboss:domain:messaging-activemq:1.0"&gt; 
+    &lt;server name="default"&gt;
+        ...
+        &lt;legacy-connection-factory name="legacyConnectionFactory-discovery" 
+                                   entries="java:jboss/exported/jms/RemoteConnectionFactory"
+                                   ... /&gt;
+    &lt;/server&gt;
+&lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Legacy HornetQ-based JMS destinations can also be configured by
+providing a <code>legacy-entries</code> attribute to the <code>jms-queue</code> and
+<code>jms-topic</code> resource.</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">    &lt;jms-queue name="myQueue"
+               entries="java:jboss/exported/jms/myQueue-new"
+               legacy-entries="java:jboss/exported/jms/myQueue" /&gt;
+    &lt;jms-topic name="testTopic"
+               entries="java:jboss/exported/jms/myTopic-new"
+               legacy-entries="java:jboss/exported/jms/myTopic" /&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>legacy-entries</code> must be used by legacy JMS clients (using HornetQ)
+while the regular <code>entries</code> are for WildFly 10 JMS clients (using
+Artemis).</p>
+</div>
+<div class="paragraph">
+<p>The legacy JMS client will then lookup this <code>legacy</code> JMS resources to
+communicate with WildFly 10.<br>
+To avoid any code change in the legacy JMS clients, the legacy JNDI
+entries must match the lookup expected by the legacy JMS client.</p>
+</div>
+<div class="sect2">
+<h3 id="migration">Migration</h3>
+<div class="paragraph">
+<p>During migration, the legacy <code>messaging</code> subsystem will create
+<code>legacy-connection-factory</code> resource and add <code>legacy-entries</code> to the
+<code>jms-queue</code> and <code>jms-topic</code> resource if the boolean attribute
+<code>add-legacy-entries</code> is set to <code>true</code> for its <code>migrate</code> operation. If
+that is the case, the legacy entries in the migrated
+<code>messaging-activemq</code> subsystem will correspond to the entries specified
+in the legacy <code>messaging</code> subsystem and the regular entries will be
+created with a <code>-new</code> suffix.<br>
+If <code>add-legacy-entries</code> is set to <code>false</code> during migration, no legacy
+resources will be created in the <code>messaging-activemq</code> subsystem and
+legacy JMS clients will not be able to communicate with WildFly 10
+servers.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="backward-compatibility">Backward Compatibility</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Backward compatibility requires no configuration change in the legacy
+server.<br>
+WildFly 10 JMS clients do not look up resources on the legacy server but
+uses client-side JNDI to create their JMS resources. Artemis JMS client
+can then uses these resources to communicate with the legacy server
+using the HornetQ CORE protocol.</p>
+</div>
+<div class="paragraph">
+<p>Artemis supports
+<a href="http://activemq.apache.org/artemis/docs/1.1.0/using-jms.html#jndi-configuration">Client-side
+JNDI</a> to create JMS resources ( <code>ConnectionFactory</code> and <code>Destination</code>).</p>
+</div>
+<div class="paragraph">
+<p>For example, if a WidFly 10 JMS clients wants to communicate with a
+legacy server using a JMS queue named <code>myQueue</code>, it must use the
+following properties to configure its JNDI <code>InitialContext</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>java.naming.factory.initial=org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory
+connectionFactory.jms/ConnectionFactory=tcp://&lt;legacy server address&gt;:5445? \
+    protocolManagerFactoryStr=org.apache.activemq.artemis.core.protocol.hornetq.client.HornetQClientProtocolManagerFactory
+queue.jms/myQueue=myQueue</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It can then use the <code>jms/ConnectionFactory</code> name to create the JMS
+ConnectionFactory and <code>jms/myQueue</code> to create the JMS Queue.<br>
+Note that the property
+<code>protocolManagerFactoryStr=org.apache.activemq.artemis.core.protocol.hornetq.client.HornetQClientProtocolManagerFactory</code>
+is mandatory when specifying the URL of the legacy connection factory so
+that the Artemis JMS client can communicate with the HornetQ broker in
+the legacy server.</p>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

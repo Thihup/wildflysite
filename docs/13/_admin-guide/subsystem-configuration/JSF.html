@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>JSF Configuration | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="JSF Configuration" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_admin-guide/subsystem-configuration/JSF.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_admin-guide/subsystem-configuration/JSF.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_admin-guide/subsystem-configuration/JSF.html","headline":"JSF Configuration","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div id="preamble">
+<div class="sectionbody">
+<div class="quoteblock abstract">
+<blockquote>
+JSF configuration is handled by the JSF subsystem. The JSF subsystem
+allows multiple JSF implementations to be installed on the same WildFly
+server. In particular, any version of Mojarra or MyFaces that implements
+spec level 2.1 or higher can be installed. For each JSF implementation,
+a new slot needs to be created under <code>com.sun.jsf-impl</code>,
+<code>javax.faces.api</code>, and <code>org.jboss.as.jsf-injection</code>. When the JSF
+subsystem starts up, it scans the module path to find all of the JSF
+implementations that have been installed. The default JSF implementation
+that WildFly should use is defined by the <code>default-jsf-impl-slot</code>
+attribute.
+</blockquote>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="installing-a-new-jsf-implementation-manually">Installing a new JSF implementation manually</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A new JSF implementation can be manually installed as follows:</p>
+</div>
+<div class="sect2">
+<h3 id="add-a-module-slot-for-the-new-jsf-implementation-jar">Add a module slot for the new JSF implementation JAR</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Create the following directory structure under the
+WILDFLY_HOME/modules directory:<br>
+WILDFLY_HOME/modules/com/sun/jsf-impl/&lt;JSF_IMPL_NAME&gt;-&lt;JSF_VERSION&gt;<br>
+<br>
+For example, for Mojarra 2.2.11, the above path would resolve to:<br>
+WILDFLY_HOME/modules/com/sun/jsf-impl/mojarra-2.2.11</p>
+</li>
+<li>
+<p>Place the JSF implementation JAR in the &lt;JSF_IMPL_NAME&gt;-&lt;JSF_VERSION&gt;
+subdirectory. In the same subdirectory, add a <code>module.xml</code> file similar
+to the
+<a href="https://github.com/wildfly/wildfly/blob/master/jsf/multi-jsf-installer/src/main/resources/mojarra-impl-module.xml">Mojarra</a>
+or
+<a href="https://github.com/wildfly/wildfly/blob/master/jsf/multi-jsf-installer/src/main/resources/myfaces-impl-module.xml">MyFaces</a>
+template examples. Change the <code>resource-root-path</code> to the name of your
+JSF implementation JAR and fill in appropriate values for $\{
+<code>jsf-impl-name</code>} and $\{ <code>jsf-version</code>}.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="add-a-module-slot-for-the-new-jsf-api-jar">Add a module slot for the new JSF API JAR</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Create the following directory structure under the
+WILDFLY_HOME/modules directory:<br>
+WILDFLY_HOME/modules/javax/faces/api/&lt;JSF_IMPL_NAME&gt;-&lt;JSF_VERSION&gt;</p>
+</li>
+<li>
+<p>Place the JSF API JAR in the &lt;JSF_IMPL_NAME&gt;-&lt;JSF_VERSION&gt;
+subdirectory. In the same subdirectory, add a <code>module.xml</code> file similar
+to the
+<a href="https://github.com/wildfly/wildfly/blob/master/jsf/multi-jsf-installer/src/main/resources/mojarra-api-module.xml">Mojarra</a>
+or
+<a href="https://github.com/wildfly/wildfly/blob/master/jsf/multi-jsf-installer/src/main/resources/myfaces-api-module.xml">MyFaces</a>
+template examples. Change the <code>resource-root-path</code> to the name of your
+JSF API JAR and fill in appropriate values for $\{ <code>jsf-impl-name</code>} and
+$\{ <code>jsf-version</code>}.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="add-a-module-slot-for-the-jsf-injection-jar">Add a module slot for the JSF injection JAR</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Create the following directory structure under the
+WILDFLY_HOME/modules directory:<br>
+WILDFLY_HOME/modules/org/jboss/as/jsf-injection/&lt;JSF_IMPL_NAME&gt;-&lt;JSF_VERSION&gt;</p>
+</li>
+<li>
+<p>Copy the wildfly-jsf-injection JAR and the weld-core-jsf JAR from
+WILDFLY_HOME/modules/system/layers/base/org/jboss/as/jsf-injection/main
+to the &lt;JSF_IMPL_NAME&gt;-&lt;JSF_VERSION&gt; subdirectory.</p>
+</li>
+<li>
+<p>In the &lt;JSF_IMPL_NAME&gt;-&lt;JSF_VERSION&gt; subdirectory, add a <code>module.xml</code>
+file similar to the
+<a href="https://gist.github.com/fjuma/30160f0e95ade328253118c706339604">Mojarra</a>
+or
+<a href="https://gist.github.com/fjuma/f73b05c3864255e7b10b49f989f0b75e">MyFaces</a>
+template examples and fill in appropriate values for $\{
+<code>jsf-impl-name</code>}, $\{ <code>jsf-version</code>}, $\{ <code>version.jboss.as</code>}, and $\{
+<code>version.weld.core</code>}. (These last two placeholders depend on the
+versions of the wildfly-jsf-injection and weld-core-jsf JARs that were
+copied over in the previous step.)</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="for-myfaces-only---add-a-module-for-the-commons-digester-jar">For MyFaces only - add a module for the commons-digester JAR</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Create the following directory structure under the
+WILDFLY_HOME/modules directory:<br>
+WILDFLY_HOME/modules/org/apache/commons/digester/main</p>
+</li>
+<li>
+<p>Place the
+<a href="http://search.maven.org/remotecontent?filepath=commons-digester/commons-digester/1.8/commons-digester-1.8.jar">commons-digester</a>
+JAR in WILDFLY_HOME/modules/org/apache/commons/digester/main. In the
+<code>main</code> subdirectory, add a <code>module.xml</code> file similar to this
+<a href="https://github.com/wildfly/wildfly/blob/master/jsf/multi-jsf-installer/src/main/resources/myfaces-digester-module.xml">template</a>.
+Fill in the appropriate value for $\{ <code>version.commons-digester</code>}.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="start-the-server">Start the server</h3>
+<div class="paragraph">
+<p>After starting the server, the following CLI command can be used to
+verify that your new JSF implementation has been installed successfully.
+The new JSF implementation should appear in the output of this command.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9990 /] /subsystem=jsf:list-active-jsf-impls()</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="changing-the-default-jsf-implementation">Changing the default JSF implementation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The following CLI command can be used to make a newly installed JSF
+implementation the default JSF implementation used by WildFly:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">/subsystem=jsf/:write-attribute(name=default-jsf-impl-slot,value=&lt;JSF_IMPL_NAME&gt;-&lt;JSF_VERSION&gt;)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A server restart will be required for this change to take effect.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuring-a-jsf-app-to-use-a-non-default-jsf-implementation">Configuring a JSF app to use a non-default JSF implementation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A JSF app can be configured to use an installed JSF implementation
+that&#8217;s not the default implementation by adding a
+<code>org.jboss.jbossfaces.JSF_CONFIG_NAME</code> context parameter to its
+<code>web.xml</code> file. For example, to indicate that a JSF app should use
+MyFaces 2.2.12 (assuming MyFaces 2.2.12 has been installed on the
+server), the following context parameter would need to be added:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;context-param&gt;
+  &lt;param-name&gt;org.jboss.jbossfaces.JSF_CONFIG_NAME&lt;/param-name&gt;
+  &lt;param-value&gt;myfaces-2.2.12&lt;/param-value&gt;
+&lt;/context-param&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If a JSF app does not specify this context parameter, the default JSF
+implementation will be used for that app.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="disallowing-doctype-declarations">Disallowing DOCTYPE declarations</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The following CLI commands can be used to disallow DOCTYPE declarations
+in JSF deployments:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">/subsystem=jsf:write-attribute(name=disallow-doctype-decl, value=true)
+reload</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This setting can be overridden for a particular JSF deployment by
+adding the <code>com.sun.faces.disallowDoctypeDecl</code> context parameter
+to the deployment&#8217;s <code>web.xml</code> file:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;context-param&gt;
+  &lt;param-name&gt;com.sun.faces.disallowDoctypeDecl&lt;/param-name&gt;
+  &lt;param-value&gt;false&lt;/param-value&gt;
+&lt;/context-param&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

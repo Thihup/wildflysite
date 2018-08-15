@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Securing EJBs | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Securing EJBs" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_developer-guide/ejb3/Securing_EJBs.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_developer-guide/ejb3/Securing_EJBs.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_developer-guide/ejb3/Securing_EJBs.html","headline":"Securing EJBs","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>The Java EE spec specifies certain annotations (like @RolesAllowed,
+@PermitAll, @DenyAll) which can be used on EJB implementation classes
+and/or the business method implementations of the beans. Like with all
+other configurations, these security related configurations can also be
+done via the deployment descriptor (ejb-jar.xml). We <em>won&#8217;t</em> be going
+into the details of Java EE specific annotations/deployment descriptor
+configurations in this chapter but instead will be looking at the vendor
+specific extensions to the security configurations.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="security-domain">Security Domain</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The Java EE spec doesn&#8217;t mandate a specific way to configure security
+domain for a bean. It leaves it to the vendor implementations to allow
+such configurations, the way they wish. In WildFly {wildflyVersion}, the use of
+<code>@org.jboss.ejb3.annotation.SecurityDomain</code> annotation allows the
+developer to configure the security domain for a bean. Here&#8217;s an
+example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">import org.jboss.ejb3.annotation.SecurityDomain;
+ 
+import javax.ejb.Stateless;
+ 
+@Stateless
+@SecurityDomain("other")
+﻿public class MyBean ... 
+{
+ 
+...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The use of @SecurityDomain annotation lets the developer to point the
+container to the name of the security domain which is configured in the
+EJB3 subsystem in the standalone/domain configuration. The configuration
+of the security domain in the EJB3 subsystem is out of the scope of this
+chapter.</p>
+</div>
+<div class="paragraph">
+<p>An alternate way of configuring a security domain, instead of using
+annotation, is to use jboss-ejb3.xml deployment descriptor. Here&#8217;s an
+example of how the configuration will look like:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;jboss:jboss
+        xmlns="http://java.sun.com/xml/ns/javaee"
+        xmlns:jboss="http://www.jboss.com/xml/ns/javaee"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:s="urn:security:1.1"
+         xsi:schemaLocation="http://www.jboss.com/xml/ns/javaee http://www.jboss.org/j2ee/schema/jboss-ejb3-2_0.xsd http://java.sun.com/xml/ns/javaee http://www.jboss.org/j2ee/schema/jboss-ejb3-spec-2_0.xsd"
+         version="3.1" impl-version="2.0"&gt;
+ 
+    &lt;assembly-descriptor&gt;
+        &lt;s:security&gt;
+   &lt;!-- Even wildcard * is supported --&gt;
+            &lt;ejb-name&gt;MyBean&lt;/ejb-name&gt;
+            &lt;!-- Name of the security domain which is configured in the EJB3 subsystem --&gt;
+            &lt;s:security-domain&gt;other&lt;/s:security-domain&gt;
+        &lt;/s:security&gt;
+    &lt;/assembly-descriptor&gt;
+&lt;/jboss:jboss&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As you can see we use the security-domain element to configure the
+security domain.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+The jboss-ejb3.xml is expected to be placed in the .jar/META-INF folder
+of a .jar deployment or .war/WEB-INF folder of a .war deployment.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="absence-of-security-domain-configuration-but-presence-of-other-security-metadata">Absence of security domain configuration but presence of other</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>security metadata</p>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s consider the following example bean:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@Stateless
+public class FooBean {
+ 
+ @RolesAllowed("bar")
+ public void doSomething() {
+  ..
+ }
+...
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As you can see the <code>doSomething</code> method is configured to be accessible
+for users with role "bar". However, the bean isn&#8217;t configured for any
+specific security domain. Prior to WildFly {wildflyVersion}, the absence of an
+explicitly configured security domain on the bean would leave the bean
+unsecured, which meant that even if the <code>doSomething</code> method was
+configured with <code>@RolesAllowed("bar")</code> anyone even without the "bar"
+role could invoke on the bean.</p>
+</div>
+<div class="paragraph">
+<p>In WildFly {wildflyVersion}, the presence of any security metadata (like @RolesAllowed,
+@PermitAll, @DenyAll, @RunAs, @RunAsPrincipal) on the bean or any
+business method of the bean, makes the bean secure, even in the absence
+of an explicitly configured security domain. In such cases, the security
+domain name is default to "other". Users can explicitly configure an
+security domain for the bean if they want to using either the annotation
+or deployment descriptor approach explained earlier.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="access-to-methods-without-explicit-security-metadata-on-a-secured-bean">Access to methods without explicit security metadata, on a secured</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>bean</p>
+</div>
+<div class="paragraph">
+<p>Consider this example bean:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@Stateless
+public class FooBean {
+ 
+ @RolesAllowed("bar")
+ public void doSomething() {
+  ..
+ }
+ 
+ 
+ public void helloWorld() {
+  ...
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As you can see the <code>doSomething</code> method is marked for access for only
+users with role "bar". That enables security on the bean (with security
+domain defaulted to "other"). However, notice that the method
+<code>helloWorld</code> doesn&#8217;t have any specific security configurations.</p>
+</div>
+<div class="paragraph">
+<p>In WildFly {wildflyVersion}, such methods which have no explicit security
+configurations, in a secured bean, will be treated similar to a method
+with <code>@DenyAll</code> configuration. What that means is, no one is allowed
+access to the <code>helloWorld</code> method. This behaviour can be controlled via
+the jboss-ejb3.xml deployment descriptor at a per bean level or a per
+deployment level as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;jboss:jboss
+        xmlns="http://java.sun.com/xml/ns/javaee"
+        xmlns:jboss="http://www.jboss.com/xml/ns/javaee"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:s="urn:security:1.1"
+        xsi:schemaLocation="http://www.jboss.com/xml/ns/javaee http://www.jboss.org/j2ee/schema/jboss-ejb3-2_0.xsd http://java.sun.com/xml/ns/javaee http://www.jboss.org/j2ee/schema/jboss-ejb3-spec-2_0.xsd"
+        version="3.1" impl-version="2.0"&gt;
+ 
+    &lt;assembly-descriptor&gt;
+        &lt;s:security&gt;
+   &lt;!-- Even wildcard * is supported where * is equivalent to all EJBs in the deployment --&gt;
+            &lt;ejb-name&gt;FooBean&lt;/ejb-name&gt;
+            &lt;s:missing-method-permissions-deny-access&gt;false&lt;/s:missing-method-permissions-deny-access&gt;
+        &lt;/s:security&gt;
+    &lt;/assembly-descriptor&gt;
+&lt;/jboss:jboss&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Notice the use of <code>&lt;missing-method-permissions-deny-access&gt;</code> element.
+The value for this element can either be true or false. If this element
+isn&#8217;t configured then it is equivalent to a value of true i.e. no one is
+allowed access to methods, which have no explicit security
+configurations, on secured beans. Setting this to false allows access to
+such methods for all users i.e. the behaviour will be switched to be
+similar to <code>@PermitAll</code>.</p>
+</div>
+<div class="paragraph">
+<p>This behaviour can also be configured at the EJB3 subsystem level so
+that it applies to all EJB3 deployments on the server, as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;subsystem xmlns="urn:jboss:domain:ejb3:1.4"&gt;
+...
+            &lt;default-missing-method-permissions-deny-access value="true"/&gt;
+...
+&lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Again, the <code>default-missing-method-permissions-deny-access</code> element
+accepts either a true or false value. A value of true makes the
+behaviour similar to <code>@DenyAll</code> and a value of false makes it behave
+like <code>@PermitAll</code></p>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

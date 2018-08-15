@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Using Elytron within WildFly | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Using Elytron within WildFly" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_elytron/Using_WildFly_Elytron_with_WildFly.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_elytron/Using_WildFly_Elytron_with_WildFly.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_elytron/Using_WildFly_Elytron_with_WildFly.html","headline":"Using Elytron within WildFly","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="sect1">
+<h2 id="using-the-out-of-the-box-elytron-components">Using the Out of the Box Elytron Components</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="securing-management-interfaces">Securing Management Interfaces</h3>
+<div class="paragraph">
+<p>You can find more details on the enabling WildFly to use the out of the
+box Elytron components for securing the management interfaces in the
+<a href="Elytron_Subsystem.html#src-557147_ElytronSubsystem-DefaultManagementAuthenticationConfiguration">Default
+Management Authentication Configuration</a> section.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="securing-applications">Securing Applications</h3>
+<div class="paragraph">
+<p>The <em>elytron</em> subsystem provides <em>application-http-authentication</em> by
+default which can be used to secure applications. For more details on
+how <em>application-http-authentication</em> is configured, see the
+<a href="Elytron_Subsystem.html#src-557147_ElytronSubsystem-OutoftheBoxConfiguration">Out
+of the Box Configuration</a> section.</p>
+</div>
+<div class="paragraph">
+<p>To configure applications to use <em>application-http-authentication</em>, see
+<a href="Using_the_Elytron_Subsystem.html#src-557140_UsingtheElytronSubsystem-ConfigureApplicationstoUseElytronorLegacySecurityforAuthentication">Configure
+Applications to Use Elytron or Legacy Security for Authentication</a>. You
+can also override the default behavior of all applications using the
+steps in
+<a href="Using_the_Elytron_Subsystem.html#src-557140_safe-id-VXNpbmd0aGVFbHl0cm9uU3Vic3lzdGVtLU92ZXJyaWRlYW5BcHBsaWNhdGlvbidzQXV0aGVudGljYXRpb25Db25maWd1cmF0aW9u">Override
+an Application&#8217;s Authentication Configuration</a>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="using-ssltls">Using SSL/TLS</h3>
+<div class="paragraph">
+<p>WildFly does provide a default one-way SSL/TLS configuration using the
+legacy core management authentication but does not provide one in the
+<em>elytron</em> subsystem. You can find more details on configuring SSL/TLS
+using the <em>elytron</em> subsystem for both the management interfaces as well
+as for applications in
+<a href="Using_the_Elytron_Subsystem.html#src-557140_UsingtheElytronSubsystem-ssl-tls">Configure
+SSL/TLS</a></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="using-elytron-with-other-subsystems">Using Elytron with Other Subsystems</h3>
+<div class="paragraph">
+<p>In addition to securing applications and management interfaces, Elytron
+also integrates with other subsystems in WildFly.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Subsystem</th>
+<th class="tableblock halign-left valign-top">Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">batch-jberet</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">You can configure the batch-jberet to run batch jobs
+using an Elytron security domain.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">datasources</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">You can use a credential store or an Elytron security
+domain to provide authentication information in a datasource definition.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">messaging-activemq</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">You can secure remote connections to the remote
+connections used by the messaging-activemq subsystem.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">iiop-openjdk</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">You can use the elytron subsystem to configure SSL/TLS
+between clients and servers using the iiop-openjdk subsystem.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">mail</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">You can use a credential store to provide authentication
+information in a server definition in the mail subsystem.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">undertow</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">You can use the elytron subsystem to configure both SSL/TLS
+and application authentication.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="undertow-subsystem">Undertow Subsystem</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>As a web application is deployed the name of the security domain required by that application will be identified, this will either be from within the deployment or if the deployment does not have a security domain the <code>default-security-domain</code> as defined on the Undertow subsystem will be assumed.  By default it is assumed that the security domain maps to a PicketBox domain defined in the legacy security subsystem, however an <code>application-security-domain</code> resource can be added to the Undertow subsystem which maps from the name of the security domain required by the application to the appropriate WildFly Elytron configuration.</p>
+</div>
+<div class="paragraph">
+<p>As an example in it&#8217;s simplest form a mapping can be added as: -</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">/subsystem=undertow/application-security-domain=MyAppSecurity:add(security-domain=ApplicationDomain)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Which results in: -</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;subsystem xmlns="urn:jboss:domain:undertow:7.0" ... default-security-domain="other"&gt;
+...
+    &lt;application-security-domains&gt;
+        &lt;application-security-domain name="MyAppSecurity" security-domain="ApplicationDomain"/&gt;
+    &lt;/application-security-domains&gt;
+...
+&lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><em>Note: If the deployment was already deployed at this point the
+application server should be reloaded or the deployment redeployed for
+the application security domain mapping to take effect.</em></p>
+</div>
+<div class="paragraph">
+<p>Here we are mapping from the applications security domain <code>MyAppSecurity</code> to the WildFly Elytron defined domain <code>ApplicationDomain</code>.</p>
+</div>
+<div class="paragraph">
+<p>This simple form is suitable where a deployment is using the standard HTTP mechanisms as defined within the Servlet specification i.e. <code>BASIC</code>, <code>CLIENT_CERT</code>, <code>DIGEST</code>, <code>FORM</code> and authentication will be performed against the <code>ApplicationDomain</code> security domain.  This form is also suitable where an application is not using any authentication mechanisms and instead is using programatic authentication or even wishes to obtain the SecurityDomain associated with the deployment and use it directly.</p>
+</div>
+<div class="paragraph">
+<p>An advanced form of the mapping can be added as: -</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">/subsystem=undertow/application-security-domain=MyAppSecurity:add(http-authentication-factory=application-http-authentication)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Which results in: -</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;subsystem xmlns="urn:jboss:domain:undertow:7.0" ... default-security-domain="other"&gt;
+...
+    &lt;application-security-domains&gt;
+        &lt;application-security-domain name="MyAppSecurity" http-authentication-factory="application-http-authentication"/&gt;
+    &lt;/application-security-domains&gt;
+...
+&lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In this form of the configuration instead of referencing a security domain a <code>http-authentication-factory</code> is referenced instead, this is the factory that will be used to obtain the instances of the authentication mechansisms and is in turn associated with the security domain.  The standard mechanisms as defined in the Servlet specification can be used in this way but this approach also allows for other mechanisms to be used such as <code>SPNEGO</code> which requires additional configuration or even plug-in custom mechanism implementations.</p>
+</div>
+<div class="paragraph">
+<p>When the advanced form of the mapping is used a further configuration option is available: -</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>override-deployment-config</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The referenced <code>http-authentication-factory</code> can return a complete set of authentication mechanisms, by default these are filtered to just match the mechanisms requested by the application - if this option is set to <code>true</code> then the mechanisms offered by the factory will override the mechanisms requested by the application.  One example of where this could be useful is say an application has been developed to support <code>FORM</code> authentication, by overriding the mechanisms the application could be updated to support <code>SPNEGO</code>, and <code>FORM</code> authentication without any modifications to the deployment.</p>
+</div>
+<div class="paragraph">
+<p>The <code>application-security-domain</code> resource also has one additional option <code>enable-jacc</code>, if this is set to true JACC will be enabled for any deployments matching against this mapping.</p>
+</div>
+<div class="sect2">
+<h3 id="runtime-information">Runtime Information</h3>
+<div class="paragraph">
+<p>Where an <code>application-security-domain</code> mapping is in use it can be useful to double check that deployments did match against it as expected, if the resource is read with <code>include-runtime=true</code> the deployments that are associated with the mapping will also be shown: -</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>[standalone@localhost:9990 /] /subsystem=undertow/application-security-domain=MyAppSecurity:read-resource(include-runtime=true)
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; {
+        "enable-jacc" =&gt; false,
+        "http-authentication-factory" =&gt; undefined,
+        "override-deployment-config" =&gt; false,
+        "referencing-deployments" =&gt; ["simple-webapp.war"],
+        "security-domain" =&gt; "ApplicationDomain",
+        "setting" =&gt; undefined
+    }
+}</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In this output the <code>referencing-deployments</code> attribute shows that the deployment <code>simple-webapp.war</code> has been deployed using this mapping.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="ejb-subsystem">EJB Subsystem</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Configuration can be added to the EJB subsystem to map a security domain
+name referenced in a deployment to an Elytron security domain:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">/subsystem=ejb3/application-security-domain=MyAppSecurity:add(security-domain=ApplicationDomain)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Which results in:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;subsystem xmlns="urn:jboss:domain:ejb3:5.0"&gt;
+...
+    &lt;application-security-domains&gt;
+        &lt;application-security-domain name="MyAppSecurity" security-domain="ApplicationDomain"/&gt;
+    &lt;/application-security-domains&gt;
+...
+&lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><em>Note: If the deployment was already deployed at this point the
+application server should be reloaded or the deployment redeployed for
+the application security domain mapping to take effect.</em></p>
+</div>
+<div class="paragraph">
+<p>An <code>application-security-domain</code> has two main attributes:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>name - the name of the security domain as specified in a deployment</p>
+</li>
+<li>
+<p>security-domain - a reference to the Elytron security domain that
+should be used</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>When an application security domain mapping is configured for a bean in
+a deployment, this indicates that security should be handled by Elytron.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="webservices-subsystem">WebServices Subsystem</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>There is adapter in webservices subsystem to make authentication works
+for elytron security domain automatically. Like configure with legacy
+security domain, you can configure elytron security domain in deployment
+descriptor or annotation to secure webservice endpoint.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="legacy-security-subsystem">Legacy Security Subsystem</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>As previously described, Elytron based security is configured by
+chaining together different capability references to form a complete
+security policy. To allow an incremental migration from the legacy
+Security subsystem some of the major components of this subsystem can be
+mapped to Elytron capabilities and used within an Elytron based set up.</p>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

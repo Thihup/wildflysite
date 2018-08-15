@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Spring applications development and migration guide | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Spring applications development and migration guide" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_developer-guide/Spring_applications_development_and_migration_guide.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_developer-guide/Spring_applications_development_and_migration_guide.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_developer-guide/Spring_applications_development_and_migration_guide.html","headline":"Spring applications development and migration guide","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>This document details the main points that need to be considered by
+Spring developers that wish to develop new applications or to migrate
+existing applications to be run into WildFly {wildflyVersion}.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="dependencies-and-modularity">Dependencies and Modularity</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>WildFly {wildflyVersion} has a modular class loading strategy, different from previous
+versions of JBoss AS, which enforces a better class loading isolation
+between deployments and the application server itself. A detailed
+description can be found in the documentation dedicated to
+<a href="https://docs.jboss.org/author/display/AS7/Class+Loading+in+AS7">class
+loading in WildFly {wildflyVersion}</a>.</p>
+</div>
+<div class="paragraph">
+<p>This reduces significantly the risk of running into a class loading
+conflict and allows applications to package their own dependencies if
+they choose to do so. This makes it easier for Spring applications that
+package their own dependencies - such as logging frameworks or
+persistence providers to run on WildFly {wildflyVersion}.</p>
+</div>
+<div class="paragraph">
+<p>At the same time, this does not mean that duplications and conflicts
+cannot exist on the classpath. Some module dependencies are implicit,
+depending on the type of deployment as shown
+<a href="https://docs.jboss.org/author/display/AS7/Implicit+module+dependencies+for+deployments">here</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="persistence-usage-guide">Persistence usage guide</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Depending on the strategy being used, Spring applications can be:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>native Hibernate applications;</p>
+</li>
+<li>
+<p>JPA-based applications;</p>
+</li>
+<li>
+<p>native JDBC applications;</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="native-springhibernate-applications">Native Spring/Hibernate applications</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Applications that use the Hibernate API directly with Spring (i.e.
+through either one of LocalSessionFactoryBean or
+AnnotationSessionFactoryBean) may use a version of Hibernate 3 packaged
+inside the application. Hibernate 4 (which is provided through the
+'org.hibernate' module of WildFly {wildflyVersion}) is not supported by Spring 3.0 and
+Spring 3.1 (and may be supported by Spring 3.2 as described in
+<a href="https://jira.springsource.org/browse/SPR-8096">SPR-8096</a>), so adding this
+module as a dependency is not a solution.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="jpa-based-applications">JPA-based applications</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Spring applications using JPA may choose between:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>using a server-deployed persistence unit;</p>
+</li>
+<li>
+<p>using a Spring-managed persistence unit.</p>
+</li>
+</ul>
+</div>
+<div class="sect2">
+<h3 id="using-server-deployed-persistence-units">Using server-deployed persistence units</h3>
+<div class="paragraph">
+<p>Applications that use a server-deployed persistence unit must observe
+the typical Java EE rules in what concerns dependency management, i.e.
+the javax.persistence classes and persistence provider (Hibernate) are
+contained in modules which are added automatically by the application
+when the persistence unit is deployed.</p>
+</div>
+<div class="paragraph">
+<p>In order to use the server-deployed persistence units from within
+Spring, either the persistence context or the persistence unit need to
+be registered in JNDI via web.xml as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;persistence-context-ref&gt;
+    &lt;persistence-context-ref-name&gt;persistence/petclinic-em&lt;/persistence-unit-ref-name&gt;
+    &lt;persistence-unit-name&gt;petclinic&lt;/persistence-unit-name&gt;
+&lt;/persistence-context-ref&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or, respectively:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;persistence-unit-ref&gt;
+    &lt;persistence-unit-ref-name&gt;persistence/petclinic-emf&lt;/persistence-unit-ref-name&gt;
+    &lt;persistence-unit-name&gt;petclinic&lt;/persistence-unit-name&gt;
+&lt;/persistence-unit-ref&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>When doing so, the persistence context or persistence unit are available
+to be looked up in JNDI, as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;jee:jndi-lookup id="entityManager" jndi-name="java:comp/env/persistence/petclinic-em" 
+            expected-type="javax.persistence.EntityManager"/&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;jee:jndi-lookup id="entityManagerFactory" jndi-name="java:comp/env/persistence/petclinic-emf" 
+            expected-type="javax.persistence.EntityManagerFactory"/&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>JNDI binding</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+JNDI binding via persistence.xml properties is not supported in WildFly
+8.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="using-spring-managed-persistence-units">Using Spring-managed persistence units</h3>
+<div class="paragraph">
+<p>Spring applications running in WildFly {wildflyVersion} may also create persistence
+units on their own, using the LocalContainerEntityManagerFactoryBean.
+This is what these applications need to consider:</p>
+</div>
+<div class="sect3">
+<h4 id="placement-of-the-persistence-unit-definitions">Placement of the persistence unit definitions</h4>
+<div class="paragraph">
+<p>When the application server encounters a deployment that has a file
+named META-INF/persistence.xml (or, for that matter,
+WEB-INF/classes/META-INF/persistence.xml), it will attempt to create a
+persistence unit based on what is provided in the file. In most cases,
+such definition files are not compliant with the Java EE requirements,
+mostly because required elements such as the datasource of the
+persistence unit are supposed to be provided by the Spring context
+definitions, which will fail the deployment of the persistence unit, and
+consequently of the entire deployment.</p>
+</div>
+<div class="paragraph">
+<p>Spring applications can easily avoid this type of conflict, by using a
+feature of the LocalContainerEntityManagerFactoryBean which is designed
+for this purpose. Persistence unit definition files can exist in other
+locations than META-INF/persistence.xml and the location can be
+indicated through the persistenceXmlLocation property of the factory
+bean class.</p>
+</div>
+<div class="paragraph">
+<p>Assuming that the persistence unit is in the
+META-INF/jpa-persistence.xml, the corresponding definition can be:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"&gt; 
+       &lt;property name="persistenceXmlLocation" value="classpath*:META-INF/jpa-persistence.xml"/&gt; 
+       &lt;!-- other definitions --&gt;
+&lt;/bean&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="managing-dependencies">Managing dependencies</h3>
+<div class="paragraph">
+<p>Since the LocalContainerEntityManagerFactoryBean and the corresponding
+HibernateJpaVendorAdapter are based on Hibernate 3, it is required to
+use that version with the application. Therefore, the Hibernate 3 jars
+must be included in the deployment. At the same time, due the presence
+of @PersistenceUnit or @PersistenceContext annotations on the
+application classes, the application server will automatically add the
+'org.hibernate' module as a dependency.</p>
+</div>
+<div class="paragraph">
+<p>This can be avoided by instructing the server to exclude the module from
+the deployment&#8217;s list of dependencies. In order to do so, include a
+META-INF/jboss-deployment-structure.xml or, for web applications,
+WEB-INF/jboss-deployment-structure.xml with the following content:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.0"&gt;
+  &lt;deployment&gt;
+    &lt;exclusions&gt;
+       &lt;module name="org.hibernate"/&gt;
+    &lt;/exclusions&gt;
+  &lt;/deployment&gt;
+&lt;/jboss-deployment-structure&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Configuration file history | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Configuration file history" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_admin-guide/management-tasks/Configuration_file_history.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_admin-guide/management-tasks/Configuration_file_history.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_admin-guide/management-tasks/Configuration_file_history.html","headline":"Configuration file history","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>The management operations may modify the model. When this occurs the xml
+backing the model is written out again reflecting the latest changes. In
+addition a full history of the file is maintained. The history of the
+file goes in a separate directory under the configuration directory.</p>
+</div>
+<div class="paragraph">
+<p>As mentioned in <a href="#Command_line_parameters">Command line parameters</a> the default
+configuration file can be selected using a command-line parameter. For a
+standalone server instance the history of the active <code>standalone.xml</code> is
+kept in <code>jboss.server.config.dir</code>/standalone_xml_history (See
+<a href="#Command_line_parameters">Command line parameters#standalone_system_properties</a>
+for more details). For a domain the active <code>domain.xml</code> and <code>host.xml</code>
+histories are kept in <code>jboss.domain.config.dir</code>/domain_xml_history and
+<code>jboss.domain.config.dir</code>/host_xml_history.</p>
+</div>
+<div class="paragraph">
+<p>The rest of this section will only discuss the history for
+<code>standalone.xml</code>. The concepts are exactly the same for <code>domain.xml</code> and
+<code>host.xml</code>.</p>
+</div>
+<div class="paragraph">
+<p>Within <code>standalone_xml_history</code> itself following a successful first time
+boot we end up with three new files:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>standalone.initial.xml</code> - This contains the original configuration
+that was used the first time we successfully booted. This file will
+never be overwritten. You may of course delete the history directory and
+any files in it at any stage.</p>
+</li>
+<li>
+<p><code>standalone.boot.xml</code> - This contains the original configuration that
+was used for the last successful boot of the server. This gets
+overwritten every time we boot the server successfully.</p>
+</li>
+<li>
+<p><code>standalone.last.xml</code> - At this stage the contents will be identical
+to <code>standalone.boot.xml</code>. This file gets overwritten each time the
+server successfully writes the configuration, if there was an unexpected
+failure writing the configuration this file is the last known successful
+write.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><code>standalone_xml_history</code> contains a directory called <code>current</code> which
+should be empty. Now if we execute a management operation that modifies
+the model, for example adding a new system property using the CLI:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9990 /] /system-property=test:add(value="test123")
+{"outcome" =&gt; "success"}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>What happens is:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The original configuration file is backed up to
+<code>standalone_xml_history/current/standalone.v1.xml</code>. The next change to
+the model would result in a file called <code>standalone.v2.xml</code> etc. The 100
+most recent of these files are kept.</p>
+</li>
+<li>
+<p>The change is applied to the original configuration file</p>
+</li>
+<li>
+<p>The changed original configuration file is copied to
+<code>standalone.last.xml</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>When restarting the server, any existing
+<code>standalone_xml_history/current</code> directory is moved to a new timestamped
+folder within the <code>standalone_xml_history</code>, and a new <code>current</code> folder
+is created. These timestamped folders are kept for 30 days.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="snapshots">Snapshots</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In addition to the backups taken by the server as described above you
+can manually take take snapshots which will be stored in the <code>snapshot</code>
+folder under the <code>_xml_history</code> folder, the automatic backups described
+above are subject to automatic house keeping so will eventually be
+automatically removed, the snapshots on the other hand can be entirely
+managed by the administrator.</p>
+</div>
+<div class="paragraph">
+<p>You may also take your own snapshots using the CLI:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9990 /] :take-snapshot
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; {"name" =&gt; "/Users/kabir/wildfly/standalone/configuration/standalone_xml_history/snapshot/20110630-172258657standalone.xml"}
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can also use the CLI to list all the snapshots</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9990 /] :list-snapshots
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; {
+        "directory" =&gt; "/Users/kabir/wildfly/standalone/configuration/standalone_xml_history/snapshot",
+        "names" =&gt; [
+            "20110630-165714239standalone.xml",
+            "20110630-165821795standalone.xml",
+            "20110630-170113581standalone.xml",
+            "20110630-171411463standalone.xml",
+            "20110630-171908397standalone.xml",
+            "20110630-172258657standalone.xml"
+        ]
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To delete a particular snapshot:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9990 /] :delete-snapshot(name="20110630-165714239standalone.xml")
+{"outcome" =&gt; "success"}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>and to delete all snapshots:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9990 /] :delete-snapshot(name="all")
+{"outcome" =&gt; "success"}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In domain mode executing the snapshot operations against the root node
+will work against the domain model. To do this for a host model you need
+to navigate to the host in question:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[domain@localhost:9990 /] /host=master:list-snapshots
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; {
+        "domain-results" =&gt; {"step-1" =&gt; {
+            "directory" =&gt; "/Users/kabir/wildfly/domain/configuration/host_xml_history/snapshot",
+            "names" =&gt; [
+                "20110630-141129571host.xml",
+                "20110630-172522225host.xml"
+            ]
+        }},
+        "server-operations" =&gt; undefined
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="subsequent-starts">Subsequent Starts</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>For subsequent server starts it may be desirable to take the state of
+the server back to one of the previously known states, for a number of
+items an abbreviated reverence to the file can be used:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Abreviation</th>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">initial</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--server-config=initial</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This will start the server using the
+initial configuration first used to start the server.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">boot</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--server-config=boot</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This will use the configuration from the
+last successful boot of the server.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">last</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--server-config=last</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This will start the server using the
+configuration backed up from the last successful save.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">v?</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--server-config=v?</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This will server the _xml_history/current
+folder for the configuration where ? is the number of the backup to use.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-?</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--server-config=-?</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The server will be started after searching the
+snapshot folder for the configuration which matches this prefix.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>In addition to this the <code>--server-config</code> parameter can always be used
+to specify a configuration relative to the <code>jboss.server.config.dir</code> and
+finally if no matching configuration is found an attempt to locate the
+configuration as an absolute path will be made.</p>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

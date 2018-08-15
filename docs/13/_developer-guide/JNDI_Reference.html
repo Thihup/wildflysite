@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>JNDI Reference | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="JNDI Reference" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_developer-guide/JNDI_Reference.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_developer-guide/JNDI_Reference.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_developer-guide/JNDI_Reference.html","headline":"JNDI Reference","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div id="preamble">
+<div class="sectionbody">
+<div class="quoteblock abstract">
+<blockquote>
+WildFly offers several mechanisms to retrieve components by name. Every
+WildFly instance has it&#8217;s own local JNDI namespace ( <code>java:</code>) which is
+unique per JVM. The layout of this namespace is primarily governed by
+the Java EE specification. Applications which share the same WildFly
+instance can use this namespace to intercommunicate. In addition to
+local JNDI, a variety of mechanisms exist to access remote components.
+</blockquote>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Client JNDI - This is a mechanism by which remote components can be
+accessed using the JNDI APIs, but <strong><em>without network round-trips</em></strong> . This
+approach is the most efficient, and <strong><em>removes a potential single point
+of failure</em></strong> . For this reason, it is highly recommended to use Client
+JNDI over traditional remote JNDI access. However, to make this
+possible, it does require that all names follow a strict layout, so user
+customizations are not possible. Currently only access to remote EJBs is
+supported via the <code>ejb:</code> namespace. Future revisions will likely add a
+JMS client JNDI namespace.</p>
+</li>
+<li>
+<p>Traditional Remote JNDI - This is a more familiar approach to EE
+application developers, where the client performs a remote component
+name lookup against a server, and a proxy/stub to the component is
+serialized as part of the name lookup and returned to the client. The
+client then invokes a method on the proxy which results in another
+remote network call to the underlying service. In a nutshell,
+traditional remote JNDI involves two calls to invoke an EE component,
+whereas Client JNDI requires one. It does however allow for customized
+names, and for a centralised directory for multiple application servers.
+This centralized directory is, however, <em>a single point of failure</em>.</p>
+</li>
+<li>
+<p>EE Application Client / Server-To-Server Delegation - This approach is
+where local names are bound as an <em>alias</em> to a remote name using one of
+the above mechanisms. This is useful in that it allows applications to
+only ever reference standard portable Java EE names in both code and
+deployment descriptors. It also allows for the application to be unaware
+of network topology details/ This can even work with Java SE clients by
+using the little known EE Application Client feature. This feature
+allows you to run an extremely minimal AS server around your
+application, so that you can take advantage of certain core services
+such as naming and injection.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="JNDI_Local_Reference">Local JNDI</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The Java EE platform specification defines the following JNDI contexts:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>java:comp</code> - The namespace is scoped to the current component (i.e.
+EJB)</p>
+</li>
+<li>
+<p><code>java:module</code> - Scoped to the current module</p>
+</li>
+<li>
+<p><code>java:app</code> - Scoped to the current application</p>
+</li>
+<li>
+<p><code>java:global</code> - Scoped to the application server</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>In addition to the standard namespaces, WildFly also provides the
+following two global namespaces:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>java:jboss</p>
+</li>
+<li>
+<p>java:/</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+Only entries within the <code>java:jboss/exported</code> context are accessible
+over remote JNDI.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+For web deployments <code>java:comp</code> is aliased to <code>java:module</code>, so EJB&#8217;s
+deployed in a war do not have their own comp namespace.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="binding-entries-to-jndi">Binding entries to JNDI</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>There are several methods that can be used to bind entries into JNDI in
+WildFly.</p>
+</div>
+<div class="sect2">
+<h3 id="using-a-deployment-descriptor">Using a deployment descriptor</h3>
+<div class="paragraph">
+<p>For Java EE applications the recommended way is to use a
+<a href="#Deployment_Descriptors_used_In_WildFly">deployment descriptor</a> to create the binding. For
+example the following <code>web.xml</code> binds the string <code>"Hello World"</code> to
+<code>java:global/mystring</code> and the string <code>"Hello Module"</code> to
+<code>java:comp/env/hello</code> (any non absolute JNDI name is relative to
+<code>java:comp/env</code> context).</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">&lt;web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+         version="3.1"&gt;
+    &lt;env-entry&gt;
+        &lt;env-entry-name&gt;java:global/mystring&lt;/env-entry-name&gt;
+        &lt;env-entry-type&gt;java.lang.String&lt;/env-entry-type&gt;
+        &lt;env-entry-value&gt;Hello World&lt;/env-entry-value&gt;
+    &lt;/env-entry&gt;
+    &lt;env-entry&gt;
+        &lt;env-entry-name&gt;hello&lt;/env-entry-name&gt;
+        &lt;env-entry-type&gt;java.lang.String&lt;/env-entry-type&gt;
+        &lt;env-entry-value&gt;Hello Module&lt;/env-entry-value&gt;
+    &lt;/env-entry&gt;
+&lt;/web-app&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For more details, see the <a href="http://jcp.org/en/jsr/detail?id=342">Java EE
+Platform Specification</a>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="programatically">Programatically</h3>
+<div class="sect3">
+<h4 id="java-ee-applications">Java EE Applications</h4>
+<div class="paragraph">
+<p>Standard Java EE applications may use the standard JNDI API, included
+with Java SE, to bind entries in the global namespaces (the standard
+<code>java:comp</code>, <code>java:module</code> and <code>java:app</code> namespaces are read-only, as
+mandated by the Java EE Platform Specification).</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">  InitialContext initialContext = new InitialContext();
+  initialContext.bind("java:global/a", 100);</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+There is no need to unbind entries created programatically, since
+WildFly tracks which bindings belong to a deployment, and the bindings
+are automatically removed when the deployment is undeployed.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="wildfly-modules-and-extensions">WildFly Modules and Extensions</h4>
+<div class="paragraph">
+<p>With respect to code in WildFly Modules/Extensions, which is executed
+out of a Java EE application context, using the standard JNDI API may
+result in a UnsupportedOperationException if the target namespace uses a
+WritableServiceBasedNamingStore. To work around that, the bind()
+invocation needs to be wrapped using WildFly proprietary APIs:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">  InitialContext initialContext = new InitialContext();
+  WritableServiceBasedNamingStore.pushOwner(serviceTarget);
+  try {
+    initialContext.bind("java:global/a", 100);
+  } finally {
+    WritableServiceBasedNamingStore.popOwner();
+  }</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+The ServiceTarget removes the bind when uninstalled, thus using one out
+of the module/extension domain usage should be avoided, unless entries
+are removed using unbind().
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="naming-subsystem-configuration">Naming Subsystem Configuration</h3>
+<div class="paragraph">
+<p>It is also possible to bind to one of the three global namespaces using
+configuration in the naming subsystem. This can be done by either
+editing the <code>standalone.xml/domain.xml</code> file directly, or through the
+management API.</p>
+</div>
+<div class="paragraph">
+<p>Four different types of bindings are supported:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Simple - A primitive or java.net.URL entry (default is
+<code>java.lang.String</code>).</p>
+</li>
+<li>
+<p>Object Factory - This allows to to specify the
+<code>javax.naming.spi.ObjectFactory</code> that is used to create the looked up
+value.</p>
+</li>
+<li>
+<p>External Context - An external context to federate, such as an LDAP
+Directory Service</p>
+</li>
+<li>
+<p>Lookup - The allows to create JNDI aliases, when this entry is looked
+up it will lookup the target and return the result.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>An example standalone.xml might look like:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">&lt;subsystem xmlns="urn:jboss:domain:naming:2.0" &gt;
+  &lt;bindings&gt;
+    &lt;simple name="java:global/a" value="100" type="int" /&gt;
+    &lt;simple name="java:global/jbossDocs" value="https://docs.jboss.org" type="java.net.URL" /&gt;
+    &lt;object-factory name="java:global/b" module="com.acme" class="org.acme.MyObjectFactory" /&gt;
+    &lt;external-context name="java:global/federation/ldap/example" class="javax.naming.directory.InitialDirContext" cache="true"&gt;
+      &lt;environment&gt;
+        &lt;property name="java.naming.factory.initial" value="com.sun.jndi.ldap.LdapCtxFactory" /&gt;
+        &lt;property name="java.naming.provider.url" value="ldap://ldap.example.com:389" /&gt;
+        &lt;property name="java.naming.security.authentication" value="simple" /&gt;
+        &lt;property name="java.naming.security.principal" value="uid=admin,ou=system" /&gt;
+        &lt;property name="java.naming.security.credentials" value="secret" /&gt;
+      &lt;/environment&gt;
+    &lt;/external-context&gt;
+    &lt;lookup name="java:global/c" lookup="java:global/b" /&gt;
+ &lt;/bindings&gt;
+&lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The CLI may also be used to bind an entry. As an example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">/subsystem=naming/binding=java\:global\/mybinding:add(binding-type=simple, type=long, value=1000)</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+WildFly&#8217;s Administrator Guide includes a section describing in detail
+the Naming subsystem configuration.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="retrieving-entries-from-jndi">Retrieving entries from JNDI</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="resource-injection">Resource Injection</h3>
+<div class="paragraph">
+<p>For Java EE applications the recommended way to lookup a JNDI entry is
+to use <code>@Resource</code> injection:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">  @Resource(lookup = "java:global/mystring")
+  private String myString;
+ 
+  @Resource(name = "hello")
+  private String hello;
+ 
+  @Resource
+  ManagedExecutorService executor;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note that <code>@Resource</code> is more than a JNDI lookup, it also binds an entry
+in the component&#8217;s JNDI environment. The new bind JNDI name is defined
+by <code>@Resource&#8217;s `name</code> attribute, which value, if unspecified, is the
+Java type concatenated with <code>/</code> and the field&#8217;s name, for instance
+<code>java.lang.String/myString</code>. More, similar to when using deployment
+descriptors to bind JNDI entries. unless the name is an absolute JNDI
+name, it is considered relative to <code>java:comp/env</code>. For instance, with
+respect to the field named <code>myString</code> above, the <code>@Resource&#8217;s `lookup</code>
+attribute instructs WildFly to lookup the value in
+<code>java:global/mystring</code>, bind it in
+<code>java:comp/env/java.lang.String/myString</code>, and then inject such value
+into the field.</p>
+</div>
+<div class="paragraph">
+<p>With respect to the field named <code>hello</code>, there is no <code>lookup</code> attribute
+value defined, so the responsibility to provide the entry&#8217;s value is
+delegated to the deployment descriptor. Considering that the deployment
+descriptor was the <code>web.xml</code> previously shown, which defines an
+environment entry with same <code>hello</code> name, then WildFly inject the valued
+defined in the deployment descriptor into the field.</p>
+</div>
+<div class="paragraph">
+<p>The <code>executor</code> field has no attributes specified, so the bind&#8217;s name
+would default to
+<code>java:comp/env/javax.enterprise.concurrent.ManagedExecutorService/executor</code>,
+but there is no such entry in the deployment descriptor, and when that
+happens it&#8217;s up to WildFly to provide a default value or null, depending
+on the field&#8217;s Java type. In this particular case WildFly would inject
+the default instance of a managed executor service, the value in
+<code>java:comp/DefaultManagedExecutorService</code>, as mandated by the EE
+Concurrency Utilities 1.0 Specification (JSR 236).</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="standard-java-se-jndi-api">Standard Java SE JNDI API</h3>
+<div class="paragraph">
+<p>Java EE applications may use, without any additional configuration
+needed, the standard JNDI API to lookup an entry from JNDI:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">  String myString = (String) new InitialContext().lookup("java:global/mystring");</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or simply</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">  String myString = InitialContext.doLookup("java:global/mystring");</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="JNDI_Remote_Reference">Remote JNDI Access</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>WildFly supports two different types of remote JNDI.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="http-remoting">http-remoting:</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The <code>http-remoting:</code> protocol implementation is provided by JBoss Remote
+Naming project, and uses http upgrade to lookup items from the servers
+local JNDI. To use it, you must have the appropriate jars on the class
+path, if you are maven user can be done simply by adding the following
+to your <code>pom.xml</code> dependencies:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;dependency&gt;
+  &lt;groupId&gt;org.wildfly&lt;/groupId&gt;
+  &lt;artifactId&gt;wildfly-ejb-client-bom&lt;/artifactId&gt;
+  &lt;version&gt;11.0.0.Final&lt;/version&gt;
+  &lt;type&gt;pom&lt;/type&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If you are not using maven a shaded jar that contains all required
+classes<br>
+can be found in the <code>bin/client</code> directory of WildFly&#8217;s distribution.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">final Properties env = new Properties();
+env.put(Context.INITIAL_CONTEXT_FACTORY, "org.jboss.naming.remote.client.InitialContextFactory");
+env.put(Context.PROVIDER_URL, "http-remoting://localhost:8080");
+// the property below is required ONLY if there is no ejb client configuration loaded (such as a
+// jboss-ejb-client.properties in the class path) and the context will be used to lookup EJBs
+env.put("jboss.naming.client.ejb.context", true);
+InitialContext remoteContext = new InitialContext(env);
+RemoteCalculator ejb = (RemoteCalculator) remoteContext.lookup("wildfly-http-remoting-ejb/CalculatorBean!"
+                + RemoteCalculator.class.getName());</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+The http-remoting client assumes JNDI names in remote lookups are
+relative to java:jboss/exported namespace, a lookup of an absolute JNDI
+name will fail.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="ejb">ejb:</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The ejb: namespace implementation is provided by the jboss-ejb-client
+library, and allows the lookup of EJB&#8217;s using their application name,
+module name, ejb name and interface type. To use it, you must have the
+appropriate jars on the class path, if you are maven user can be done
+simply by adding the following to your <code>pom.xml</code> dependencies:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;dependency&gt;
+  &lt;groupId&gt;org.wildfly&lt;/groupId&gt;
+  &lt;artifactId&gt;wildfly-ejb-client-bom&lt;/artifactId&gt;
+  &lt;version&gt;11.0.0.Final&lt;/version&gt;
+  &lt;type&gt;pom&lt;/type&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If you are not using maven a shaded jar that contains all required
+classes<br>
+can be found in the <code>bin/client</code> directory of WildFly&#8217;s distribution.</p>
+</div>
+<div class="paragraph">
+<p>This is a client side JNDI implementation. Instead of looking up an EJB
+on the server the lookup name contains enough information for the client
+side library to generate a proxy with the EJB information. When you
+invoke a method on this proxy it will use the current EJB client context
+to perform the invocation. If the current context does not have a
+connection to a server with the specified EJB deployed then an error
+will occur. Using this protocol it is possible to look up EJB&#8217;s that do
+not actually exist, and no error will be thrown until the proxy is
+actually used. The exception to this is stateful session beans, which
+need to connect to a server when they are created in order to create the
+session bean instance on the server.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">final Properties env = new Properties();
+env.put(Context.URL_PKG_PREFIXES, "org.jboss.ejb.client.naming");
+InitialContext remoteContext = new InitialContext(env);
+MyRemoteInterface myRemote = (MyRemoteInterface) remoteContext.lookup("ejb:myapp/myejbjar/MyEjbName\!com.test.MyRemoteInterface");
+MyStatefulRemoteInterface myStatefulRemote = (MyStatefulRemoteInterface) remoteContext.lookup("ejb:myapp/myejbjar/MyStatefulName\!comp.test.MyStatefulRemoteInterface?stateful");</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The first example is a lookup of a singleton, stateless or EJB 2.x home
+interface. This lookup will not hit the server, instead a proxy will be
+generated for the remote interface specified in the name. The second
+example is for a stateful session bean, in this case the JNDI lookup
+will hit the server, in order to tell the server to create the SFSB
+session.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+For more details on how the server connections are configured, including
+the <strong>required</strong> jboss ejb client setup, please see
+<a href="#EJB_invocations_from_a_remote_client_using_JNDI">EJB invocations from a remote client using JNDI</a>.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

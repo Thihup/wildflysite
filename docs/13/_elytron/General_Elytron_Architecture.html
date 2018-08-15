@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>General Elytron Architecture | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="General Elytron Architecture" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_elytron/General_Elytron_Architecture.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_elytron/General_Elytron_Architecture.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_elytron/General_Elytron_Architecture.html","headline":"General Elytron Architecture","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>The overall architecture for WildFly Elytron is building up a full
+security policy from assembling smaller components together, by default
+we include various implementations of the components - in addition to
+this, custom implementations of many components can be provided in order
+to provide more specialised implementations.</p>
+</div>
+<div class="paragraph">
+<p>Within WildFly the different Elytron components are handled as
+capabilities meaning that different implementations can be mixed and
+matched, however the different implementations are modelled using
+distinct resources. This section contains a number of diagrams to show
+the general relationships between different components to provide a high
+level view, however the different resource definitions may use different
+dependencies depending on their purpose.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="security-domains">Security Domains</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Within WildFly Elytron a SecurityDomain can be considered as a security
+policy backed by one or more SecurityRealm instances. Resources that
+make authorization decisions will be associated with a SecurityDomain,
+from the SecurityDomain a SecurityIdentity can be obtained which is a
+representation of the current identity, from this the identities roles
+and permissions can be checked to make the authorization decision for
+the resource.</p>
+</div>
+<div class="paragraph">
+<p>The SecurityDomain is the general wrapper around the policy describing a
+resulting SecurityIdentity and makes use of the following components to
+define this policy.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>NameRewriter</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>NameRewriters are used in multiple places within the Elytron
+configuration, as their name implies, their purpose is to take a name
+and map it to another representation of the name or perform some
+normalisation or clean up of the name.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>RealmMapper</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>As a SecurityDomain is able to reference multiple SecurityRealms the
+RealmMapper is responsible for identifying which SecurityRealm to use
+based on the supplied name for authentication.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>SecurityRealm</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>One more more named SecurityRealms are associated with a SecurityDomain,
+the SecurityRealms are the access to the underlying repository of
+identities and are used for obtaining credentials to allow
+authentication mechanisms to perform verification, for validation of
+Evidence and for obtaining the raw AuthorizationIdentity performing the
+authentication.</p>
+</div>
+<div class="paragraph">
+<p>Some SecurityRealm implementations are also modifiable so expose an API
+that allows for updates to be made to the repository containing the
+identities.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>RoleDecoder</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Along with the SecurityRealm association is also a reference to a
+RoleDecoder, the RoleDecoder takes the raw AuthorizationIdentity
+returned from the SecurityRealm and converts it&#8217;s attributes into roles.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>RoleMapper</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>After the roles have been decoded for an identity further mapping can be
+applied, this could be as simple at normalising the format of the names
+through to adding or removing specific role names. If a RoleMapper is
+referenced by the SecurityRealm association that RoleMapper is applied
+first before applying the RoleMapper associated with the SecurityDomain.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>PrincipalDecoder</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>A PrincipalDecoder converts from a Principal to a String representation
+of a name, one example for this is we have an X500PrincipalDecoder which
+is able to extract an attribute from a distinguished name.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>PermissionMapper</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>In addition to having roles a SecurityIdentity can also have a set of
+permissions, the PermissionMapper assigns those permissions to the
+identity.</p>
+</div>
+<div class="paragraph">
+<p>Different secured resources can be associated with different
+SecurityDomains for their authorization decisions, within WildFly
+Elytron we have the ability to configure inflow between different
+SecurityDomains. The inflow process means that a SecurityIdentity
+inflowed into a second SecurityDomain has the mappings of the new
+SecurityDomain applied to it so although a common identity may be
+calling different resources each of those resources could have a very
+different view.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="sasl-authentication">SASL Authentication</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The SaslAuthenticationFactory is an authentication policy for
+authentication using SASL authentication mechanisms, in addition to
+being a policy it is also a factory for configured authentication
+mechanisms backed by a SecurityDomain.</p>
+</div>
+<div class="paragraph">
+<p>The SaslAuthenticationFactory references the following: -</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>SecurityDomain</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This is the security domain that any mechanism authentication will be
+performed against.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>SaslServerFactory</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This is the general factory for server side SASL authentication
+mechanisms.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>MechanismConfigurationSelector</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Additional configuration can be supplied for the authentication
+mechanisms, the configuration will be described in more detail later but
+the purpose of the MechanismConfigurationSelector is to obtain
+configuration specific to the mechanism selected. This can include
+information about realm names a mechanism should present to a remote
+client plus additional NameRewriters and RealmMappers to use during the
+authentication process.</p>
+</div>
+<div class="paragraph">
+<p>The reason some of the components referenced by the SecurityDomain are
+duplicated is so that mechanism specific mappings can be applied.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="http-authentication">HTTP Authentication</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The HttpAuthenticationFactory is an authentication policy for
+authentication using HTTP authentication mechanisms, in addition to
+being a policy it is also a factory for configured authentication
+mechanisms backed by a SecurityDomain.</p>
+</div>
+<div class="paragraph">
+<p>The HttpAuthenticationFactory references the following: -</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>SecurityDomain</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This is the security domain that any mechanism authentication will be
+performed against.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>HttpServerAuthenticationMechanismFactory</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This is the general factory for server side HTTP authentication
+mechanisms.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>MechanismConfigurationSelector</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Additional configuration can be supplied for the authentication
+mechanisms, the configuration will be described in more detail later but
+the purpose of the MechanismConfigurationSelector is to obtain
+configuration specific to the mechanism selected. This can include
+information about realm names a mechanism should present to a remote
+client plus additional NameRewriters and RealmMappers to use during the
+authentication process.</p>
+</div>
+<div class="paragraph">
+<p>The reason some of the components referenced by the SecurityDomain are
+duplicated is so that mechanism specific mappings can be applied.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="ssl-tls">SSL / TLS</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The SSLContext defined within Elytron is a javax.net.ssl.SSLContext
+meaning it can be used by anything that uses an SSLContext directly.</p>
+</div>
+<div class="paragraph">
+<p>In addition to the usual configuration for an SSLContext it is possible
+to configure additional items such as cipher suites and protocols and
+the SSLContext returned will wrap any engines created to set these
+values.</p>
+</div>
+<div class="paragraph">
+<p>The SSLContext within Elytron can also reference the following: -</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>KeyManagers</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>An array of KeyManager instances to be used by the SSLContext, this in
+turn can reference a KeyStore to load the keys.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>TrustManagers</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>An array of TrustManager instances to be used by the SSLContext, this in
+turn can also reference a KeyStore to load the certificates.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>SecurityDomain</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This is optional, however if an SSLContext is configured to reference a
+SecurityDomain then verification of a clients certificate can be
+performed as an authentication ensuring the appropriate permissions to
+Logon are assigned before even allowing the connection to be fully
+opened, additionally the SecurityIdentity can be established at the time
+the connection is opened and used for any invocations over the
+connection.</p>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

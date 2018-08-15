@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Web_(undertow)_reference_guide | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Web_(undertow)_reference_guide" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="[[Web_(Undertow)_Reference_Guide]] = Sharing sessions between wars in an ear" />
+<meta property="og:description" content="[[Web_(Undertow)_Reference_Guide]] = Sharing sessions between wars in an ear" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_developer-guide/Web_(Undertow)_Reference_Guide.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_developer-guide/Web_(Undertow)_Reference_Guide.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_developer-guide/Web_(Undertow)_Reference_Guide.html","headline":"Web_(undertow)_reference_guide","description":"[[Web_(Undertow)_Reference_Guide]] = Sharing sessions between wars in an ear","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="paragraph">
+<p>[[Web_(Undertow)_Reference_Guide]]
+= Sharing sessions between wars in an ear</p>
+</div>
+<div class="paragraph">
+<p>Undertow allows you to share sessions between wars in an ear, if it is
+explicitly configured to do so. Note that if you use this feature your
+applications may not be portable, as this is not a standard servlet
+feature.</p>
+</div>
+<div class="paragraph">
+<p>In order to enable this you must include a <code>shared-session-config</code>
+element in the <code>jboss-all.xml</code> file in the META-INF directory of the
+ear:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;jboss umlns="urn:jboss:1.0"&gt;
+    &lt;shared-session-config xmlns="urn:jboss:shared-session-config:1.0"&gt;
+        &lt;session-config&gt;
+            &lt;cookie-config&gt;
+                &lt;path&gt;/&lt;/path&gt;
+            &lt;/cookie-config&gt;
+        &lt;/session-config&gt;
+    &lt;/shared-session-config&gt;
+&lt;/jboss&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This element is used to configure the shared session manager that will
+be used by all wars in the ear. For full details of all the options
+provided by this file please see the schema at
+<a href="https://github.com/wildfly/wildfly/blob/master/undertow/src/main/resources/schema/shared-session-config_1_0.xsd" class="bare">https://github.com/wildfly/wildfly/blob/master/undertow/src/main/resources/schema/shared-session-config_1_0.xsd</a>,
+however in general it mimics the options that are available in
+jboss-web.xml for configuring the session.</p>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

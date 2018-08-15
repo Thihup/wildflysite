@@ -1,0 +1,2292 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Example subsystem | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Example subsystem" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_extending-wildfly/Example_subsystem.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_extending-wildfly/Example_subsystem.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_extending-wildfly/Example_subsystem.html","headline":"Example subsystem","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Our example subsystem will keep track of all deployments of certain
+types containing a special marker file, and expose operations to see how
+long these deployments have been deployed.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="create-the-skeleton-project">Create the skeleton project</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To make your life easier we have provided a maven archetype which will
+create a skeleton project for implementing subsystems.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">mvn archetype:generate \
+    -DarchetypeArtifactId=wildfly-subsystem \
+    -DarchetypeGroupId=org.wildfly.archetypes \
+    -DarchetypeVersion=8.0.0.Final \
+    -DarchetypeRepository=http://repository.jboss.org/nexus/content/groups/public</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Maven will download the archetype and it&#8217;s dependencies, and ask you
+some questions:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">$ mvn archetype:generate \
+    -DarchetypeArtifactId=wildfly-subsystem \
+    -DarchetypeGroupId=org.wildfly.archetypes \
+    -DarchetypeVersion=8.0.0.Final \
+    -DarchetypeRepository=http://repository.jboss.org/nexus/content/groups/public
+[INFO] Scanning for projects...
+[INFO]
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Maven Stub Project (No POM) 1
+[INFO] ------------------------------------------------------------------------
+[INFO]
+ 
+.........
+ 
+Define value for property 'groupId': : com.acme.corp
+Define value for property 'artifactId': : acme-subsystem
+Define value for property 'version':  1.0-SNAPSHOT: :
+Define value for property 'package':  com.acme.corp: : com.acme.corp.tracker
+Define value for property 'module': : com.acme.corp.tracker
+[INFO] Using property: name = WildFly subsystem project
+Confirm properties configuration:
+groupId: com.acme.corp
+artifactId: acme-subsystem
+version: 1.0-SNAPSHOT
+package: com.acme.corp.tracker
+module: com.acme.corp.tracker
+name: WildFly subsystem project
+ Y: : Y
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 1:42.563s
+[INFO] Finished at: Fri Jul 08 14:30:09 BST 2011
+[INFO] Final Memory: 7M/81M
+[INFO] ------------------------------------------------------------------------
+$</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top"></th>
+<th class="tableblock halign-left valign-top">Instruction</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Enter the groupId you wish to use</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Enter the artifactId you wish to use</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Enter the version you wish to use, or just hit Enter if you wish to
+accept the default 1.0-SNAPSHOT</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Enter the java package you wish to use, or just hit Enter if you
+wish to accept the default (which is copied from groupId ).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Enter the module name you wish to use for your extension.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">6</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Finally, if you are happy with your choices, hit Enter and Maven
+will generate the project for you.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>We now have a skeleton project that you can use to
+implement a subsystem. Import the ﻿ <code>acme-subsystem</code> project into your
+favourite IDE. A nice side-effect of running this in the IDE is that you
+can see the javadoc of WildFly classes and interfaces imported by the
+skeleton code. If you do a <code>mvn install</code> in the project it will work if
+we plug it into WildFly, but before doing that we will change it to do
+something more useful.</p>
+</div>
+<div class="paragraph">
+<p>The rest of this section modifies the skeleton project created by the
+archetype to do something more useful, and the full code can be found in
+<a href="downloads/acme-subsystem.zip">acme-subsystem.zip</a>.</p>
+</div>
+<div class="paragraph">
+<p>If you do a <code>mvn install</code> in the created project, you will see some
+tests being run</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">$mvn install
+[INFO] Scanning for projects...
+[...]
+[INFO] Surefire report directory: /Users/kabir/sourcecontrol/temp/archetype-test/acme-subsystem/target/surefire-reports
+ 
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+Running com.acme.corp.tracker.extension.SubsystemBaseParsingTestCase
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.424 sec
+Running com.acme.corp.tracker.extension.SubsystemParsingTestCase
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.074 sec
+ 
+Results :
+ 
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0
+[...]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We will talk about these later in the
+<a href="#testing-the-parsers">#Testing the
+parsers</a> section.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="create-the-schema">Create the schema</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>First, let us define the schema for our subsystem. Rename
+<code>src/main/resources/schema/mysubsystem.xsd</code> to
+<code>src/main/resources/schema/acme.xsd</code>. Then open <code>acme.xsd</code> and modify it
+to the following</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="urn:com.acme.corp.tracker:1.0"
+            xmlns="urn:com.acme.corp.tracker:1.0"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified"
+            version="1.0"&gt;
+ 
+   &lt;!-- The subsystem root element --&gt;
+   &lt;xs:element name="subsystem" type="subsystemType"/&gt;
+   &lt;xs:complexType name="subsystemType"&gt;
+      &lt;xs:all&gt;
+         &lt;xs:element name="deployment-types" type="deployment-typesType"/&gt;
+      &lt;/xs:all&gt;
+   &lt;/xs:complexType&gt;
+   &lt;xs:complexType name="deployment-typesType"&gt;
+      &lt;xs:choice minOccurs="0" maxOccurs="unbounded"&gt;
+         &lt;xs:element name="deployment-type" type="deployment-typeType"/&gt;
+      &lt;/xs:choice&gt;
+   &lt;/xs:complexType&gt;
+   &lt;xs:complexType name="deployment-typeType"&gt;
+      &lt;xs:attribute name="suffix" use="required"/&gt;
+      &lt;xs:attribute name="tick" type="xs:long" use="optional" default="10000"/&gt;
+   &lt;/xs:complexType&gt;
+&lt;/xs:schema&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note that we modified the <code>xmlns</code> and <code>targetNamespace</code> values to ﻿
+<code>urn.com.acme.corp.tracker:1.0</code>. Our new <code>subsystem</code> element has a child
+called <code>deployment-types</code>, which in turn can have zero or more children
+called <code>deployment-type</code>. Each <code>deployment-type</code> has a required <code>suffix</code>
+attribute, and a <code>tick</code> attribute which defaults to <code>true.</code></p>
+</div>
+<div class="paragraph">
+<p>Now modify the ﻿ <code>com.acme.corp.tracker.extension.SubsystemExtension</code>
+class to contain the new namespace.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">public class SubsystemExtension implements Extension {
+ 
+    /** The name space used for the {@code substystem} element */
+    public static final String NAMESPACE = "urn:com.acme.corp.tracker:1.0";
+    ...</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="design-and-define-the-model-structure">Design and define the model structure</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The following example xml contains a valid subsystem configuration, we
+will see how to plug this in to WildFly later in this tutorial.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;subsystem xmlns="urn:com.acme.corp.tracker:1.0"&gt;
+   &lt;deployment-types&gt;
+      &lt;deployment-type suffix="sar" tick="10000"/&gt;
+      &lt;deployment-type suffix="war" tick="10000"/&gt;
+   &lt;/deployment-types&gt;
+&lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now when designing our model, we can either do a one to one mapping
+between the schema and the model or come up with something slightly or
+very different. To keep things simple, let us stay pretty true to the
+schema so that when executing a <code>:read-resource(recursive=true)</code> against
+our subsystem we&#8217;ll see something like:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">{
+    "outcome" =&gt; "success",
+    "result" =&gt; {"type" =&gt; {
+        "sar" =&gt; {"tick" =&gt; "10000"},
+        "war" =&gt; {"tick" =&gt; "10000"}
+    }}
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Each <code>deployment-type</code> in the xml becomes in the model a child resource
+of the subsystem&#8217;s root resource. The child resource&#8217;s child-type is
+<code>type</code>, and it is indexed by its <code>suffix</code>. Each <code>type</code> resource then
+contains the <code>tick</code> attribute.</p>
+</div>
+<div class="paragraph">
+<p>We also need a name for our subsystem, to do that change
+<code>com.acme.corp.tracker.extension.SubsystemExtension</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">public class SubsystemExtension implements Extension {
+    ...
+    /** The name of our subsystem within the model. */
+    public static final String SUBSYSTEM_NAME = "tracker";
+    ...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Once we are finished our subsystem will be available under
+<code>/subsystem=tracker</code>.</p>
+</div>
+<div class="paragraph">
+<p>The <code>SubsystemExtension.initialize()</code> method defines the model,
+currently it sets up the basics to add our subsystem to the model:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@Override
+    public void initialize(ExtensionContext context) {
+        //register subsystem with its model version
+        final SubsystemRegistration subsystem = context.registerSubsystem(SUBSYSTEM_NAME, 1, 0);
+        //register subsystem model with subsystem definition that defines all attributes and operations
+        final ManagementResourceRegistration registration = subsystem.registerSubsystemModel(SubsystemDefinition.INSTANCE);
+        //register describe operation, note that this can be also registered in SubsystemDefinition
+        registration.registerOperationHandler(DESCRIBE, GenericSubsystemDescribeHandler.INSTANCE, GenericSubsystemDescribeHandler.INSTANCE, false, OperationEntry.EntryType.PRIVATE);
+        //we can register additional submodels here
+        //
+        subsystem.registerXMLElementWriter(parser);
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>registerSubsystem()</code> call registers our subsystem with the
+extension context. At the end of the method we register our parser with
+the returned <code>SubsystemRegistration</code> to be able to marshal our
+subsystem&#8217;s model back to the main configuration file when it is
+modified. We will add more functionality to this method later.</p>
+</div>
+<div class="sect2">
+<h3 id="registering-the-core-subsystem-model">Registering the core subsystem model</h3>
+<div class="paragraph">
+<p>Next we obtain a <code>ManagementResourceRegistration</code> by registering the
+subsystem model. This is a <strong>compulsory</strong> step for every new subsystem.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">final ManagementResourceRegistration registration = subsystem.registerSubsystemModel(SubsystemDefinition.INSTANCE);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Its parameter is an implementation of the <code>ResourceDefinition</code>
+interface, which means that when you call
+<code>/subsystem=tracker:read-resource-description</code> the information you see
+comes from model that is defined by <code>SubsystemDefinition.INSTANCE</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">public class SubsystemDefinition extends SimpleResourceDefinition {
+    public static final SubsystemDefinition INSTANCE = new SubsystemDefinition();
+ 
+    private SubsystemDefinition() {
+        super(SubsystemExtension.SUBSYSTEM_PATH,
+                SubsystemExtension.getResourceDescriptionResolver(null),
+                //We always need to add an 'add' operation
+                SubsystemAdd.INSTANCE,
+                //Every resource that is added, normally needs a remove operation
+                SubsystemRemove.INSTANCE);
+    }
+ 
+    @Override
+    public void registerOperations(ManagementResourceRegistration resourceRegistration) {
+        super.registerOperations(resourceRegistration);
+        //you can register aditional operations here
+    }
+ 
+    @Override
+    public void registerAttributes(ManagementResourceRegistration resourceRegistration) {
+        //you can register attributes here
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Since we need child resource <code>type</code> we need to add new
+ResourceDefinition,</p>
+</div>
+<div class="paragraph">
+<p>The <code>ManagementResourceRegistration</code> obtained in
+<code>SubsystemExtension.initialize()</code> is then used to add additional
+operations or to register submodels to the <code>/subsystem=tracker</code> address.
+Every subsystem and resource <strong>must</strong> have an <code>ADD</code> method which can be
+achieved by the following line inside <code>registerOperations</code> in your
+<code>ResourceDefinition</code> or by providing it in constructor of your
+<code>SimpleResourceDefinition</code> just as we did in example above.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">//We always need to add an 'add' operation
+        resourceRegistration.registerOperationHandler(ADD, SubsystemAdd.INSTANCE, new DefaultResourceAddDescriptionProvider(resourceRegistration,descriptionResolver), false);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The parameters when registering an operation handler are:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>The name</strong> - i.e. <code>ADD</code>.</p>
+</li>
+<li>
+<p>The handler instance - we will talk more about this below</p>
+</li>
+<li>
+<p>The handler description provider - we will talk more about this
+below.</p>
+</li>
+<li>
+<p>Whether this operation handler is inherited - <code>false</code> means that
+this operation is not inherited, and will only apply to
+<code>/subsystem=tracker</code>. The content for this operation handler will be
+provided by <code>3</code>.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Let us first look at the description provider which is quite simple
+since this operation takes no parameters. The addition of <code>type</code>
+children will be handled by another operation handler, as we will see
+later on.</p>
+</div>
+<div class="paragraph">
+<p>There are two way to define <code>DescriptionProvider</code>, one is by defining it
+by hand using ModelNode, but as this has show to be very error prone
+there are lots of helper methods to help you automatically describe the
+model. Following example is done by manually defining Description
+provider for ADD operation handler</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">/**
+     * Used to create the description of the subsystem add method
+     */
+    public static DescriptionProvider SUBSYSTEM_ADD = new DescriptionProvider() {
+        public ModelNode getModelDescription(Locale locale) {
+            //The locale is passed in so you can internationalize the strings used in the descriptions
+ 
+            final ModelNode subsystem = new ModelNode();
+            subsystem.get(OPERATION_NAME).set(ADD);
+            subsystem.get(DESCRIPTION).set("Adds the tracker subsystem");
+ 
+            return subsystem;
+        }
+    };</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Or you can use API that helps you do that for you. For Add and Remove
+methods there are classes <code>DefaultResourceAddDescriptionProvider</code> and
+<code>DefaultResourceRemoveDescriptionProvider</code> that do work for you. In case
+you use <code>SimpleResourceDefinition</code> even that part is hidden from you.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">resourceRegistration.registerOperationHandler(ADD, SubsystemAdd.INSTANCE, new DefaultResourceAddDescriptionProvider(resourceRegistration,descriptionResolver), false);
+resourceRegistration.registerOperationHandler(REMOVE, SubsystemRemove.INSTANCE, new DefaultResourceRemoveDescriptionProvider(resourceRegistration,descriptionResolver), false);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For other operation handlers that are not add/remove you can use
+<code>DefaultOperationDescriptionProvider</code> that takes additional parameter of
+what is the name of operation and optional array of
+parameters/attributes operation takes. This is an example to register
+operation " `add-mime`" with two parameters:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">container.registerOperationHandler("add-mime",
+                MimeMappingAdd.INSTANCE,
+                new DefaultOperationDescriptionProvider("add-mime", Extension.getResourceDescriptionResolver("container.mime-mapping"), MIME_NAME, MIME_VALUE));</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+When descriping an operation its description provider&#8217;s <code>OPERATION_NAME</code>
+must match the name used when calling
+<code>ManagementResourceRegistration.registerOperationHandler()</code>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Next we have the actual operation handler instance, note that we have
+changed its <code>populateModel()</code> method to initialize the <code>type</code> child of
+the model.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">class SubsystemAdd extends AbstractBoottimeAddStepHandler {
+ 
+    static final SubsystemAdd INSTANCE = new SubsystemAdd();
+ 
+    private SubsystemAdd() {
+    }
+ 
+    /** {@inheritDoc} */
+    @Override
+    protected void populateModel(ModelNode operation, ModelNode model) throws OperationFailedException {
+        log.info("Populating the model");
+        //Initialize the 'type' child node
+        model.get("type").setEmptyObject();
+    }
+    ....</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>SubsystemAdd</code> also has a <code>performBoottime()</code> method which is used for
+initializing the deployer chain associated with this subsystem. We will
+talk about the deployers later on. However, the basic idea for all
+operation handlers is that we do any model updates before changing the
+actual runtime state.</p>
+</div>
+<div class="paragraph">
+<p>The rule of thumb is that every thing that can be added, can also be
+removed so we have a remove handler for the subsystem registered<br>
+in <code>SubsystemDefinition.registerOperations</code> or just provide the
+operation handler in constructor.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">//Every resource that is added, normally needs a remove operation
+        registration.registerOperationHandler(REMOVE, SubsystemRemove.INSTANCE, DefaultResourceRemoveDescriptionProvider(resourceRegistration,descriptionResolver) , false);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>SubsystemRemove</code> extends <code>AbstractRemoveStepHandler</code> which takes care
+of removing the resource from the model so we don&#8217;t need to override its
+<code>performRemove()</code> operation, also the add handler did not install any
+services (services will be discussed later) so we can delete the
+<code>performRuntime()</code> method generated by the archetype.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">class SubsystemRemove extends AbstractRemoveStepHandler {
+ 
+    static final SubsystemRemove INSTANCE = new SubsystemRemove();
+ 
+    private final Logger log = Logger.getLogger(SubsystemRemove.class);
+ 
+    private SubsystemRemove() {
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The description provider for the remove operation is simple and quite
+similar to that of the add handler where just name of the method
+changes.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="registering-the-subsystem-child">Registering the subsystem child</h3>
+<div class="paragraph">
+<p>The <code>type</code> child does not exist in our skeleton project so we need to
+implement the operations to add and remove them from the model.</p>
+</div>
+<div class="paragraph">
+<p>First we need an add operation to add the <code>type</code> child, create a class
+called <code>com.acme.corp.tracker.extension.TypeAddHandler</code>. In this case we
+extend the <code>org.jboss.as.controller.AbstractAddStepHandler</code> class and
+implement the <code>org.jboss.as.controller.descriptions.DescriptionProvider</code>
+interface. <code>org.jboss.as.controller.OperationStepHandler</code> is the main
+interface for the operation handlers, and <code>AbstractAddStepHandler</code> is an
+implementation of that which does the plumbing work for adding a
+resource to the model.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">class TypeAddHandler extends AbstractAddStepHandler implements DescriptionProvider {
+ 
+    public static final TypeAddHandler INSTANCE = new TypeAddHandler();
+ 
+    private TypeAddHandler() {
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then we define subsystem model. Lets call it <code>TypeDefinition</code> and for
+ease of use let it extend <code>SimpleResourceDefinition</code> instead just
+implement <code>ResourceDefinition</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">public class TypeDefinition extends SimpleResourceDefinition {
+ 
+ public static final TypeDefinition INSTANCE = new TypeDefinition();
+ 
+ //we define attribute named tick
+protected static final SimpleAttributeDefinition TICK =
+new SimpleAttributeDefinitionBuilder(TrackerExtension.TICK, ModelType.LONG)
+  .setAllowExpression(true)
+  .setXmlName(TrackerExtension.TICK)
+  .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
+  .setDefaultValue(new ModelNode(1000))
+  .setAllowNull(false)
+  .build();
+ 
+private TypeDefinition(){
+   super(TYPE_PATH, TrackerExtension.getResourceDescriptionResolver(TYPE),TypeAdd.INSTANCE,TypeRemove.INSTANCE);
+}
+ 
+@Override
+public void registerAttributes(ManagementResourceRegistration resourceRegistration){
+   resourceRegistration.registerReadWriteAttribute(TICK, null, TrackerTickHandler.INSTANCE);
+}
+ 
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Which will take care of describing the model for us. As you can see in
+example above we define <code>SimpleAttributeDefinition</code> named <code>TICK</code>, this
+is a mechanism to define Attributes in more type safe way and to add
+more common API to manipulate attributes. As you can see here we define
+default value of 1000 as also other constraints and capabilities. There
+could be other properties set such as validators, alternate names, xml
+name, flags for marking it attribute allows expressions and more.</p>
+</div>
+<div class="paragraph">
+<p>Then we do the work of updating the model by implementing the
+<code>populateModel()</code> method from the <code>AbstractAddStepHandler</code>, which
+populates the model&#8217;s attribute from the operation parameters. First we
+get hold of the model relative to the address of this operation (we will
+see later that we will register it against <code>/subsystem=tracker/type=*</code>),
+so we just specify an empty relative address, and we then populate our
+model with the parameters from the operation. There is operation
+<code>validateAndSet</code> on <code>AttributeDefinition</code> that helps us validate and set
+the model based on definition of the attribute.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@Override
+    protected void populateModel(ModelNode operation, ModelNode model) throws OperationFailedException {
+         TICK.validateAndSet(operation,model);
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We then override the <code>performRuntime()</code> method to perform our runtime
+changes, which in this case involves installing a service into the
+controller at the heart of WildFly. (
+<code>AbstractAddStepHandler.performRuntime()</code> is similar to
+<code>AbstractBoottimeAddStepHandler.performBoottime()</code> in that the model is
+updated before runtime changes are made.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@Override
+    protected void performRuntime(OperationContext context, ModelNode operation, ModelNode model,
+            ServiceVerificationHandler verificationHandler, List&lt;ServiceController&lt;?&gt;&gt; newControllers)
+            throws OperationFailedException {
+        String suffix = PathAddress.pathAddress(operation.get(ModelDescriptionConstants.ADDRESS)).getLastElement().getValue();
+        long tick = TICK.resolveModelAttribute(context,model).asLong();
+        TrackerService service = new TrackerService(suffix, tick);
+        ServiceName name = TrackerService.createServiceName(suffix);
+        ServiceController&lt;TrackerService&gt; controller = context.getServiceTarget()
+                .addService(name, service)
+                .addListener(verificationHandler)
+                .setInitialMode(Mode.ACTIVE)
+                .install();
+        newControllers.add(controller);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Since the add methods will be of the format
+<code>/subsystem=tracker/suffix=war:add(tick=1234)</code>, we look for the last
+element of the operation address, which is <code>war</code> in the example just
+given and use that as our suffix. We then create an instance of
+TrackerService and install that into the <code>service target</code> of the context
+and add the created <code>service controller</code> to the <code>newControllers</code> list.</p>
+</div>
+<div class="paragraph">
+<p>The tracker service is quite simple. All services installed into WildFly
+must implement the <code>org.jboss.msc.service.Service</code> interface.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">public class TrackerService implements Service&lt;TrackerService&gt;{</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We then have some fields to keep the tick count and a thread which when
+run outputs all the deployments registered with our service.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">private AtomicLong tick = new AtomicLong(10000);
+ 
+    private Set&lt;String&gt; deployments = Collections.synchronizedSet(new HashSet&lt;String&gt;());
+    private Set&lt;String&gt; coolDeployments = Collections.synchronizedSet(new HashSet&lt;String&gt;());
+    private final String suffix;
+ 
+    private Thread OUTPUT = new Thread() {
+        @Override
+        public void run() {
+            while (true) {
+                try {
+                    Thread.sleep(tick.get());
+                    System.out.println("Current deployments deployed while " + suffix + " tracking active:\n" + deployments
+                       + "\nCool: " + coolDeployments.size());
+                } catch (InterruptedException e) {
+                    interrupted();
+                    break;
+                }
+            }
+        }
+    };
+ 
+    public TrackerService(String suffix, long tick) {
+        this.suffix = suffix;
+        this.tick.set(tick);
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Next we have three methods which come from the <code>Service</code> interface.
+<code>getValue()</code> returns this service, <code>start()</code> is called when the service
+is started by the controller, <code>stop</code> is called when the service is
+stopped by the controller, and they start and stop the thread outputting
+the deployments.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@Override
+    public TrackerService getValue() throws IllegalStateException, IllegalArgumentException {
+        return this;
+    }
+ 
+    @Override
+    public void start(StartContext context) throws StartException {
+        OUTPUT.start();
+    }
+ 
+    @Override
+    public void stop(StopContext context) {
+        OUTPUT.interrupt();
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Next we have a utility method to create the <code>ServiceName</code> which is used
+to register the service in the controller.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">public static ServiceName createServiceName(String suffix) {
+        return ServiceName.JBOSS.append("tracker", suffix);
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Finally we have some methods to add and remove deployments, and to set
+and read the <code>tick</code>. The 'cool' deployments will be explained later.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">public void addDeployment(String name) {
+        deployments.add(name);
+    }
+ 
+    public void addCoolDeployment(String name) {
+        coolDeployments.add(name);
+    }
+ 
+    public void removeDeployment(String name) {
+        deployments.remove(name);
+        coolDeployments.remove(name);
+    }
+ 
+    void setTick(long tick) {
+        this.tick.set(tick);
+    }
+ 
+    public long getTick() {
+        return this.tick.get();
+    }
+}//TrackerService - end</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Since we are able to add <code>type</code> children, we need a way to be able to
+remove them, so we create a
+<code>com.acme.corp.tracker.extension.TypeRemoveHandler</code>. In this case we
+extend <code>AbstractRemoveStepHandler</code> which takes care of removing the
+resource from the model so we don&#8217;t need to override its
+<code>performRemove()</code> operationa. But we need to implement the
+<code>DescriptionProvider</code> method to provide the model description, and since
+the add handler installs the TrackerService, we need to remove that in
+the <code>performRuntime()</code> method.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">public class TypeRemoveHandler extends AbstractRemoveStepHandler {
+ 
+    public static final TypeRemoveHandler INSTANCE = new TypeRemoveHandler();
+ 
+    private TypeRemoveHandler() {
+    }
+ 
+ 
+    @Override
+    protected void performRuntime(OperationContext context, ModelNode operation, ModelNode model) throws OperationFailedException {
+        String suffix = PathAddress.pathAddress(operation.get(ModelDescriptionConstants.ADDRESS)).getLastElement().getValue();
+        ServiceName name = TrackerService.createServiceName(suffix);
+        context.removeService(name);
+    }
+ 
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We then need a description provider for the <code>type</code> part of the model
+itself, so we modify TypeDefinitnion to registerAttribute</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">class TypeDefinition{
+...
+@Override
+public void registerAttributes(ManagementResourceRegistration resourceRegistration){
+    resourceRegistration.registerReadWriteAttribute(TICK, null, TrackerTickHandler.INSTANCE);
+}
+ 
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then finally we need to specify that our new <code>type</code> child and associated
+handlers go under <code>/subsystem=tracker/type=*</code> in the model by adding
+registering it with the model in <code>SubsystemExtension.initialize()</code>. So
+we add the following just before the end of the method.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@Override
+public void initialize(ExtensionContext context)
+{
+ final SubsystemRegistration subsystem = context.registerSubsystem(SUBSYSTEM_NAME, 1, 0);
+ final ManagementResourceRegistration registration = subsystem.registerSubsystemModel(TrackerSubsystemDefinition.INSTANCE);
+ //Add the type child
+ ManagementResourceRegistration typeChild = registration.registerSubModel(TypeDefinition.INSTANCE);
+ subsystem.registerXMLElementWriter(parser);
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The above first creates a child of our main subsystem registration for
+the relative address <code>type=*</code>, and gets the <code>typeChild</code> registration.<br>
+To this we add the <code>TypeAddHandler</code> and <code>TypeRemoveHandler</code>.<br>
+The add variety is added under the name <code>add</code> and the remove handler
+under the name <code>remove</code>, and for each registered operation handler we
+use the handler singleton instance as both the handler parameter and as
+the <code>DescriptionProvider</code>.</p>
+</div>
+<div class="paragraph">
+<p>Finally, we register <code>tick</code> as a read/write attribute, the null
+parameter means we don&#8217;t do anything special with regards to reading it,
+for the write handler we supply it with an operation handler called
+<code>TrackerTickHandler</code>.<br>
+Registering it as a read/write attribute means we can use the
+<code>:write-attribute</code> operation to modify the value of the parameter, and
+it will be handled by <code>TrackerTickHandler</code>.</p>
+</div>
+<div class="paragraph">
+<p>Not registering a write attribute handler makes the attribute read only.</p>
+</div>
+<div class="paragraph">
+<p><code>TrackerTickHandler</code> extends <code>AbstractWriteAttributeHandler</code><br>
+directly, and so must implement its <code>applyUpdateToRuntime</code> and
+<code>revertUpdateToRuntime</code> method.<br>
+This takes care of model manipulation (validation, setting) but leaves
+us to do just to deal with what we need to do.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">class TrackerTickHandler extends AbstractWriteAttributeHandler&lt;Void&gt; {
+ 
+    public static final TrackerTickHandler INSTANCE = new TrackerTickHandler();
+ 
+    private TrackerTickHandler() {
+        super(TypeDefinition.TICK);
+    }
+ 
+    protected boolean applyUpdateToRuntime(OperationContext context, ModelNode operation, String attributeName,
+              ModelNode resolvedValue, ModelNode currentValue, HandbackHolder&lt;Void&gt; handbackHolder) throws OperationFailedException {
+ 
+        modifyTick(context, operation, resolvedValue.asLong());
+ 
+        return false;
+    }
+ 
+    protected void revertUpdateToRuntime(OperationContext context, ModelNode operation, String attributeName, ModelNode valueToRestore, ModelNode valueToRevert, Void handback){
+        modifyTick(context, operation, valueToRestore.asLong());
+    }
+ 
+    private void modifyTick(OperationContext context, ModelNode operation, long value) throws OperationFailedException {
+ 
+        final String suffix = PathAddress.pathAddress(operation.get(ModelDescriptionConstants.ADDRESS)).getLastElement().getValue();
+        TrackerService service = (TrackerService) context.getServiceRegistry(true).getRequiredService(TrackerService.createServiceName(suffix)).getValue();
+        service.setTick(value);
+    }
+ 
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The operation used to execute this will be of the form
+<code>/subsystem=tracker/type=war:write-attribute(name=tick,value=12345</code>) so
+we first get the <code>suffix</code> from the operation address, and the <code>tick</code>
+value from the operation parameter&#8217;s <code>resolvedValue</code> parameter, and use
+that to update the model.</p>
+</div>
+<div class="paragraph">
+<p>We then add a new step associated with the <code>RUNTIME</code> stage to update the
+tick of the TrackerService for our suffix. This is essential since the
+call to <code>context.getServiceRegistry()</code> will fail unless the step
+accessing it belongs to the <code>RUNTIME</code> stage.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+When implementing <code>execute()</code>, you <strong>must</strong> call <code>context.completeStep()</code>
+when you are done.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="parsing-and-marshalling-of-the-subsystem-xml">Parsing and marshalling of the subsystem xml</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>WildFly uses the Stax API to parse the xml files. This is initialized in
+<code>SubsystemExtension</code> by mapping our parser onto our namespace:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">public class SubsystemExtension implements Extension {
+ 
+    /** The name space used for the {@code subsystem} element */
+    public static final String NAMESPACE = "urn:com.acme.corp.tracker:1.0";
+    ...
+    protected static final PathElement SUBSYSTEM_PATH = PathElement.pathElement(SUBSYSTEM, SUBSYSTEM_NAME);
+    protected static final PathElement TYPE_PATH = PathElement.pathElement(TYPE);
+ 
+   /** The parser used for parsing our subsystem */
+    private final SubsystemParser parser = new SubsystemParser();
+ 
+   @Override
+    public void initializeParsers(ExtensionParsingContext context) {
+        context.setSubsystemXmlMapping(NAMESPACE, parser);
+    }
+    ...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We then need to write the parser. The contract is that we read our
+subsystem&#8217;s xml and create the operations that will populate the model
+with the state contained in the xml. These operations will then be
+executed on our behalf as part of the parsing process. The entry point
+is the <code>readElement()</code> method.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">public class SubsystemExtension implements Extension {
+ 
+    /**
+     * The subsystem parser, which uses stax to read and write to and from xml
+     */
+    private static class SubsystemParser implements XMLStreamConstants, XMLElementReader&lt;List&lt;ModelNode&gt;&gt;, XMLElementWriter&lt;SubsystemMarshallingContext&gt; {
+ 
+        /** {@inheritDoc} */
+        @Override
+        public void readElement(XMLExtendedStreamReader reader, List&lt;ModelNode&gt; list) throws XMLStreamException {
+            // Require no attributes
+            ParseUtils.requireNoAttributes(reader);
+ 
+            //Add the main subsystem 'add' operation
+            final ModelNode subsystem = new ModelNode();
+            subsystem.get(OP).set(ADD);
+            subsystem.get(OP_ADDR).set(PathAddress.pathAddress(SUBSYSTEM_PATH).toModelNode());
+            list.add(subsystem);
+ 
+            //Read the children
+            while (reader.hasNext() &amp;&amp; reader.nextTag() != END_ELEMENT) {
+                if (!reader.getLocalName().equals("deployment-types")) {
+                    throw ParseUtils.unexpectedElement(reader);
+                }
+                while (reader.hasNext() &amp;&amp; reader.nextTag() != END_ELEMENT) {
+                    if (reader.isStartElement()) {
+                        readDeploymentType(reader, list);
+                    }
+                }
+            }
+        }
+ 
+        private void readDeploymentType(XMLExtendedStreamReader reader, List&lt;ModelNode&gt; list) throws XMLStreamException {
+            if (!reader.getLocalName().equals("deployment-type")) {
+                throw ParseUtils.unexpectedElement(reader);
+            }
+            ModelNode addTypeOperation = new ModelNode();
+            addTypeOperation.get(OP).set(ModelDescriptionConstants.ADD);
+ 
+            String suffix = null;
+            for (int i = 0; i &lt; reader.getAttributeCount(); i++) {
+                String attr = reader.getAttributeLocalName(i);
+                String value = reader.getAttributeValue(i);
+                if (attr.equals("tick")) {
+                    TypeDefinition.TICK.parseAndSetParameter(value, addTypeOperation, reader);
+                } else if (attr.equals("suffix")) {
+                    suffix = value;
+                } else {
+                    throw ParseUtils.unexpectedAttribute(reader, i);
+                }
+            }
+            ParseUtils.requireNoContent(reader);
+            if (suffix == null) {
+                throw ParseUtils.missingRequiredElement(reader, Collections.singleton("suffix"));
+            }
+ 
+            //Add the 'add' operation for each 'type' child
+            PathAddress addr = PathAddress.pathAddress(SUBSYSTEM_PATH, PathElement.pathElement(TYPE, suffix));
+            addTypeOperation.get(OP_ADDR).set(addr.toModelNode());
+            list.add(addTypeOperation);
+        }
+        ...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>So in the above we always create the add operation for our subsystem.
+Due to its address <code>/subsystem=tracker</code> defined by <code>SUBSYSTEM_PATH</code> this
+will trigger the <code>SubsystemAddHandler</code> we created earlier when we invoke
+<code>/subsystem=tracker:add</code>. We then parse the child elements and create an
+add operation for the child address for each <code>type</code> child. Since the
+address will for example be <code>/subsystem=tracker/type=sar</code> (defined by
+<code>TYPE_PATH</code> ) and <code>TypeAddHandler</code> is registered for all <code>type</code>
+subaddresses the <code>TypeAddHandler</code> will get invoked for those operations.
+Note that when we are parsing attribute <code>tick</code> we are using definition
+of attribute that we defined in TypeDefintion to parse attribute value
+and apply all rules that we specified for this attribute, this also
+enables us to property support expressions on attributes.</p>
+</div>
+<div class="paragraph">
+<p>The parser is also used to marshal the model to xml whenever something
+modifies the model, for which the entry point is the <code>writeContent()</code>
+method:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">private static class SubsystemParser implements XMLStreamConstants, XMLElementReader&lt;List&lt;ModelNode&gt;&gt;, XMLElementWriter&lt;SubsystemMarshallingContext&gt; {
+        ...
+        /** {@inheritDoc} */
+        @Override
+        public void writeContent(final XMLExtendedStreamWriter writer, final SubsystemMarshallingContext context) throws XMLStreamException {
+            //Write out the main subsystem element
+            context.startSubsystemElement(TrackerExtension.NAMESPACE, false);
+            writer.writeStartElement("deployment-types");
+            ModelNode node = context.getModelNode();
+            ModelNode type = node.get(TYPE);
+            for (Property property : type.asPropertyList()) {
+ 
+                //write each child element to xml
+                writer.writeStartElement("deployment-type");
+                writer.writeAttribute("suffix", property.getName());
+                ModelNode entry = property.getValue();
+                TypeDefinition.TICK.marshallAsAttribute(entry, true, writer);
+                writer.writeEndElement();
+            }
+            //End deployment-types
+            writer.writeEndElement();
+            //End subsystem
+            writer.writeEndElement();
+        }
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then we have to implement the <code>SubsystemDescribeHandler</code> which
+translates the current state of the model into operations similar to the
+ones created by the parser. The <code>SubsystemDescribeHandler</code> is only used
+when running in a managed domain, and is used when the host controller
+queries the domain controller for the configuration of the profile used
+to start up each server. In our case the <code>SubsystemDescribeHandler</code> adds
+the operation to add the subsystem and then adds the operation to add
+each <code>type</code> child. Since we are using ResourceDefinitinon for defining
+subsystem all that is generated for us, but if you want to customize
+that you can do it by implementing it like this.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">private static class SubsystemDescribeHandler implements OperationStepHandler, DescriptionProvider {
+        static final SubsystemDescribeHandler INSTANCE = new SubsystemDescribeHandler();
+ 
+        public void execute(OperationContext context, ModelNode operation) throws OperationFailedException {
+            //Add the main operation
+            context.getResult().add(createAddSubsystemOperation());
+ 
+            //Add the operations to create each child
+ 
+            ModelNode node = context.readModel(PathAddress.EMPTY_ADDRESS);
+            for (Property property : node.get("type").asPropertyList()) {
+ 
+                ModelNode addType = new ModelNode();
+                addType.get(OP).set(ModelDescriptionConstants.ADD);
+                PathAddress addr = PathAddress.pathAddress(SUBSYSTEM_PATH, PathElement.pathElement("type", property.getName()));
+                addType.get(OP_ADDR).set(addr.toModelNode());
+                if (property.getValue().hasDefined("tick")) {
+                   TypeDefinition.TICK.validateAndSet(property,addType);
+                }
+                context.getResult().add(addType);
+            }
+            context.completeStep();
+        }
+ 
+ 
+}</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="testing-the-parsers">Testing the parsers</h3>
+<div class="paragraph">
+<p>Changes to tests between 7.0.0 and 7.0.1</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+The testing framework was moved from the archetype into the core JBoss
+AS 7 sources between JBoss AS 7.0.0 and JBoss AS 7.0.1, and has been
+improved upon and is used internally for testing JBoss AS 7&#8217;s
+subsystems. The differences between the two versions is that in
+7.0.0.Final the testing framework is bundled with the code generated by
+the archetype (in a sub-package of the package specified for your
+subsystem, e.g. <code>com.acme.corp.tracker.support</code>), and the test extends
+the <code>AbstractParsingTest</code> class.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>From 7.0.1 the testing framework is now brought in via the
+<code>org.jboss.as:jboss-as-subsystem-test</code> maven artifact, and the test&#8217;s
+superclass is <code>org.jboss.as.subsystem.test.AbstractSubsystemTest</code>. The
+concepts are the same but more and more functionality will be available
+as JBoss AS 7 is developed.</p>
+</div>
+<div class="paragraph">
+<p>Now that we have modified our parsers we need to update our tests to
+reflect the new model. There are currently three tests testing the basic
+functionality, something which is a lot easier to debug from your IDE
+before you plug it into the application server. We will talk about these
+tests in turn and they all live in
+<code>com.acme.corp.tracker.extension.SubsystemParsingTestCase</code>.
+<code>SubsystemParsingTestCase</code> extends <code>AbstractSubsystemTest</code> which does a
+lot of the setup for you and contains utility methods for verifying
+things from your test. See the javadoc of that class for more
+information about the functionality available to you. And by all means
+feel free to add more tests for your subsystem, here we are only testing
+for the best case scenario while you will probably want to throw in a
+few tests for edge cases.</p>
+</div>
+<div class="paragraph">
+<p>The first test we need to modify is <code>testParseSubsystem()</code>. It tests
+that the parsed xml becomes the expected operations that will be parsed
+into the server, so let us tweak this test to match our subsystem. First
+we tell the test to parse the xml into operations</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">@Test
+    public void testParseSubsystem() throws Exception {
+        //Parse the subsystem xml into operations
+        String subsystemXml =
+                "&lt;subsystem xmlns=\"" + SubsystemExtension.NAMESPACE + "\"&gt;" +
+                "   &lt;deployment-types&gt;" +
+                "       &lt;deployment-type suffix=\"tst\" tick=\"12345\"/&gt;" +
+                "   &lt;/deployment-types&gt;" +
+                "&lt;/subsystem&gt;";
+        List&lt;ModelNode&gt; operations = super.parse(subsystemXml);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>There should be one operation for adding the subsystem itself and an
+operation for adding the <code>deployment-type</code>, so check we got two
+operations</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">///Check that we have the expected number of operations
+        Assert.assertEquals(2, operations.size());</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now check that the first operation is <code>add</code> for the address
+<code>/subsystem=tracker</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">//Check that each operation has the correct content
+        //The add subsystem operation will happen first
+        ModelNode addSubsystem = operations.get(0);
+        Assert.assertEquals(ADD, addSubsystem.get(OP).asString());
+        PathAddress addr = PathAddress.pathAddress(addSubsystem.get(OP_ADDR));
+        Assert.assertEquals(1, addr.size());
+        PathElement element = addr.getElement(0);
+        Assert.assertEquals(SUBSYSTEM, element.getKey());
+        Assert.assertEquals(SubsystemExtension.SUBSYSTEM_NAME, element.getValue());</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then check that the second operation is <code>add</code> for the address
+<code>/subsystem=tracker</code>, and that <code>12345</code> was picked up for the value of
+the <code>tick</code> parameter:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">//Then we will get the add type operation
+        ModelNode addType = operations.get(1);
+        Assert.assertEquals(ADD, addType.get(OP).asString());
+        Assert.assertEquals(12345, addType.get("tick").asLong());
+        addr = PathAddress.pathAddress(addType.get(OP_ADDR));
+        Assert.assertEquals(2, addr.size());
+        element = addr.getElement(0);
+        Assert.assertEquals(SUBSYSTEM, element.getKey());
+        Assert.assertEquals(SubsystemExtension.SUBSYSTEM_NAME, element.getValue());
+        element = addr.getElement(1);
+        Assert.assertEquals("type", element.getKey());
+        Assert.assertEquals("tst", element.getValue());
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The second test we need to modify is <code>testInstallIntoController()</code> which
+tests that the xml installs properly into the controller. In other words
+we are making sure that the <code>add</code> operations we created earlier work
+properly. First we create the xml and install it into the controller.
+Behind the scenes this will parse the xml into operations as we saw in
+the last test, but it will also create a new controller and boot that up
+using the created operations</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@Test
+    public void testInstallIntoController() throws Exception {
+        //Parse the subsystem xml and install into the controller
+        String subsystemXml =
+                "&lt;subsystem xmlns=\"" + SubsystemExtension.NAMESPACE + "\"&gt;" +
+                "   &lt;deployment-types&gt;" +
+                "       &lt;deployment-type suffix=\"tst\" tick=\"12345\"/&gt;" +
+                "   &lt;/deployment-types&gt;" +
+                "&lt;/subsystem&gt;";
+        KernelServices services = super.installInController(subsystemXml);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The returned <code>KernelServices</code> allow us to execute operations on the
+controller, and to read the whole model.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">//Read the whole model and make sure it looks as expected
+        ModelNode model = services.readWholeModel();
+        //Useful for debugging :-)
+        //System.out.println(model);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now we make sure that the structure of the model within the controller
+has the expected format and values</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">Assert.assertTrue(model.get(SUBSYSTEM).hasDefined(SubsystemExtension.SUBSYSTEM_NAME));
+        Assert.assertTrue(model.get(SUBSYSTEM, SubsystemExtension.SUBSYSTEM_NAME).hasDefined("type"));
+        Assert.assertTrue(model.get(SUBSYSTEM, SubsystemExtension.SUBSYSTEM_NAME, "type").hasDefined("tst"));
+        Assert.assertTrue(model.get(SUBSYSTEM, SubsystemExtension.SUBSYSTEM_NAME, "type", "tst").hasDefined("tick"));
+        Assert.assertEquals(12345, model.get(SUBSYSTEM, SubsystemExtension.SUBSYSTEM_NAME, "type", "tst", "tick").asLong());
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The last test provided is called <code>testParseAndMarshalModel()</code>. It&#8217;s main
+purpose is to make sure that our <code>SubsystemParser.writeContent()</code> works
+as expected. This is achieved by starting a controller in the same way
+as before</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@Test
+    public void testParseAndMarshalModel() throws Exception {
+        //Parse the subsystem xml and install into the first controller
+        String subsystemXml =
+                "&lt;subsystem xmlns=\"" + SubsystemExtension.NAMESPACE + "\"&gt;" +
+                "   &lt;deployment-types&gt;" +
+                "       &lt;deployment-type suffix=\"tst\" tick=\"12345\"/&gt;" +
+                "   &lt;/deployment-types&gt;" +
+                "&lt;/subsystem&gt;";
+        KernelServices servicesA = super.installInController(subsystemXml);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now we read the model and the xml that was persisted from the first
+controller, and use that xml to start a second controller</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">//Get the model and the persisted xml from the first controller
+        ModelNode modelA = servicesA.readWholeModel();
+        String marshalled = servicesA.getPersistedSubsystemXml();
+ 
+        //Install the persisted xml from the first controller into a second controller
+        KernelServices servicesB = super.installInController(marshalled);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Finally we read the model from the second controller, and make sure that
+the models are identical by calling <code>compare()</code> on the test superclass.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">ModelNode modelB = servicesB.readWholeModel();
+ 
+        //Make sure the models from the two controllers are identical
+        super.compare(modelA, modelB);
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We then have a test that needs no changing from what the archetype
+provides us with. As we have seen before we start a controller</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@Test
+    public void testDescribeHandler() throws Exception {
+        //Parse the subsystem xml and install into the first controller
+        String subsystemXml =
+                "&lt;subsystem xmlns=\"" + SubsystemExtension.NAMESPACE + "\"&gt;" +
+                "&lt;/subsystem&gt;";
+        KernelServices servicesA = super.installInController(subsystemXml);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We then call <code>/subsystem=tracker:describe</code> which outputs the subsystem
+as operations needed to reach the current state (Done by our
+<code>SubsystemDescribeHandler</code>)</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">//Get the model and the describe operations from the first controller
+        ModelNode modelA = servicesA.readWholeModel();
+        ModelNode describeOp = new ModelNode();
+        describeOp.get(OP).set(DESCRIBE);
+        describeOp.get(OP_ADDR).set(
+                PathAddress.pathAddress(
+                        PathElement.pathElement(SUBSYSTEM, SubsystemExtension.SUBSYSTEM_NAME)).toModelNode());
+        List&lt;ModelNode&gt; operations = super.checkResultAndGetContents(servicesA.executeOperation(describeOp)).asList();</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then we create a new controller using those operations</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">//Install the describe options from the first controller into a second controller
+        KernelServices servicesB = super.installInController(operations);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And then we read the model from the second controller and make sure that
+the two subsystems are identical<br>
+ModelNode modelB = servicesB.readWholeModel();</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">//Make sure the models from the two controllers are identical
+        super.compare(modelA, modelB);
+ 
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To test the removal of the the subsystem and child resources we modify
+the <code>testSubsystemRemoval()</code> test provided by the archetype:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">/**
+     * Tests that the subsystem can be removed
+     */
+    @Test
+    public void testSubsystemRemoval() throws Exception {
+        //Parse the subsystem xml and install into the first controller</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We provide xml for the subsystem installing a child, which in turn
+installs a TrackerService</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">String subsystemXml =
+                "&lt;subsystem xmlns=\"" + SubsystemExtension.NAMESPACE + "\"&gt;" +
+                "   &lt;deployment-types&gt;" +
+                "       &lt;deployment-type suffix=\"tst\" tick=\"12345\"/&gt;" +
+                "   &lt;/deployment-types&gt;" +
+                "&lt;/subsystem&gt;";
+        KernelServices services = super.installInController(subsystemXml);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Having installed the xml into the controller we make sure the
+TrackerService is there</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">//Sanity check to test the service for 'tst' was there
+        services.getContainer().getRequiredService(TrackerService.createServiceName("tst"));</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This call from the subsystem test harness will call remove for each
+level in our subsystem, children first and validate<br>
+that the subsystem model is empty at the end.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">//Checks that the subsystem was removed from the model
+        super.assertRemoveSubsystemResources(services);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Finally we check that all the services were removed by the remove
+handlers</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">//Check that any services that were installed were removed here
+        try {
+            services.getContainer().getRequiredService(TrackerService.createServiceName("tst"));
+            Assert.fail("Should have removed services");
+        } catch (Exception expected) {
+        }
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For good measure let us throw in another test which adds a
+<code>deployment-type</code> and also changes its attribute at runtime. So first of
+all boot up the controller with the same xml we have been using so far</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@Test
+    public void testExecuteOperations() throws Exception {
+        String subsystemXml =
+                "&lt;subsystem xmlns=\"" + SubsystemExtension.NAMESPACE + "\"&gt;" +
+                "   &lt;deployment-types&gt;" +
+                "       &lt;deployment-type suffix=\"tst\" tick=\"12345\"/&gt;" +
+                "   &lt;/deployment-types&gt;" +
+                "&lt;/subsystem&gt;";
+        KernelServices services = super.installInController(subsystemXml);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now create an operation which does the same as the following CLI command
+<code>/subsystem=tracker/type=foo:add(tick=1000)</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">//Add another type
+        PathAddress fooTypeAddr = PathAddress.pathAddress(
+                PathElement.pathElement(SUBSYSTEM, SubsystemExtension.SUBSYSTEM_NAME),
+                PathElement.pathElement("type", "foo"));
+        ModelNode addOp = new ModelNode();
+        addOp.get(OP).set(ADD);
+        addOp.get(OP_ADDR).set(fooTypeAddr.toModelNode());
+        addOp.get("tick").set(1000);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Execute the operation and make sure it was successful</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">ModelNode result = services.executeOperation(addOp);
+        Assert.assertEquals(SUCCESS, result.get(OUTCOME).asString());</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Read the whole model and make sure that the original data is still there
+(i.e. the same as what was done by <code>testInstallIntoController()</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">ModelNode model = services.readWholeModel();
+        Assert.assertTrue(model.get(SUBSYSTEM).hasDefined(SubsystemExtension.SUBSYSTEM_NAME));
+        Assert.assertTrue(model.get(SUBSYSTEM, SubsystemExtension.SUBSYSTEM_NAME).hasDefined("type"));
+        Assert.assertTrue(model.get(SUBSYSTEM, SubsystemExtension.SUBSYSTEM_NAME, "type").hasDefined("tst"));
+        Assert.assertTrue(model.get(SUBSYSTEM, SubsystemExtension.SUBSYSTEM_NAME, "type", "tst").hasDefined("tick"));
+        Assert.assertEquals(12345, model.get(SUBSYSTEM, SubsystemExtension.SUBSYSTEM_NAME, "type", "tst", "tick").asLong());</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then make sure our new <code>type</code> has been added:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">Assert.assertTrue(model.get(SUBSYSTEM, SubsystemExtension.SUBSYSTEM_NAME, "type").hasDefined("foo"));
+        Assert.assertTrue(model.get(SUBSYSTEM, SubsystemExtension.SUBSYSTEM_NAME, "type", "foo").hasDefined("tick"));
+        Assert.assertEquals(1000, model.get(SUBSYSTEM, SubsystemExtension.SUBSYSTEM_NAME, "type", "foo", "tick").asLong());</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then we call <code>write-attribute</code> to change the <code>tick</code> value of
+<code>/subsystem=tracker/type=foo</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">//Call write-attribute
+        ModelNode writeOp = new ModelNode();
+        writeOp.get(OP).set(WRITE_ATTRIBUTE_OPERATION);
+        writeOp.get(OP_ADDR).set(fooTypeAddr.toModelNode());
+        writeOp.get(NAME).set("tick");
+        writeOp.get(VALUE).set(3456);
+        result = services.executeOperation(writeOp);
+        Assert.assertEquals(SUCCESS, result.get(OUTCOME).asString());</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To give you exposure to other ways of doing things, now instead of
+reading the whole model to check the attribute, we call <code>read-attribute</code>
+instead, and make sure it has the value we set it to.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">//Check that write attribute took effect, this time by calling read-attribute instead of reading the whole model
+        ModelNode readOp = new ModelNode();
+        readOp.get(OP).set(READ_ATTRIBUTE_OPERATION);
+        readOp.get(OP_ADDR).set(fooTypeAddr.toModelNode());
+        readOp.get(NAME).set("tick");
+        result = services.executeOperation(readOp);
+        Assert.assertEquals(3456, checkResultAndGetContents(result).asLong());</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Since each <code>type</code> installs its own copy of <code>TrackerService</code>, we get the
+<code>TrackerService</code> for <code>type=foo</code> from the service container exposed by
+the kernel services and make sure it has the right value</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">TrackerService service = (TrackerService)services.getContainer().getService(TrackerService.createServiceName("foo")).getValue();
+        Assert.assertEquals(3456, service.getTick());
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>TypeDefinition.TICK.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="add-the-deployers">Add the deployers</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>When discussing <code>SubsystemAddHandler</code> we did not mention the work done
+to install the deployers, which is done in the following method:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">    @Override
+    public void performBoottime(OperationContext context, ModelNode operation, ModelNode model,
+            ServiceVerificationHandler verificationHandler, List&lt;ServiceController&lt;?&gt;&gt; newControllers)
+            throws OperationFailedException {
+ 
+        log.info("Populating the model");
+ 
+        //Add deployment processors here
+        //Remove this if you don't need to hook into the deployers, or you can add as many as you like
+        //see SubDeploymentProcessor for explanation of the phases
+        context.addStep(new AbstractDeploymentChainStep() {
+            public void execute(DeploymentProcessorTarget processorTarget) {
+                processorTarget.addDeploymentProcessor(SubsystemDeploymentProcessor.PHASE, SubsystemDeploymentProcessor.priority, new SubsystemDeploymentProcessor());
+ 
+            }
+        }, OperationContext.Stage.RUNTIME);
+ 
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This adds an extra step which is responsible for installing deployment
+processors. You can add as many as you like, or avoid adding any all
+together depending on your needs. Each processor has a <code>Phase</code> and a
+<code>priority</code>. Phases are sequential, and a deployment passes through each
+phases deployment processors. The <code>priority</code> specifies where within a
+phase the processor appears. See <code>org.jboss.as.server.deployment.Phase</code>
+for more information about phases.</p>
+</div>
+<div class="paragraph">
+<p>In our case we are keeping it simple and staying with one deployment
+processor with the phase and priority created for us by the maven
+archetype. The phases will be explained in the next section. The
+deployment processor is as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">public class SubsystemDeploymentProcessor implements DeploymentUnitProcessor {
+    ...
+ 
+    @Override
+    public void deploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
+        String name = phaseContext.getDeploymentUnit().getName();
+        TrackerService service = getTrackerService(phaseContext.getServiceRegistry(), name);
+        if (service != null) {
+            ResourceRoot root = phaseContext.getDeploymentUnit().getAttachment(Attachments.DEPLOYMENT_ROOT);
+            VirtualFile cool = root.getRoot().getChild("META-INF/cool.txt");
+            service.addDeployment(name);
+            if (cool.exists()) {
+                service.addCoolDeployment(name);
+            }
+        }
+    }
+ 
+    @Override
+    public void undeploy(DeploymentUnit context) {
+        context.getServiceRegistry();
+        String name = context.getName();
+        TrackerService service = getTrackerService(context.getServiceRegistry(), name);
+        if (service != null) {
+            service.removeDeployment(name);
+        }
+    }
+ 
+    private TrackerService getTrackerService(ServiceRegistry registry, String name) {
+        int last = name.lastIndexOf(".");
+        String suffix = name.substring(last + 1);
+        ServiceController&lt;?&gt; container = registry.getService(TrackerService.createServiceName(suffix));
+        if (container != null) {
+            TrackerService service = (TrackerService)container.getValue();
+            return service;
+        }
+        return null;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>deploy()</code> method is called when a deployment is being deployed. In
+this case we look for the <code>TrackerService</code> instance for the service name
+created from the deployment&#8217;s suffix. If there is one it means that we
+are meant to be tracking deployments with this suffix (i.e.
+<code>TypeAddHandler</code> was called for this suffix), and if we find one we add
+the deployment&#8217;s name to it. Similarly <code>undeploy()</code> is called when a
+deployment is being undeployed, and if there is a <code>TrackerService</code>
+instance for the deployment&#8217;s suffix, we remove the deployment&#8217;s name
+from it.</p>
+</div>
+<div class="sect2">
+<h3 id="deployment-phases-and-attachments">Deployment phases and attachments</h3>
+<div class="paragraph">
+<p>The code in the SubsystemDeploymentProcessor uses an <em>attachment</em>, which
+is the means of communication between the individual deployment
+processors. A deployment processor belonging to a phase may create an
+attachment which is then read further along the chain of deployment unit
+processors. In the above example we look for the
+<code>Attachments.DEPLOYMENT_ROOT</code> attachment, which is a view of the file
+structure of the deployment unit put in place before the chain of
+deployment unit processors is invoked.</p>
+</div>
+<div class="paragraph">
+<p>As mentioned above, the deployment unit processors are organized in
+phases, and have a relative order within each phase. A deployment unit
+passes through all the deployment unit processors in that order. A
+deployment unit processor may choose to take action or not depending on
+what attachments are available. Let&#8217;s take a quick look at what the
+deployment unit processors for in the phases described in
+<code>org.jboss.as.server.deployment.Phase</code>.</p>
+</div>
+<div class="sect3">
+<h4 id="structure">STRUCTURE</h4>
+<div class="paragraph">
+<p>The deployment unit processors in this phase determine the structure of
+a deployment, and looks for sub deployments and metadata files.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="parse">PARSE</h4>
+<div class="paragraph">
+<p>In this phase the deployment unit processors parse the deployment
+descriptors and build up the annotation index. <code>Class-Path</code> entries from
+the META-INF/MANIFEST.MF are added.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="dependencies">DEPENDENCIES</h4>
+<div class="paragraph">
+<p>Extra class path dependencies are added. For example if deploying a
+<code>war</code> file, the commonly needed dependencies for a web application are
+added.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="configure_module">CONFIGURE_MODULE</h4>
+<div class="paragraph">
+<p>In this phase the modular class loader for the deployment is created. No
+attempt should be made loading classes from the deployment until <strong>after</strong>
+this phase.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="post_module">POST_MODULE</h4>
+<div class="paragraph">
+<p>Now that our class loader has been constructed we have access to the
+classes. In this stage deployment processors may use the
+<code>Attachments.REFLECTION_INDEX</code> attachment which is a deployment index
+used to obtain members of classes in the deployment, and to invoke upon
+them, bypassing the inefficiencies of using <code>java.lang.reflect</code>
+directly.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="install">INSTALL</h4>
+<div class="paragraph">
+<p>Install new services coming from the deployment.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="cleanup">CLEANUP</h4>
+<div class="paragraph">
+<p>Attachments put in place earlier in the deployment unit processor chain
+may be removed here.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="integrate-with-wildfly">Integrate with WildFly</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Now that we have all the code needed for our subsystem, we can build our
+project by running <code>mvn install</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">[kabir ~/sourcecontrol/temp/archetype-test/acme-subsystem]
+$mvn install
+[INFO] Scanning for projects...
+[...]
+main:
+   [delete] Deleting: /Users/kabir/sourcecontrol/temp/archetype-test/acme-subsystem/null1004283288
+   [delete] Deleting directory /Users/kabir/sourcecontrol/temp/archetype-test/acme-subsystem/target/module
+     [copy] Copying 1 file to /Users/kabir/sourcecontrol/temp/archetype-test/acme-subsystem/target/module/com/acme/corp/tracker/main
+     [copy] Copying 1 file to /Users/kabir/sourcecontrol/temp/archetype-test/acme-subsystem/target/module/com/acme/corp/tracker/main
+     [echo] Module com.acme.corp.tracker has been created in the target/module directory. Copy to your JBoss AS 7 installation.
+[INFO] Executed tasks
+[INFO]
+[INFO] --- maven-install-plugin:2.3.1:install (default-install) @ acme-subsystem ---
+[INFO] Installing /Users/kabir/sourcecontrol/temp/archetype-test/acme-subsystem/target/acme-subsystem.jar to /Users/kabir/.m2/repository/com/acme/corp/acme-subsystem/1.0-SNAPSHOT/acme-subsystem-1.0-SNAPSHOT.jar
+[INFO] Installing /Users/kabir/sourcecontrol/temp/archetype-test/acme-subsystem/pom.xml to /Users/kabir/.m2/repository/com/acme/corp/acme-subsystem/1.0-SNAPSHOT/acme-subsystem-1.0-SNAPSHOT.pom
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 5.851s
+[INFO] Finished at: Mon Jul 11 23:24:58 BST 2011
+[INFO] Final Memory: 7M/81M
+[INFO] ------------------------------------------------------------------------</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This will have built our project and assembled a module for us that can
+be used for installing it into WildFly. If you go to the <code>target/module</code>
+folder where you built the project you will see the module</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">$ls target/module/com/acme/corp/tracker/main/
+acme-subsystem.jar  module.xml</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>module.xml</code> comes from <code>src/main/resources/module/main/module.xml</code>
+and is used to define your module. It says that it contains the
+<code>acme-subsystem.jar</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;module xmlns="urn:jboss:module:1.0" name="com.acme.corp.tracker"&gt;
+    &lt;resources&gt;
+        &lt;resource-root path="acme-subsystem.jar"/&gt;
+    &lt;/resources&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And has a default set of dependencies needed by every subsystem created.
+If your subsystem requires additional module dependencies you can add
+them here before building and installing.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">    &lt;dependencies&gt;
+        &lt;module name="javax.api"/&gt;
+        &lt;module name="org.jboss.staxmapper"/&gt;
+        &lt;module name="org.jboss.as.controller"/&gt;
+        &lt;module name="org.jboss.as.server"/&gt;
+        &lt;module name="org.jboss.modules"/&gt;
+        &lt;module name="org.jboss.msc"/&gt;
+        &lt;module name="org.jboss.logging"/&gt;
+        &lt;module name="org.jboss.vfs"/&gt;
+    &lt;/dependencies&gt;
+&lt;/module&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note that the name of the module corresponds to the directory structure
+containing it. Now copy the <code>target/module/com/acme/corp/tracker/main/</code>
+directory and its contents to
+<code>$WFLY/modules/com/acme/corp/tracker/main/</code> (where <code>$WFLY</code> is the root
+of your WildFly install).</p>
+</div>
+<div class="paragraph">
+<p>Next we need to modify <code>$WFLY/standalone/configuration/standalone.xml</code>.
+First we need to add our new module to the <code>&lt;extensions&gt;</code> section:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">    &lt;extensions&gt;
+        ...
+        &lt;extension module="org.jboss.as.weld"/&gt;
+        &lt;extension module="com.acme.corp.tracker"/&gt;
+    &lt;/extensions&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And then we have to add our subsystem to the <code>&lt;profile&gt;</code> section:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">    &lt;profile&gt;
+    ...
+ 
+        &lt;subsystem xmlns="urn:com.acme.corp.tracker:1.0"&gt;
+            &lt;deployment-types&gt;
+                &lt;deployment-type suffix="sar" tick="10000"/&gt;
+                &lt;deployment-type suffix="war" tick="10000"/&gt;
+            &lt;/deployment-types&gt;
+        &lt;/subsystem&gt;
+    ...
+    &lt;/profile&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Adding this to a managed domain works exactly the same apart from in
+this case you need to modify <code>$WFLY/domain/configuration/domain.xml</code>.</p>
+</div>
+<div class="paragraph">
+<p>Now start up WildFly by running <code>$WFLY/bin/standalone.sh</code> and you should
+see messages like these after the server has started, which means our
+subsystem has been added and our <code>TrackerService</code> is working:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>15:27:33,838 INFO  [org.jboss.as] (Controller Boot Thread) JBoss AS 7.0.0.Final "Lightning" started in 2861ms - Started 94 of 149 services (55 services are passive or on-demand)
+15:27:42,966 INFO  [stdout] (Thread-8) Current deployments deployed while sar tracking active:
+15:27:42,966 INFO  [stdout] (Thread-8) []
+15:27:42,967 INFO  [stdout] (Thread-8) Cool: 0
+15:27:42,967 INFO  [stdout] (Thread-9) Current deployments deployed while war tracking active:
+15:27:42,967 INFO  [stdout] (Thread-9) []
+15:27:42,967 INFO  [stdout] (Thread-9) Cool: 0
+15:27:52,967 INFO  [stdout] (Thread-8) Current deployments deployed while sar tracking active:
+15:27:52,967 INFO  [stdout] (Thread-8) []
+15:27:52,967 INFO  [stdout] (Thread-8) Cool: 0</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If you run the command line interface you can execute some commands to
+see more about the subsystem. For example</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9999 /] /subsystem=tracker/:read-resource-description(recursive=true, operations=true)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>will return a lot of information, including what we provided in the
+`DescriptionProvider`s we created to document our subsystem.</p>
+</div>
+<div class="paragraph">
+<p>To see the current subsystem state you can execute</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9999 /] /subsystem=tracker/:read-resource(recursive=true)
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; {"type" =&gt; {
+        "war" =&gt; {"tick" =&gt; 10000L},
+        "sar" =&gt; {"tick" =&gt; 10000L}
+    }}
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We can remove both the deployment types which removes them from the
+model:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9999 /] /subsystem=tracker/type=sar:remove
+{"outcome" =&gt; "success"}
+[standalone@localhost:9999 /] /subsystem=tracker/type=war:remove
+{"outcome" =&gt; "success"}
+[standalone@localhost:9999 /] /subsystem=tracker/:read-resource(recursive=true)
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; {"type" =&gt; undefined}
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You should now see the output from the <code>TrackerService</code> instances having
+stopped.</p>
+</div>
+<div class="paragraph">
+<p>Now, let&#8217;s add the war tracker again:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9999 /] /subsystem=tracker/type=war:add
+{"outcome" =&gt; "success"}
+[standalone@localhost:9999 /] /subsystem=tracker/:read-resource(recursive=true)
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; {"type" =&gt; {"war" =&gt; {"tick" =&gt; 10000L}}}
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>and the WildFly console should show the messages coming from the war
+<code>TrackerService</code> again.</p>
+</div>
+<div class="paragraph">
+<p>Now let us deploy something. You can find two maven projects for test
+wars already built at <a href="downloads/test1.zip">test1.zip</a> and
+<a href="downloads/test2.zip">test2.zip</a>. If you download them and
+extract them to <code>/Downloads/test1</code> and <code>/Downloads/test2</code>, you can see
+that <code>/Downloads/test1/target/test1.war</code> contains a <code>META-INF/cool.txt</code>
+while <code>/Downloads/test2/target/test2.war</code> does not contain that file.
+From CLI deploy <code>test1.war</code> first:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">[standalone@localhost:9999 /] deploy ~/Downloads/test1/target/test1.war
+'test1.war' deployed successfully.</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And you should now see the output from the war <code>TrackerService</code> list the
+deployments:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>15:35:03,712 INFO  [org.jboss.as.server.deployment] (MSC service thread 1-2) Starting deployment of "test1.war"
+15:35:03,988 INFO  [org.jboss.web] (MSC service thread 1-1) registering web context: /test1
+15:35:03,996 INFO  [org.jboss.as.server.controller] (pool-2-thread-9) Deployed "test1.war"
+15:35:13,056 INFO  [stdout] (Thread-9) Current deployments deployed while war tracking active:
+15:35:13,056 INFO  [stdout] (Thread-9) [test1.war]
+15:35:13,057 INFO  [stdout] (Thread-9) Cool: 1</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>So our <code>test1.war</code> got picked up as a 'cool' deployment. Now if we
+deploy <code>test2.war</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9999 /] deploy ~/sourcecontrol/temp/archetype-test/test2/target/test2.war
+'test2.war' deployed successfully.</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You will see that deployment get picked up as well but since there is no
+<code>META-INF/cool.txt</code> it is not marked as a 'cool' deployment:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>15:37:05,634 INFO  [org.jboss.as.server.deployment] (MSC service thread 1-4) Starting deployment of "test2.war"
+15:37:05,699 INFO  [org.jboss.web] (MSC service thread 1-1) registering web context: /test2
+15:37:05,982 INFO  [org.jboss.as.server.controller] (pool-2-thread-15) Deployed "test2.war"
+15:37:13,075 INFO  [stdout] (Thread-9) Current deployments deployed while war tracking active:
+15:37:13,075 INFO  [stdout] (Thread-9) [test1.war, test2.war]
+15:37:13,076 INFO  [stdout] (Thread-9) Cool: 1</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>An undeploy</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">[standalone@localhost:9999 /] undeploy test1.war
+Successfully undeployed test1.war.</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>is also reflected in the <code>TrackerService</code> output:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>15:38:47,901 INFO  [org.jboss.as.server.controller] (pool-2-thread-21) Undeployed "test1.war"
+15:38:47,934 INFO  [org.jboss.as.server.deployment] (MSC service thread 1-3) Stopped deployment test1.war in 40ms
+15:38:53,091 INFO  [stdout] (Thread-9) Current deployments deployed while war tracking active:
+15:38:53,092 INFO  [stdout] (Thread-9) [test2.war]
+15:38:53,092 INFO  [stdout] (Thread-9) Cool: 0</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Finally, we registered a write attribute handler for the <code>tick</code> property
+of the <code>type</code> so we can change the frequency</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9999 /] /subsystem=tracker/type=war:write-attribute(name=tick,value=1000)
+{"outcome" =&gt; "success"}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You should now see the output from the <code>TrackerService</code> happen every
+second</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>15:39:43,100 INFO  [stdout] (Thread-9) Current deployments deployed while war tracking active:
+15:39:43,100 INFO  [stdout] (Thread-9) [test2.war]
+15:39:43,101 INFO  [stdout] (Thread-9) Cool: 0
+15:39:44,101 INFO  [stdout] (Thread-9) Current deployments deployed while war tracking active:
+15:39:44,102 INFO  [stdout] (Thread-9) [test2.war]
+15:39:44,105 INFO  [stdout] (Thread-9) Cool: 0
+15:39:45,106 INFO  [stdout] (Thread-9) Current deployments deployed while war tracking active:
+15:39:45,106 INFO  [stdout] (Thread-9) [test2.war]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If you open <code>$WFLY/standalone/configuration/standalone.xml</code> you can see
+that our subsystem entry reflects the current state of the subsystem:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">        &lt;subsystem xmlns="urn:com.acme.corp.tracker:1.0"&gt;
+            &lt;deployment-types&gt;
+                &lt;deployment-type suffix="war" tick="1000"/&gt;
+            &lt;/deployment-types&gt;
+        &lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="expressions">Expressions</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Expressions are mechanism that enables you to support variables in your
+attributes, for instance when you want the value of attribute to be
+resolved using system / environment properties.</p>
+</div>
+<div class="paragraph">
+<p>An example expression is</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>${jboss.bind.address.management:127.0.0.1}</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>which means that the value should be taken from a system property named
+<code>jboss.bind.address.management</code> and if it is not defined use
+<code>127.0.0.1</code>.</p>
+</div>
+<div class="sect2">
+<h3 id="what-expression-types-are-supported">What expression types are supported</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>System properties, which are resolved using
+<code>java.lang.System.getProperty(String key)</code></p>
+</li>
+<li>
+<p>Environment properties, which are resolved using
+<code>java.lang.System.getEnv(String name)</code>.</p>
+</li>
+<li>
+<p>Security vault expressions, resolved against the security vault
+configured for the server or Host Controller that needs to resolve the
+expression.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>In all cases, the syntax for the expression is</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>${expression_to_resolve}</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For an expression meant to be resolved against environment properties,
+the <code>expression_to_resolve</code> must be prefixed with <code>env.</code>. The portion
+after <code>env.</code> will be the name passed to
+<code>java.lang.System.getEnv(String name)</code>.</p>
+</div>
+<div class="paragraph">
+<p>Security vault expressions do not support default values (i.e. the
+<code>127.0.0.1</code> in the <code>jboss.bind.address.management:127.0.0.1</code> example
+above.)</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="how-to-support-expressions-in-subsystems">How to support expressions in subsystems</h3>
+<div class="paragraph">
+<p>The easiest way is by using AttributeDefinition, which provides support
+for expressions just by using it correctly.</p>
+</div>
+<div class="paragraph">
+<p>When we create an AttributeDefinition all we need to do is mark that is
+allows expressions. Here is an example how to define an attribute that
+allows expressions to be used.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">SimpleAttributeDefinition MY_ATTRIBUTE =
+            new SimpleAttributeDefinitionBuilder("my-attribute", ModelType.INT, true)
+                    .setAllowExpression(true)
+                    .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
+                    .setDefaultValue(new ModelNode(1))
+                    .build();</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then later when you are parsing the xml configuration you should use the
+MY_ATTRIBUTE attribute definition to set the value to the management
+operation ModelNode you are creating.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">....
+      String attr = reader.getAttributeLocalName(i);
+      String value = reader.getAttributeValue(i);
+      if (attr.equals("my-attribute")) {
+          MY_ATTRIBUTE.parseAndSetParameter(value, operation, reader);
+      } else if (attr.equals("suffix")) {
+.....</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note that this just helps you to properly set the value to the model
+node you are working on, so no need to additionally set anything to the
+model for this attribute. Method parseAndSetParameter parses the value
+that was read from xml for possible expressions in it and if it finds
+any it creates special model node that defines that node is of type
+<code>ModelType.EXPRESSION</code>.</p>
+</div>
+<div class="paragraph">
+<p>Later in your operation handlers where you implement populateModel and
+have to store the value from the operation to the configuration model
+you also use this MY_ATTRIBUTE attribute definition.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java"> @Override
+ protected void populateModel(ModelNode operation, ModelNode model) throws OperationFailedException {
+        MY_ATTRIBUTE.validateAndSet(operation,model);
+ }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This will make sure that the attribute that is stored from the operation
+to the model is valid and nothing is lost. It also checks the value
+stored in the operation <code>ModelNode</code>, and if it isn&#8217;t already
+<code>ModelType.EXPRESSION</code>, it checks if the value is a string that contains
+the expression syntax. If so, the value stored in the model will be of
+type <code>ModelType.EXPRESSION</code>. Doing this ensures that expressions are
+properly handled when they appear in operations that weren&#8217;t created by
+the subsystem parser, but are instead passed in from CLI or admin
+console users.</p>
+</div>
+<div class="paragraph">
+<p>As last step we need to use the value of the attribute. This is usually
+needed inside of the <code>performRuntime</code> method</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java"> protected void performRuntime(OperationContext context, ModelNode operation, ModelNode model, ServiceVerificationHandler verificationHandler, List&lt;ServiceController&lt;?&gt;&gt; newControllers) throws OperationFailedException {
+       ....
+        final int attributeValue = MY_ATTRIBUTE.resolveModelAttribute(context, model).asInt();     
+        ...
+ 
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As you can see resolving of attribute&#8217;s value is not done until it is
+needed for use in the subsystem&#8217;s runtime services. The resolved value
+is not stored in the configuration model, the unresolved expression is.
+That way we do not lose any information in the model and can assure that
+also marshalling is done properly, where we must marshall back the
+unresolved value.</p>
+</div>
+<div class="paragraph">
+<p>Attribute definitinon also helps you with that:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java"> public void writeContent(XMLExtendedStreamWriter writer, SubsystemMarshallingContext context) throws XMLStreamException {
+    ....
+      MY_ATTRIBUTE.marshallAsAttribute(sessionData, writer);
+      MY_OTHER_ATTRIBUTE.marshallAsElement(sessionData, false, writer);
+    ...
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

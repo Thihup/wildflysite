@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Elytron and Java Authorization Contract for Containers (JACC) | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Elytron and Java Authorization Contract for Containers (JACC)" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_elytron/Elytron_and_Java_Authorization_Contract_for_Containers-JACC.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_elytron/Elytron_and_Java_Authorization_Contract_for_Containers-JACC.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_elytron/Elytron_and_Java_Authorization_Contract_for_Containers-JACC.html","headline":"Elytron and Java Authorization Contract for Containers (JACC)","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div id="preamble">
+<div class="sectionbody">
+<div class="quoteblock abstract">
+<blockquote>
+This document will guide you on how to enable JACC using Elytron
+Subsystem.
+</blockquote>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="disabling-jacc-in-legacy-security-subsystem-picketbox">Disabling JACC in Legacy Security Subsystem (PicketBox)</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>By default, the application server uses the legacy security subsystem
+(PicketBox) to configure the JACC policy provider and factory. The
+default configuration maps to implementations from PicketBox.</p>
+</div>
+<div class="paragraph">
+<p>In order to use Elytron to manage JACC configuration (or any other
+policy you want to install to the application server) you must first
+disable JACC in legacy security subsystem. For that, please execute the
+following CLI command:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">/subsystem=security:write-attribute(name=initialize-jacc, value=false)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The command above tells the legacy security subsystem to not initialize
+any JACC related configuration, but rely on the policies defined via
+Elytron subsystem as we&#8217;ll see in the next sections.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="defining-a-jacc-policy-provider">Defining a JACC Policy Provider</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Elytron subsystem provides a built-in policy provider based on JACC
+specification. To create the policy provider you can execute a CLI
+command as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9990 /] /subsystem=elytron/policy=jacc:add(jacc-policy={})</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>After executing the command above, please reload the server
+configuration as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9990 /] reload</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="enabling-jacc-to-a-web-deployment">Enabling JACC to a Web Deployment</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Once JACC Policy Provider is defined you can enable JACC to web
+deployments by executing the following command:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9990 /] /subsystem=undertow/application-security-domain=other:add(http-authentication-factory=application-http-authentication,enable-jacc=true)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The command above defines a default security domain for applications if
+none is provided in <strong>jboss-web.xml.</strong> In case you already have a
+<strong>application-security-domain</strong> defined and just want to enable JACC you
+can execute a command as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9990 /] /subsystem=undertow/application-security-domain=my-security-domain:write-attribute(name=enable-jacc,value=true)</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="enabling-jacc-to-a-ejb-deployment">Enabling JACC to a EJB Deployment</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Once JACC Policy Provider is defined you can enable JACC to EJB
+deployments by executing the following command:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9990 /] /subsystem=ejb3/application-security-domain=other:add(security-domain=ApplicationDomain,enable-jacc=true)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The command above defines a default security domain for EJBs. In case
+you already have a *application-security-domain *defined and just want
+to enable JACC you can execute a command as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9990 /] /subsystem=ejb3/application-security-domain=my-security-domain:write-attribute(name=enable-jacc,value=true)</code></pre>
+</div>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

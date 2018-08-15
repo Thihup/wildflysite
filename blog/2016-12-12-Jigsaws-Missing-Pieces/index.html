@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="A set of technical issues, currently under discussion, prevents Jigsaw from fully supporting Java EE, OSGi, or any other system with similar dynamic capabilities. We believe it’s critical that these gaps are addressed, as the existence of multiple incompatible standards would likely fragment the Java ecosystem.">
+  <link rel="shortcut icon" type="image/png" href="/wildflysite/favicon.ico" >
+  <link rel="stylesheet" href="/wildflysite/assets/css/main.css" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+
+
+</head>
+
+<body class="Jigsaw's Missing Pieces">
+  <div class="content">
+    <div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+
+    <div class="post-page grid-wrapper">
+  <!-- <div class="grid__item width-12-12"><h1 class="title">Jigsaw's Missing Pieces</h1></div> -->
+  <!-- <div class="grid__item width-2-12 doc-toc"><ul class="inline_toc">
+  <li><a href="#jigsaws-missing-pieces">Jigsaw’s Missing Pieces</a></li>
+</ul></div> -->
+  <div class="grid__item width-10-12 doc-content"><div class="sect1">
+<h2 id="jigsaws-missing-pieces">Jigsaw&#8217;s Missing Pieces</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>jgreene
+2016-12-12</p>
+</div>
+<div class="paragraph">
+<p>Red Hat, with its years of experience supporting large scale software systems, has always been a strong proponent of modular Java. Over time, we have delivered many products and solutions that provide and support popular modular environments like Java EE, and OSGi. Since 2011, we introduced a flexible modular implementation called JBoss Modules, which is capable of supporting the core modularity needs of both Java EE and OSGi, but is usable in a standalone manner, without the need to bring in the full platform those specifications require. JBoss EAP and WildFly are built on this technology, which is a major contributor to the flexible runtime they provide.</p>
+</div>
+<div class="paragraph">
+<p>While the above technology allows us to meet the needs of our customers as well as our own, we are hopeful that <a href="https://www.jcp.org/en/jsr/detail?id=376">JSR-376 (Java Platform Modular System)</a>, also known as <a href="http://openjdk.java.net/projects/jigsaw/">Project Jigsaw</a>, will provide a standardized solution that could be embraced by the full Java community and lead to better software and better interoperability. Additionally, the Java EE expert group has long wanted to improve the overall modularity of the platform, but has deferred these goals hoping to leverage the common SE technology to be introduced by the above JSR.</p>
+</div>
+<div class="paragraph">
+<p>These goals were widely shared as noted in the agreed upon JSR submission. Relevant sections include:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><em>“This JSR will define an approachable yet scalable module system for the Java Platform. It will be approachable, i.e., easy to learn and easy to use, <strong>so that developers can use it to construct and maintain libraries and large applications for both the Java SE and Java EE Platforms</strong>.”</em></p>
+</li>
+<li>
+<p><em>”This JSR targets Java SE 9. <strong>We expect the module system to be leveraged by Java EE 9</strong>, so we will make sure to take Java EE requirements into account.”</em></p>
+</li>
+<li>
+<p><em>”Some members of the Java community have already invested significantly in applications and frameworks built on top of the OSGi Service Platform. The module system <strong>will provide a means for an OSGi kernel to locate Java modules and resolve them using its own resolver</strong>, except possibly for core system modules. This will enable OSGi bundles running in such a kernel to depend upon Java modules.”</em></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Unfortunately, Jigsaw (JSR-376’s implementation), suffers from a number of significant gaps which may prevent these goals from being fully achieved.  As currently defined, Jigsaw is not capable of fully supporting Java EE, OSGi, or any other system with similar dynamic capabilities.  However in recent weeks, there have been a number of proposals and discussions to address these problems.</p>
+</div>
+<div class="paragraph">
+<p>We believe it’s critical that these gaps are addressed, as the existence of multiple incompatible standards would likely fragment the Java ecosystem. Application developers would be forced to artificially choose between a totally new static oriented universe of software based on Jigsaw, and the already existing universe, which handles more use-cases and encompases traditional Java SE, Java EE, and OSGi.  Framework developers may attempt to support both, but they will likely incur additional cost and potential defects to do so.  Finally, divergence will likely increase as standards such as Java EE 9 are forced to consider other options.</p>
+</div>
+<div class="paragraph">
+<p>While there are a number of issues under discussion, they can be categorized into the following areas:</p>
+</div>
+<div class="olist upperalpha">
+<ol class="upperalpha" type="A">
+<li>
+<p><strong>Reflection is disallowed from operating on non-exported types, even with the use of setAccessible</strong> [<a href="http://openjdk.java.net/projects/jigsaw/spec/issues/#ReflectiveAccessToNonExportedTypes">1</a>]. This breaks anything using dependency injection or custom serialization (Java EE, Hibernate, Spring, CDI, JAXB, etc). The current proposal put forth by Oracle addresses this by allowing the user to declare packages “open” for reflection.</p>
+</li>
+<li>
+<p><strong>Jigsaw has only limited support for the dynamic introduction and alteration of modules</strong> [<a href="http://openjdk.java.net/projects/jigsaw/spec/issues/#MutableConfigurations">2</a>]. This prevents modeling Java EE deployments or OSGi bundles as sets of modules as both require support for dynamic installation and hot redeployment. While layers could potentially act as a solution, layers do not support peer-to-peer inter-layer dependency graphs [<a href="http://openjdk.java.net/projects/jigsaw/spec/issues/#NonHierarchicalLayers">3</a>]. Additionally everything is eagerly loaded, with a complete graph required to be known up front [<a href="http://openjdk.java.net/projects/jigsaw/spec/issues/#LazyConfigurationAndInstantiation">4</a>]. This problem is still under active discussion, with some partial proposals. If certain hooks are added, it may be possible to bypass Jigsaw&#8217;s native dependency resolution to work around the issue. On the other hand, this has some drawbacks. It requires replicating Jigsaw&#8217;s resolution in a dynamic fashion, and it will likely hide information from reflection that a developer might wish to see, but it opens the door for advanced/specialized behavior.</p>
+</li>
+<li>
+<p><strong>Restrictions that make interoperability with alternative modular systems difficult.</strong> [<a href="http://openjdk.java.net/projects/jigsaw/spec/issues/#CyclicDependences">5</a>] [<a href="http://openjdk.java.net/projects/jigsaw/spec/issues/#ModuleNameCharacters">6</a>] [<a href="http://openjdk.java.net/projects/jigsaw/spec/issues/#ResourceExistenceAndSize">7</a>]. Bypassing or mangling Jigsaw’s dependency resolution would allow for a custom implementation to provide support for cyclic dependencies [<a href="http://openjdk.java.net/projects/jigsaw/spec/issues/#CyclicDependences">5</a>]. There is a proposal to allow more flexibility in terms of allowed characters and escaping with module names [<a href="http://openjdk.java.net/projects/jigsaw/spec/issues/#ModuleNameCharacters">6</a>].</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>In summary, we believe fragmentation of the Java ecosystem must be avoided, as it will overly burden Java developers and stifle innovation. We remain hopeful that continued progress on these issues will not only prevent such an outcome, but allow the full Java community to embrace and benefit from standardized modularity.</p>
+</div>
+<div class="paragraph">
+<p>[1] <a href="http://openjdk.java.net/projects/jigsaw/spec/issues/#ReflectiveAccessToNonExportedTypes" class="bare">http://openjdk.java.net/projects/jigsaw/spec/issues/#ReflectiveAccessToNonExportedTypes</a><br>
+[2] <a href="http://openjdk.java.net/projects/jigsaw/spec/issues/#MutableConfigurations" class="bare">http://openjdk.java.net/projects/jigsaw/spec/issues/#MutableConfigurations</a><br>
+[3] <a href="http://openjdk.java.net/projects/jigsaw/spec/issues/#NonHierarchicalLayers" class="bare">http://openjdk.java.net/projects/jigsaw/spec/issues/#NonHierarchicalLayers</a><br>
+[4] <a href="http://openjdk.java.net/projects/jigsaw/spec/issues/#LazyConfigurationAndInstantiation" class="bare">http://openjdk.java.net/projects/jigsaw/spec/issues/#LazyConfigurationAndInstantiation</a><br>
+[5] <a href="http://openjdk.java.net/projects/jigsaw/spec/issues/#CyclicDependences" class="bare">http://openjdk.java.net/projects/jigsaw/spec/issues/#CyclicDependences</a><br>
+[6] <a href="http://openjdk.java.net/projects/jigsaw/spec/issues/#ModuleNameCharacters" class="bare">http://openjdk.java.net/projects/jigsaw/spec/issues/#ModuleNameCharacters</a><br>
+[7] <a href="http://openjdk.java.net/projects/jigsaw/spec/issues/#ResourceExistenceAndSize" class="bare">http://openjdk.java.net/projects/jigsaw/spec/issues/#ResourceExistenceAndSize</a><br></p>
+</div>
+</div>
+</div></div>
+</div>
+
+
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">WildFly is open. All dependencies of this project are available under the <a href='https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html' class='dark-background' target='_blank'>LGPL 2.1</a> or compatible license.<br/><br/>This website was built with <a href='https://jekyllrb.com/' class='dark-background' target='_blank'>Jekyll</a> is hosted on <a href='https://pages.github.com/' class='dark-background' target='_blank'>Github Pages</a> and is completely open source. If you want to make it better, <a href='https://github.com/wildfly/wildfly.org/fork' class='dark-background' target='_blank'>fork it</a> and show us what you’ve got.</p>
+
+    
+      <div class="width-1-12 project-links">
+        <strong>Navigation</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="/wildflysite/downloads" class="dark-background">Downloads</a></li>
+          
+            <li><a href="/wildflysitef/docs" class="dark-background">Docs</a></li>
+          
+            <li><a href="https://github.com/wildfly/wildfly" class="dark-background">Github</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <strong>Contribute</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="https://issues.jboss.org/browse/WFLY" class="dark-background">Submit a bug</a></li>
+          
+            <li><a href="https://community.jboss.org/en/wildfly?view=discussion" class="dark-background">Join the forum</a></li>
+          
+            <li><a href="https://github.com/wildfly/wildfly/fork" class="dark-background">Fork WildFly</a></li>
+          
+            <li><a href="https://twitter.com/WildFlyAS" class="dark-background">Follow us</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <strong>Get Help</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="https://community.jboss.org/en/wildfly?view=discussion" class="dark-background">Join the forum</a></li>
+          
+            <li><a href="https://www.hipchat.com/gFOhnVQke" class="dark-background">Join HipChat</a></li>
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-6-12 more-links">
+        <strong>Find more Red Hat Middleware Community Projects</strong>
+        <ul class="footer-links">
+          
+            <li><a href="https://www.apiman.io/" class="dark-background">APIMan</a></li>
+          
+            <li><a href="http://arquillian.org" class="dark-background">Arquillian</a></li>
+          
+            <li><a href="http://byteman.jboss.org/" class="dark-background">Byteman</a></li>
+          
+            <li><a href="http://capedwarf.org/" class="dark-background">CapeDwarf</a></li>
+          
+            <li><a href="https://github.com/alechenninger/chronicler" class="dark-background">Chronicler</a></li>
+          
+            <li><a href="https://github.com/darcy-framework" class="dark-background">Darcy</a></li>
+          
+            <li><a href="http://debezium.io/" class="dark-background">Debezium</a></li>
+          
+            <li><a href="https://www.drools.org/" class="dark-background">Drools</a></li>
+          
+            <li><a href="http://gatein.jboss.org/" class="dark-background">GateIn</a></li>
+          
+            <li><a href="http://www.hawkular.org/" class="dark-background">Hawkular</a></li>
+          
+            <li><a href="http://hawt.io/" class="dark-background">Hawtio</a></li>
+          
+            <li><a href="http://hibernate.org/" class="dark-background">Hibernate</a></li>
+          
+            <li><a href="http://www.infinispan.org/" class="dark-background">Infinispan</a></li>
+          
+            <li><a href="https://devstudio.jboss.com/" class="dark-background">JBoss DevStudio</a></li>
+          
+            <li><a href="http://forge.jboss.org/" class="dark-background">JBoss Forge</a></li>
+          
+            <li><a href="https://github.com/jboss-logging" class="dark-background">JBoss Logging</a></li>
+          
+            <li><a href="http://jbossremoting.jboss.org/" class="dark-background">JBoss Remoting</a></li>
+          
+            <li><a href="https://www.jbpm.org/" class="dark-background">jBPM</a></li>
+          
+            <li><a href="https://jsfunit.jboss.org/" class="dark-background">JSFUnit</a></li>
+          
+            <li><a href="https://www.keycloak.org/" class="dark-background">Keycloak</a></li>
+          
+            <li><a href="http://modcluster.io/" class="dark-background">Mod Cluster</a></li>
+          
+            <li><a href="http://modeshape.jboss.org/" class="dark-background">ModeShape</a></li>
+          
+            <li><a href="https://www.optaplanner.org/" class="dark-background">OptaPlanner</a></li>
+          
+            <li><a href="https://picketbox.jboss.org/" class="dark-background">Picketbox</a></li>
+          
+            <li><a href="http://resteasy.jboss.org/" class="dark-background">RESTEasy</a></li>
+          
+            <li><a href="https://riftsaw.jboss.org/" class="dark-background">Riftsaw</a></li>
+          
+            <li><a href="http://savara.jboss.org/" class="dark-background">Savara</a></li>
+          
+            <li><a href="http://seamframework.org/" class="dark-background">Seam</a></li>
+          
+            <li><a href="http://arquillian.org/" class="dark-background">Shrinkwrap</a></li>
+          
+            <li><a href="http://snowdrop.jboss.org/" class="dark-background">Snowdrop</a></li>
+          
+            <li><a href="https://switchyard.jboss.org/" class="dark-background">Switchyard</a></li>
+          
+            <li><a href="https://tattletale.jboss.org/" class="dark-background">Tattletale</a></li>
+          
+            <li><a href="http://teiid.jboss.org/" class="dark-background">Teiid</a></li>
+          
+            <li><a href="http://wildfly-swarm.io/" class="dark-background">WildFly Swarm</a></li>
+          
+            <li><a href="http://wise.jboss.org/" class="dark-background">Wise</a></li>
+          
+            <li><a href="https://xnio.jboss.org/" class="dark-background">XNIO</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" class="dark-background" target="_blank">CC by 3.0</a>
+    </span>
+    <span class="redhat">
+      a Red Hat sponsored project   
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/"><img src="/wildflysite/assets/img/RHLogo_white.svg"></a>
+    </span>
+  </div>
+</div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script type="text/javascript" src="/wildflysite/assets/javascript/mobile-nav.js"></script>
+</body>
+
+</html>

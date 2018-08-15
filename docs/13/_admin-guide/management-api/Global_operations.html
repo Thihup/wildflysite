@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Global operations | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Global operations" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_admin-guide/management-api/Global_operations.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_admin-guide/management-api/Global_operations.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_admin-guide/management-api/Global_operations.html","headline":"Global operations","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>The WildFly management API includes a number of operations that apply to
+every resource.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="the-read-resource-operation">The read-resource operation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Reads a management resource&#8217;s attribute values along with either basic
+or complete information about any child resources. Supports the<br>
+following parameters, none of which are required:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>recursive</code> – (boolean, default is <code>false</code>) – whether to include
+complete information about child resources, recursively.</p>
+</li>
+<li>
+<p><code>recursive-depth</code> – (int) – The depth to which information about child
+resources should be included if <code>recursive</code> is <code>true</code>. If not set, the
+depth will be unlimited; i.e. all descendant resources will be included.</p>
+</li>
+<li>
+<p><code>proxies</code> – (boolean, default is <code>false</code>) – whether to include remote
+resources in a recursive query (i.e. host level resources from slave
+Host Controllers in a query of the Domain Controller; running server
+resources in a query of a host).</p>
+</li>
+<li>
+<p><code>include-runtime</code> – (boolean, default is <code>false</code>) – whether to include
+runtime attributes (i.e. those whose value does not come from the
+persistent configuration) in the response.</p>
+</li>
+<li>
+<p><code>include-defaults</code> – (boolean, default is <code>true</code>) – whether to include
+in the result default values not set by users. Many attributes have a
+default value that will be used in the runtime if the users have not
+provided an explicit value. If this parameter is <code>false</code> the value for
+such attributes in the result will be <code>undefined</code>. If <code>true</code> the result
+will include the default value for such parameters.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="the-read-attribute-operation">The read-attribute operation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Reads the value of an individual attribute. Takes a single, required,
+parameter:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>name</code> – (string) – the name of the attribute to read.</p>
+</li>
+<li>
+<p><code>include-defaults</code> – (boolean, default is <code>true</code>) – whether to include
+in the result default values not set by users. Many attributes have a
+default value that will be used in the runtime if the users have not
+provided an explicit value. If this parameter is <code>false</code> the value for
+such attributes in the result will be <code>undefined</code>. If <code>true</code> the result
+will include the default value for such parameters.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="the-write-attribute-operation">The write-attribute operation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Writes the value of an individual attribute. Takes two required
+parameters:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>name</code> – (string) – the name of the attribute to write.</p>
+</li>
+<li>
+<p><code>value</code> – (type depends on the attribute being written) – the new
+value.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="the-undefine-attribute-operation">The undefine-attribute operation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Sets the value of an individual attribute to the <code>undefined</code> value, if
+such a value is allowed for the attribute. The operation will fail if
+the <code>undefined</code> value is not allowed. Takes a single required parameter:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>name</code> – (string) – the name of the attribute to write.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="the-list-add-operation">The list-add operation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Adds an element to the value of a list attribute, adding the element to
+the end of the list unless the optional attribute <code>index</code> is passed:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>name</code> – (string) – the name of the list attribute to add new value
+to.</p>
+</li>
+<li>
+<p><code>value</code> – (type depends on the element being written) – the new
+element to be added to the attribute value.</p>
+</li>
+<li>
+<p><code>index</code> – (int, optional) – index where in the list to add the new
+element. By default it is <code>undefined</code> meaning add at the end. Index is
+zero based.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This operation will fail if the specified attribute is not a list.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="the-list-remove-operation">The list-remove operation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Removes an element from the value of a list attribute, either the
+element at a specified <code>index</code>, or the first element whose value matches
+a specified <code>value</code>:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>name</code> – (string) – the name of the list attribute to add new value
+to.</p>
+</li>
+<li>
+<p><code>value</code> – (type depends on the element being written, optional) – the
+element to be removed. Optional and ignored if <code>index</code> is specified.</p>
+</li>
+<li>
+<p><code>index</code> – (int, optional) – index in the list whose element should be
+removed. By default it is <code>undefined</code>, meaning <code>value</code> should be
+specified.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This operation will fail if the specified attribute is not a list.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="the-list-get-operation">The list-get operation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Gets one element from a list attribute by its index</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>name</code> – (string) – the name of the list attribute</p>
+</li>
+<li>
+<p><code>index</code> – (int, required) – index of element to get from list</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This operation will fail if the specified attribute is not a list.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="the-list-clear-operation">The list-clear operation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Empties the list attribute. It is different from <code>:undefine-attribute</code>
+as it results in attribute of type list with 0 elements, whereas
+<code>:undefine-attribute</code> results in an <code>undefined</code> value for the attribute</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>name</code> – (string) – the name of the list attribute</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This operation will fail if the specified attribute is not a list.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="the-map-put-operation">The map-put operation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Adds an key/value pair entry to the value of a map attribute:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>name</code> – (string) – the name of the map attribute to add the new entry
+to.</p>
+</li>
+<li>
+<p><code>key</code> – (string) – the key of the new entry to be added.</p>
+</li>
+<li>
+<p><code>value</code> – (type depends on the entry being written) – the value of the
+new entry to be added to the attribute value.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This operation will fail if the specified attribute is not a map.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="the-map-remove-operation">The map-remove operation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Removes an entry from the value of a map attribute:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>name</code> – (string) – the name of the map attribute to remove the new
+entry from.</p>
+</li>
+<li>
+<p><code>key</code> – (string) – the key of the entry to be removed.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This operation will fail if the specified attribute is not a map.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="the-map-get-operation">The map-get operation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Gets the value of one entry from a map attribute</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>name</code> – (string) – the name of the map attribute</p>
+</li>
+<li>
+<p><code>key</code> – (string) – the key of the entry.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This operation will fail if the specified attribute is not a map.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="the-map-clear-operation">The map-clear operation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Empties the map attribute. It is different from <code>:undefine-attribute</code> as
+it results in attribute of type map with 0 entries, whereas
+<code>:undefine-attribute</code> results in an <code>undefined</code> value for the attribute</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>name</code> – (string) – the name of the map attribute</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This operation will fail if the specified attribute is not a map.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="the-read-resource-description-operation">The read-resource-description operation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Returns the description of a resource&#8217;s attributes, types of children
+and, optionally, operations. Supports the<br>
+following parameters, none of which are required:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>recursive</code> – (boolean, default is <code>false</code>) – whether to include
+information about child resources, recursively.</p>
+</li>
+<li>
+<p><code>proxies</code> – (boolean, default is <code>false</code>) – whether to include remote
+resources in a recursive query (i.e. host level resources from slave
+Host Controllers in a query of the Domain Controller; running server
+resources in a query of a host)</p>
+</li>
+<li>
+<p><code>operations</code> – (boolean, default is <code>false</code>) – whether to include
+descriptions of the resource&#8217;s operations</p>
+</li>
+<li>
+<p><code>inherited</code> – (boolean, default is <code>true</code>) – if <code>operations</code> is
+<code>true</code>, whether to include descriptions of operations inherited from
+higher level resources. The global operations described in this section
+are themselves inherited from the root resource, so the primary effect
+of setting <code>inherited</code> to <code>false</code> is to exclude the descriptions of the
+global operations from the output.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>See <a href="#Description_of_the_Management_Model">Description of the
+Management Model</a> for details on the result of this operation.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="the-read-operation-names-operation">The read-operation-names operation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Returns a list of the names of all the operations the resource supports.
+Takes no parameters.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="the-read-operation-description-operation">The read-operation-description operation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Returns the description of an operation, along with details of its
+parameter types and its return value. Takes a single, required,
+parameter:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>name</code> – (string) – the name of the operation</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>See <a href="#Description_of_the_Management_Model">Description of the
+Management Model</a> for details on the result of this operation.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="the-read-children-types-operation">The read-children-types operation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Returns a list of the
+<a href="Management_resources.html#src-557064_Managementresources-Address">types
+of child resources</a> the resource supports. Takes two optional
+parameters:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>include-aliases</code> – (boolean, default is <code>false</code>) – whether to include
+alias children (i.e. those which are aliases of other sub-resources) in
+the response.</p>
+</li>
+<li>
+<p><code>include-singletons</code> – (boolean, default is <code>false</code>) – whether to
+include singleton children (i.e. those are children that acts as
+resource aggregate and are registered with a wildcard name) in the
+response
+<a href="http://lists.jboss.org/pipermail/wildfly-dev/2014-August/002701.html">wildfly-dev
+discussion around this topic</a>.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="the-read-children-names-operation">The read-children-names operation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Returns a list of the names of all child resources of a given
+<a href="Management_resources.html#src-557064_Managementresources-Address">type</a>.
+Takes a single, required, parameter:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>child-type</code> – (string) – the name of the type</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="the-read-children-resources-operation">The read-children-resources operation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Returns information about all of a resource&#8217;s children that are of a
+given
+<a href="Management_resources.html#src-557064_Managementresources-Address">type</a>.
+For each child resource, the returned information is equivalent to
+executing the <code>read-resource</code> operation on that resource. Takes the
+following parameters, of which only \{{child-type} is required:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>child-type</code> – (string) – the name of the type of child resource</p>
+</li>
+<li>
+<p><code>recursive</code> – (boolean, default is <code>false</code>) – whether to include
+complete information about child resources, recursively.</p>
+</li>
+<li>
+<p><code>recursive-depth</code> – (int) – The depth to which information about child
+resources should be included if <code>recursive</code> is \{{true}. If not set,
+the depth will be unlimited; i.e. all descendant resources will be
+included.</p>
+</li>
+<li>
+<p><code>proxies</code> – (boolean, default is <code>false</code>) – whether to include remote
+resources in a recursive query (i.e. host level resources from slave
+Host Controllers in a query of the Domain Controller; running server
+resources in a query of a host)</p>
+</li>
+<li>
+<p><code>include-runtime</code> – (boolean, default is <code>false</code>) – whether to include
+runtime attributes (i.e. those whose value does not come from the
+persistent configuration) in the response.</p>
+</li>
+<li>
+<p><code>include-defaults</code> – (boolean, default is <code>true</code>) – whether to include
+in the result default values not set by users. Many attributes have a
+default value that will be used in the runtime if the users have not
+provided an explicit value. If this parameter is <code>false</code> the value for
+such attributes in the result will be <code>undefined</code>. If <code>true</code> the result
+will include the default value for such parameters.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="the-read-attribute-group-operation">The read-attribute-group operation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Returns a list of attributes of a
+<a href="Management_resources.html#src-557064_Managementresources-Address">type</a>
+for a given attribute group name. For each attribute the returned
+information is equivalent to executing the <code>read-attribute</code> operation of
+that resource. Takes the following parameters, of which only \{{name}
+is required:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>name</code> – (string) – the name of the attribute group to read.</p>
+</li>
+<li>
+<p><code>include-defaults</code> – (boolean, default is <code>true</code>) – whether to include
+in the result default values not set by users. Many attributes have a
+default value that will be used in the runtime if the users have not
+provided an explicit value. If this parameter is <code>false</code> the value for
+such attributes in the result will be <code>undefined</code>. If <code>true</code> the result
+will include the default value for such parameters.</p>
+</li>
+<li>
+<p><code>include-runtime</code> – (boolean, default is <code>false</code>) – whether to include
+runtime attributes (i.e. those whose value does not come from the
+persistent configuration) in the response.</p>
+</li>
+<li>
+<p><code>include-aliases</code> – (boolean, default is <code>false</code>) – whether to include
+alias attributes (i.e. those which are alias of other attributes) in the
+response.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="the-read-attribute-group-names-operation">The read-attribute-group-names operation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Returns a list of attribute groups names for a given
+<a href="Management_resources.html#src-557064_Managementresources-Address">type</a>.
+Takes no parameters.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="standard-operations">Standard Operations</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Besides the global operations described above, by convention nearly
+every resource should expose an <code>add</code> operation and a <code>remove</code>
+operation. Exceptions to this convention are the root resource, and
+resources that do not store persistent configuration and are created
+dynamically at runtime (e.g. resources representing the JVM&#8217;s platform
+mbeans or resources representing aspects of the running state of a
+deployment.)</p>
+</div>
+<div class="sect2">
+<h3 id="the-add-operation">The add operation</h3>
+<div class="paragraph">
+<p>The operation that creates a new resource must be named <code>add</code>. The
+operation may take zero or more parameters; what those parameters are
+depends on the resource being created.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="the-remove-operation">The remove operation</h3>
+<div class="paragraph">
+<p>The operation that removes an existing resource must be named <code>remove</code>.
+The operation should take no parameters.</p>
+</div>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

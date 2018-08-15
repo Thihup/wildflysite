@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Properties Based Authentication / Authorization | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Properties Based Authentication / Authorization" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_elytron/migrate/Properties_File_Based_Authentication_Migration.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_elytron/migrate/Properties_File_Based_Authentication_Migration.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_elytron/migrate/Properties_File_Based_Authentication_Migration.html","headline":"Properties Based Authentication / Authorization","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="sect1">
+<h2 id="picketbox-based-configuration">PicketBox Based Configuration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This migration example assumes a deployed web application is configured
+to require authentication using FORM based authentication and is
+referencing a PicketBox based security domain using the
+UsersRolesLoginModule to load user information from a pair or properties
+files.</p>
+</div>
+<div class="sect2">
+<h3 id="original-configuration">Original Configuration</h3>
+<div class="paragraph">
+<p>A security domain can be defined in the legacy security subsystem using
+the following management operations: -</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">./subsystem=security/security-domain=application-security:add
+./subsystem=security/security-domain=application-security/authentication=classic:add(login-modules=[{code=UsersRoles, flag=Required, module-options={usersProperties=file://${jboss.server.config.dir}/example-users.properties, rolesProperties=file://${jboss.server.config.dir}/example-roles.properties}}])</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This would result in a security domain definition: -</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">  &lt;security-domain name="application-security"&gt;
+    &lt;authentication&gt;
+      &lt;login-module code="UsersRoles" flag="required"&gt;
+        &lt;module-option name="usersProperties" value="file://${jboss.server.config.dir}/example-users.properties"/&gt;
+        &lt;module-option name="rolesProperties" value="file://${jboss.server.config.dir}/example-roles.properties"/&gt;
+      &lt;/login-module&gt;
+    &lt;/authentication&gt;
+  &lt;/security-domain&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="intermediate-configuration">Intermediate Configuration</h3>
+<div class="paragraph">
+<p>It is possible to take a previously defined PicketBox security domain
+and expose it as an Elytron security realm so it can be wired into a
+complete Elytron based configuration, if only properties based
+authentication was to be migrated it would be recommended to jump to the
+fully migration configuration and avoid the unnecessary dependency on
+the legacy security subsystem but for situations where that is not
+immediately possible these commands illustrate an intermediate solution.</p>
+</div>
+<div class="paragraph">
+<p>These steps assume the original configuration is already in place.</p>
+</div>
+<div class="paragraph">
+<p>The first step is to add a mapping to an Elytron security realm within
+the legacy security subsystem.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">./subsystem=security/elytron-realm=application-security:add(legacy-jaas-config=application-security)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This results in the following configuration.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">  &lt;subsystem xmlns="urn:jboss:domain:security:2.0"&gt;
+    ...
+    &lt;elytron-integration&gt;
+      &lt;security-realms&gt;
+        &lt;elytron-realm name="application-security" legacy-jaas-config="application-security"/&gt;
+      &lt;/security-realms&gt;
+    &lt;/elytron-integration&gt;
+    ...
+  &lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Within the Elytron subsystem a security domain can be defined which
+references the exported security realm and also a http authentication
+factory which supports FORM based authentication.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">./subsystem=elytron/security-domain=application-security:add(realms=[{realm=application-security}], default-realm=application-security, permission-mapper=default-permission-mapper)
+./subsystem=elytron/http-authentication-factory=application-security-http:add(http-server-mechanism-factory=global, security-domain=application-security, mechanism-configurations=[{mechanism-name=FORM}])</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And the resulting configuration: -</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">  &lt;subsystem xmlns="urn:wildfly:elytron:1.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto"&gt;
+    ...
+    &lt;security-domains&gt;
+      ...
+      &lt;security-domain name="application-security" default-realm="application-security" permission-mapper="default-permission-mapper"&gt;
+        &lt;realm name="application-security"/&gt;
+      &lt;/security-domain&gt;
+    &lt;/security-domains&gt;
+    ...
+    &lt;http&gt;
+      ...
+      &lt;http-authentication-factory name="application-security-http" http-server-mechanism-factory="global" security-domain="application-security"&gt;
+        &lt;mechanism-configuration&gt;
+          &lt;mechanism mechanism-name="FORM"/&gt;
+        &lt;/mechanism-configuration&gt;
+      &lt;/http-authentication-factory&gt;
+      ...
+    &lt;/http&gt;
+    ...
+  &lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Finally configuration needs to be added to the Undertow subsystem to map
+the security domain referenced by the deployment to the newly defined
+http authentication factory.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">./subsystem=undertow/application-security-domain=application-security:add(http-authentication-factory=application-security-http)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Which results in: -</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">  &lt;subsystem xmlns="urn:jboss:domain:undertow:4.0"&gt;
+    ...
+    &lt;application-security-domains&gt;
+      &lt;application-security-domain name="application-security" http-authentication-factory="application-security-http"/&gt;
+    &lt;/application-security-domains&gt;
+    ...
+  &lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><em>Note: If the deployment was already deployed at this point the
+application server should be reloaded or the deployment redeployed for
+the application security domain mapping to take effect.</em></p>
+</div>
+<div class="paragraph">
+<p>The following command can then be used to verify the mapping was applied
+to the deployment.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9990 /] ./subsystem=undertow/application-security-domain=application-security:read-resource(include-runtime=true)
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; {
+        "enable-jacc" =&gt; false,
+        "http-authentication-factory" =&gt; "application-security-http",
+        "override-deployment-config" =&gt; false,
+        "referencing-deployments" =&gt; ["HelloWorld.war"],
+        "setting" =&gt; undefined
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The deployment being tested here is 'HelloWorld.war' and the output from
+the previous command shows this deployment is referencing the mapping.</p>
+</div>
+<div class="paragraph">
+<p>At this stage the previously defined security domain is used for it&#8217;s
+LoginModule configuration but this is wrapped by Elytron components
+which take over authentication.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="fully-migrated-configuration">Fully Migrated Configuration</h3>
+<div class="paragraph">
+<p>Alternatively the configuration can be completely defined within the
+Elytron subsystem, in this case it is assumed none of the previous
+commands have been executed and this is started from a clean
+configuration - however if the security domain definition does exist in
+the legacy security subsystem that will remain completely independent.</p>
+</div>
+<div class="paragraph">
+<p>First a new security realm can be defined within the Elytron subsystem
+referencing the files referenced previously: -</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">./subsystem=elytron/properties-realm=application-properties:add(users-properties={path=example-users.properties, relative-to=jboss.server.config.dir, plain-text=true, digest-realm-name="Application Security"}, groups-properties={path=example-roles.properties, relative-to=jboss.server.config.dir}, groups-attribute=Roles)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As before a security domain and http authentication factory can be
+defined.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">./subsystem=elytron/security-domain=application-security:add(realms=[{realm=application-properties}], default-realm=application-properties, permission-mapper=default-permission-mapper)
+./subsystem=elytron/http-authentication-factory=application-security-http:add(http-server-mechanism-factory=global, security-domain=application-security, mechanism-configurations=[{mechanism-name=FORM}])</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This results in the following overall configuration.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">  &lt;subsystem xmlns="urn:wildfly:elytron:1.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto"&gt;
+    ...
+    &lt;security-domains&gt;
+      ...
+      &lt;security-domain name="application-security" default-realm="application-properties" permission-mapper="default-permission-mapper"&gt;
+        &lt;realm name="application-properties"/&gt;
+      &lt;/security-domain&gt;
+    &lt;/security-domains&gt;
+    &lt;security-realms&gt;
+      ...
+      &lt;properties-realm name="application-properties" groups-attribute="Roles"&gt;
+        &lt;users-properties path="example-users.properties" relative-to="jboss.server.config.dir" digest-realm-name="Application Security" plain-text="true"/&gt;
+        &lt;groups-properties path="example-roles.properties" relative-to="jboss.server.config.dir"/&gt;
+      &lt;/properties-realm&gt;
+    &lt;/security-realms&gt;
+    ...
+    &lt;http&gt;
+      ...
+      &lt;http-authentication-factory name="application-security-http" http-server-mechanism-factory="global" security-domain="application-security"&gt;
+        &lt;mechanism-configuration&gt;
+          &lt;mechanism mechanism-name="FORM"/&gt;
+        &lt;/mechanism-configuration&gt;
+      &lt;/http-authentication-factory&gt;
+      ...
+    &lt;/http&gt;
+    ...
+  &lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As before the application-security-domain mapping should be added to the
+Undertow subsystem and the server reloaded or the deployment redeployed
+as required.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">./subsystem=undertow/application-security-domain=application-security:add(http-authentication-factory=application-security-http)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Which results in: -</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">  &lt;subsystem xmlns="urn:jboss:domain:undertow:4.0"&gt;
+    ...
+    &lt;application-security-domains&gt;
+      &lt;application-security-domain name="application-security" http-authentication-factory="application-security-http"/&gt;
+    &lt;/application-security-domains&gt;
+    ...
+  &lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>At this stage the authentication is the equivalent of the original
+configuration however now Elytron components are used exclusively.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="legacy-security-realm">Legacy Security Realm</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="original-configuration-1">Original Configuration</h3>
+<div class="paragraph">
+<p>A legacy security realm can be defined using the following commands to
+load users passwords and group information from properties files.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">./core-service=management/security-realm=ApplicationSecurity:add
+./core-service=management/security-realm=ApplicationSecurity/authentication=properties:add(relative-to=jboss.server.config.dir, path=example-users.properties, plain-text=true)
+./core-service=management/security-realm=ApplicationSecurity/authorization=properties:add(relative-to=jboss.server.config.dir, path=example-roles.properties)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This results in the following realm definition.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">  &lt;security-realm name="ApplicationSecurity"&gt;
+    &lt;authentication&gt;
+      &lt;properties path="example-users.properties" relative-to="jboss.server.config.dir" plain-text="true"/&gt;
+    &lt;/authentication&gt;
+    &lt;authorization&gt;
+      &lt;properties path="example-roles.properties" relative-to="jboss.server.config.dir"/&gt;
+    &lt;/authorization&gt;
+  &lt;/security-realm&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A legacy security realm would typically be used to secure either the
+management interfaces or remoting connectors.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="migrated-configuration">Migrated Configuration</h3>
+<div class="paragraph">
+<p>One of the motivations for adding the Elytron based security to the
+application server is to allow a consistent security solution to be used
+across the server, to replace the security realm the same steps as
+described in the previous 'Fully Migrated' section can be followed again
+up until the http-authentication-factory is defined.</p>
+</div>
+<div class="paragraph">
+<p>A legacy security realm can also be used for SASL based authentication
+so a sasl-authentication-factory should also be defined.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">./subsystem=elytron/sasl-authentication-factory=application-security-sasl:add(sasl-server-factory=elytron, security-domain=application-security, mechanism-configurations=[{mechanism-name=PLAIN}])</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">  &lt;subsystem xmlns="urn:wildfly:elytron:1.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto"&gt;
+    ...
+    &lt;sasl&gt;
+      ...
+      &lt;sasl-authentication-factory name="application-security-sasl" sasl-server-factory="elytron" security-domain="application-security"&gt;
+        &lt;mechanism-configuration&gt;
+          &lt;mechanism mechanism-name="PLAIN"/&gt;
+        &lt;/mechanism-configuration&gt;
+      &lt;/sasl-authentication-factory&gt;
+      ...
+    &lt;/sasl&gt;
+  &lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This can be associated with a Remoting connector to use for
+authentication and the existing security realm reference cleared.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">./subsystem=remoting/http-connector=http-remoting-connector:write-attribute(name=sasl-authentication-factory, value=application-security-sasl)
+./subsystem=remoting/http-connector=http-remoting-connector:undefine-attribute(name=security-realm)</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">  &lt;subsystem xmlns="urn:jboss:domain:remoting:4.0"&gt;
+    ...
+    &lt;http-connector name="http-remoting-connector" connector-ref="default" sasl-authentication-factory="application-security-sasl"/&gt;
+  &lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If this new configuration was to be used to secure the management
+interfaces more suitable names should be chosen but the following
+commands illustrate how to set the two authentication factories and
+clear the existing security realm reference.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">./core-service=management/management-interface=http-interface:write-attribute(name=http-authentication-factory, value=application-security-http)
+./core-service=management/management-interface=http-interface:write-attribute(name=http-upgrade.sasl-authentication-factory, value=application-security-sasl)
+./core-service=management/management-interface=http-interface:undefine-attribute(name=security-realm)</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">  &lt;management-interfaces&gt;
+    &lt;http-interface http-authentication-factory="application-security-http"&gt;
+      &lt;http-upgrade enabled="true" sasl-authentication-factory="application-security-sasl"/&gt;
+      &lt;socket-binding http="management-http"/&gt;
+    &lt;/http-interface&gt;
+  &lt;/management-interfaces&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

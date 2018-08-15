@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>SSL with Client Cert Migration | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="SSL with Client Cert Migration" />
+<meta name="author" content="As this documentation is primarily intended for users migrating to WildFly Elytron I am going to jump straight into the configuration required with WildFly Elytron." />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_elytron/migrate/SSL_with_Client_Cert_Migration.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_elytron/migrate/SSL_with_Client_Cert_Migration.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_elytron/migrate/SSL_with_Client_Cert_Migration.html","headline":"SSL with Client Cert Migration","author":{"@type":"Person","name":"As this documentation is primarily intended for users migrating to WildFly Elytron I am going to jump straight into the configuration required with WildFly Elytron."},"@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>This section will cover how to create the various resources required to achieve CLIENT_CERT authentication with fallback to username / password authentication for both HTTP and SASL (i.e. Remoting) - both are being covered at the same time as predominantly they require the same core configuration, it is not until the definition of the authentication factories that the configuration becomes really specific.</p>
+</div>
+<div class="paragraph">
+<p>The WildFly Elytron project already contains a dummy certificate authority set up that we use for testing, the KeyStores within this documentation are from the dummy certificate authority although for anything other than testing these should be replaced with your own.</p>
+</div>
+<div class="paragraph">
+<p>As a first step we define some paths that point to the wildfly-elytron project so we can use these in the subsequent configuration.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">./subsystem=security/security-domain=application-security:add
+./subsystem=security/security-domain=application-security/authentication=classic:add(login-modules=[{code=UsersRoles, flag=Required, module-options={usersProperties=file://${jboss.server.config.dir}/example-users.properties, rolesProperties=file://${jboss.server.config.dir}/example-roles.properties}}])</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This results in the following configuration.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;paths&gt;
+  &lt;path name="elytron.project" path="/home/darranl/src/wildfly10/wildfly-elytron"/&gt;
+  &lt;path name="elytron.project.jks" path="src/test/resources/ca/jks" relative-to="elytron.project"/&gt;
+  &lt;path name="elytron.project.properties" path="src/test/resources/org/wildfly/security/auth/realm" relative-to="elytron.project"/&gt;
+&lt;/paths&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="keystores-keymanagers-and-trustmanagers">KeyStores, KeyManagers, and TrustManagers.</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The next step is to define the KeyStore resources, for this example three different keystores are used: -</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">localhost.keystore</dt>
+<dd>
+<p>Contains the servers key and certificate for 'localhost'.</p>
+</dd>
+<dt class="hdlist1">beetles.keystore</dt>
+<dd>
+<p>Contains the individual client certificates.</p>
+</dd>
+<dt class="hdlist1">ca.keystore</dt>
+<dd>
+<p>Contains the certificate of the certificate authority.</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>When we define the overall configuration we will use the localhost keystore along with the ca keystore for the incoming connections so initially all client certificates signed by the certificate authority will be accepted and subsequently a security realm will check it against the actual certificates within beetles keystore.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">./subsystem=elytron/key-store=localhost:add(type=jks, relative-to=elytron.project.jks, path=localhost.keystore, credential-reference={clear-text=Elytron})
+./subsystem=elytron/key-store=beetles:add(type=jks, relative-to=elytron.project.jks, path=beetles.keystore, credential-reference={clear-text=Elytron})
+./subsystem=elytron/key-store=ca:add(type=jks, relative-to=elytron.project.jks, path=ca.truststore, credential-reference={clear-text=Elytron})</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This results in the following configuration.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;subsystem xmlns="urn:wildfly:elytron:1.1" final-providers="combined-providers" disallowed-providers="OracleUcrypto"&gt;
+  ...
+  &lt;tls&gt;
+    &lt;key-stores&gt;
+      &lt;key-store name="localhost"&gt;
+        &lt;credential-reference clear-text="Elytron"/&gt;
+        &lt;implementation type="jks"/&gt;
+        &lt;file path="localhost.keystore" relative-to="elytron.project.jks"/&gt;
+      &lt;/key-store&gt;
+      &lt;key-store name="beetles"&gt;
+        &lt;credential-reference clear-text="Elytron"/&gt;
+        &lt;implementation type="jks"/&gt;
+        &lt;file path="beetles.keystore" relative-to="elytron.project.jks"/&gt;
+      &lt;/key-store&gt;
+      &lt;key-store name="ca"&gt;
+        &lt;credential-reference clear-text="Elytron"/&gt;
+        &lt;implementation type="jks"/&gt;
+        &lt;file path="ca.truststore" relative-to="elytron.project.jks"/&gt;
+      &lt;/key-store&gt;
+    &lt;/key-stores&gt;
+  &lt;/tls&gt;
+&lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Next the key and trust manager resources will be defined using these keystores.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">./subsystem=elytron/key-manager=localhost-manager:add(algorithm=SunX509, key-store=localhost, credential-reference={clear-text=Elytron})
+./subsystem=elytron/trust-manager=ca-manager:add(algorithm=SunX509, key-store=ca)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Resulting in:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;subsystem xmlns="urn:wildfly:elytron:1.1" final-providers="combined-providers" disallowed-providers="OracleUcrypto"&gt;
+  ...
+  &lt;tls&gt;
+   ...
+     &lt;key-managers&gt;
+       &lt;key-manager name="localhost-manager" algorithm="SunX509" key-store="localhost"&gt;
+         &lt;credential-reference clear-text="Elytron"/&gt;
+       &lt;/key-manager&gt;
+     &lt;/key-managers&gt;
+     &lt;trust-managers&gt;
+       &lt;trust-manager name="ca-manager" algorithm="SunX509" key-store="ca"/&gt;
+     &lt;/trust-managers&gt;
+  &lt;/tls&gt;
+&lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="realms-and-domains">Realms and Domains</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Two security realms are now defined, one of these uses properties files from within the WildFly Elytron project to support username/password authentication and the other using the clients certificates for verification.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">./subsystem=elytron/properties-realm=test-users:add(users-properties={relative-to=elytron.project.properties, path=clear.properties, plain-text=true, digest-realm-name=ManagementRealm}, groups-properties={relative-to=elytron.project.properties, path=groups.properties})
+./subsystem=elytron/key-store-realm=key-store-realm:add(key-store=beetles)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Resulting in:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;subsystem xmlns="urn:wildfly:elytron:1.1" final-providers="combined-providers" disallowed-providers="OracleUcrypto"&gt;
+  ...
+  &lt;security-realms&gt;
+    ...
+    &lt;key-store-realm name="key-store-realm" key-store="beetles"/&gt;
+    ...
+    &lt;properties-realm name="test-users"&gt;
+      &lt;users-properties path="clear.properties" relative-to="elytron.project.properties" digest-realm-name="ManagementRealm" plain-text="true"/&gt;
+      &lt;groups-properties path="groups.properties" relative-to="elytron.project.properties"/&gt;
+    &lt;/properties-realm&gt;
+  &lt;/security-realms&gt;
+  ...
+&lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>These security realms can now be referenced from a security domain:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">./subsystem=elytron/security-domain=client-cert-domain:add(realms=[{realm=test-users},{realm=key-store-realm}], \
+  default-realm=test-users, \
+  permission-mapper=default-permission-mapper)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Resulting in:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;subsystem xmlns="urn:wildfly:elytron:1.1" final-providers="combined-providers" disallowed-providers="OracleUcrypto"&gt;
+  ...
+  &lt;security-domains&gt;
+    ...
+    &lt;security-domain name="client-cert-domain" default-realm="test-users" permission-mapper="default-permission-mapper"&gt;
+      &lt;realm name="test-users"/&gt;
+      &lt;realm name="key-store-realm"/&gt;
+    &lt;/security-domain&gt;
+  &lt;/security-domains&gt;
+  ...
+&lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Before moving onto the individual authentication factories a couple of additional utility resources are also required: -</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>./subsystem=elytron/constant-realm-mapper=key-store-realm:add(realm-name=key-store-realm)
+./subsystem=elytron/x500-attribute-principal-decoder=x500-decoder:add(attribute-name=CN, maximum-segments=1)</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Resulting in: -</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;subsystem xmlns="urn:wildfly:elytron:1.1" final-providers="combined-providers" disallowed-providers="OracleUcrypto"&gt;
+  ...
+  &lt;mappers&gt;
+    ...
+    &lt;x500-attribute-principal-decoder name="x500-decoder" attribute-name="CN" maximum-segments="1"/&gt;
+    ...
+    &lt;constant-realm-mapper name="key-store-realm" realm-name="key-store-realm"/&gt;
+    ...
+  &lt;/mappers&gt;
+  ...
+&lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="http-authentication-factory">HTTP Authentication Factory</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>For the HTTP connections we now define a HTTP authentication factory using the previously defined resources and it is configured to support CLIENT_CERT and DIGEST authentication.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>./subsystem=elytron/http-authentication-factory=client-cert-digest:add(http-server-mechanism-factory=global, \
+  security-domain=client-cert-domain, \
+ mechanism-configurations=[{ \
+  mechanism-name=CLIENT_CERT, \
+  realm-mapper=key-store-realm, \
+  pre-realm-principal-transformer=x500-decoder}, \
+ {mechanism-name=DIGEST, mechanism-realm-configurations=[{realm-name=ManagementRealm}]}])</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Resulting in: -</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>&lt;subsystem xmlns="urn:wildfly:elytron:1.1" final-providers="combined-providers" disallowed-providers="OracleUcrypto"&gt;
+  ...
+  &lt;http&gt;
+    ...
+    &lt;http-authentication-factory name="client-cert-digest" http-server-mechanism-factory="global" security-domain="client-cert-domain"&gt;
+      &lt;mechanism-configuration&gt;
+        &lt;mechanism mechanism-name="CLIENT_CERT" pre-realm-principal-transformer="x500-decoder" realm-mapper="key-store-realm"/&gt;
+        &lt;mechanism mechanism-name="DIGEST"&gt;
+          &lt;mechanism-realm realm-name="ManagementRealm"/&gt;
+        &lt;/mechanism&gt;
+      &lt;/mechanism-configuration&gt;
+    &lt;/http-authentication-factory&gt;
+    ...
+  &lt;/http&gt;
+  ...
+&lt;/subsystem&gt;</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Where DIGEST authentication is used we rely on the default configuration within the security domain to select the 'test-users' realm, however where CLIENT_CERT authentication is in use an alternative realm-mapper is referenced to ensure the 'key-store-realm' is used.</p>
+</div>
+<div class="paragraph">
+<p>Additionally for CLIENT_CERT authentication a principal-transformer is referenced to extract the CN attribute from the distinguished name of the client certificate and use this when accessing the identity from the security realm.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="sasl-authentication-factory">SASL Authentication Factory</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The architecture of the two authentication factories if very similar so a SASL authentication factory can be defined in the same way as the HTTP equivalent.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>./subsystem=elytron/sasl-authentication-factory=client-cert-digest:add(sasl-server-factory=elytron, \
+  security-domain=client-cert-domain, \
+  mechanism-configurations=[{mechanism-name=EXTERNAL, \
+  realm-mapper=key-store-realm, \
+  pre-realm-principal-transformer=x500-decoder}, \
+  {mechanism-name=DIGEST-MD5, mechanism-realm-configurations=[{realm-name=ManagementRealm}]}])</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This results in: -</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;subsystem xmlns="urn:wildfly:elytron:1.1" final-providers="combined-providers" disallowed-providers="OracleUcrypto"&gt;
+  ...
+  &lt;sasl&gt;
+    ...
+    &lt;sasl-authentication-factory name="client-cert-digest" sasl-server-factory="elytron" security-domain="client-cert-domain"&gt;
+      &lt;mechanism-configuration&gt;
+        &lt;mechanism mechanism-name="EXTERNAL" pre-realm-principal-transformer="x500-decoder" realm-mapper="key-store-realm"/&gt;
+        &lt;mechanism mechanism-name="DIGEST-MD5"&gt;
+          &lt;mechanism-realm realm-name="ManagementRealm"/&gt;
+        &lt;/mechanism&gt;
+      &lt;/mechanism-configuration&gt;
+    &lt;/sasl-authentication-factory&gt;
+    ...
+  &lt;/sasl&gt;
+  ...
+&lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Realm mappers and principal transformers are defined in the same way as were defined for HTTP.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="ssl-context">SSL Context</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>An SSL context is also defined for use by the server.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>./subsystem=elytron/server-ssl-context=localhost:add(key-manager=localhost-manager, trust-manager=ca-manager, \
+  security-domain=client-cert-domain, \
+  authentication-optional=true, \
+  want-client-auth=true, \
+  need-client-auth=false)</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Resulting in: -</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;subsystem xmlns="urn:wildfly:elytron:1.1" final-providers="combined-providers" disallowed-providers="OracleUcrypto"&gt;
+  ...
+  &lt;tls&gt;
+    ...
+    &lt;server-ssl-contexts&gt;
+      &lt;server-ssl-context name="localhost" security-domain="client-cert-domain" want-client-auth="true" need-client-auth="false" authentication-optional="true" key-manager="localhost-manager" trust-manager="ca-manager"/&gt;
+    &lt;/server-ssl-contexts&gt;
+  &lt;/tls&gt;
+&lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As we will be supporting fallback to username/password authentication need-client-auth is set to false as well as authentication-optional being set to false, this allows connections to be established but an alternative form of authentication will be required.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="using-for-management">Using for Management</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>At this point the management interfaces can be updated to use the newly defined resources, we need to add references to the two new authentication factories and the SSL context, we can also remove the existing reference to the legacy security realm. As this is modifying existing interfaces a server reload will also be required.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>./core-service=management/management-interface=http-interface:write-attribute(name=ssl-context, value=localhost)
+./core-service=management/management-interface=http-interface:write-attribute(name=secure-socket-binding, value=management-https)
+./core-service=management/management-interface=http-interface:write-attribute(name=http-authentication-factory, value=client-cert-digest)
+./core-service=management/management-interface=http-interface:write-attribute(name=http-upgrade.sasl-authentication-factory, value=client-cert-digest)
+./core-service=management/management-interface=http-interface:undefine-attribute(name=security-realm)
+:reload</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The management interface configuration then becomes: -</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;management&gt;
+  ...
+  &lt;management-interfaces&gt;
+    &lt;http-interface http-authentication-factory="client-cert-digest" ssl-context="localhost"&gt;
+      &lt;http-upgrade enabled="true" sasl-authentication-factory="client-cert-digest"/&gt;
+      &lt;socket-binding http="management-http" https="management-https"/&gt;
+    &lt;/http-interface&gt;
+  &lt;/management-interfaces&gt;
+  ...
+&lt;/management&gt;</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="admin-clients">Admin Clients</h3>
+<div class="paragraph">
+<p>At this stage assuming the same files have been used as in this example it should be possible to connect to the management interface of the server either using a web browser or the JBoss CLI with the username elytron and password passwd12#$</p>
+</div>
+<div class="paragraph">
+<p>For certificate based authentication the keys and certificates from the WildFly Elytron tests can be used, these are found in JKS keystores under 'src/test/resources/ca/jks', these keystores have a password of Elytron.</p>
+</div>
+<div class="sect3">
+<h4 id="web-browser-configuration">Web Browser Configuration</h4>
+<div class="paragraph">
+<p>A PKCS#12 file can be created from the test keystores,this can then be imported into the web browser to use when connecting to the server.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>keytool -importkeystore -srckeystore ladybird.keystore \
+  -destkeystore ladybird.pkcs12 \
+  -srcstoretype jks \
+  -deststoretype pkcs12 \
+  -deststorepass Elytron \
+  -srcalias ladybird \
+  -destalias ladybird</pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="cli-configuration">CLI Configuration</h4>
+<div class="paragraph">
+<p>Since the integration of WildFly Elytron it is possible with the CLI to use a configuration file wildfly-config.xml to define the security settings including the settings for the client side SSL context.</p>
+</div>
+<div class="paragraph">
+<p>For the purpose of this example copy the ladybird,keystore and ca.truststore from the Wildfly Elytron testsuite to the location the JBoss CLI is being started from, the following wildfly-config.xml can be created in this location as well: -</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+
+&lt;configuration&gt;
+    &lt;authentication-client xmlns="urn:elytron:1.0"&gt;
+        &lt;key-stores&gt;
+            &lt;key-store name="ladybird" type="jks" &gt;
+                &lt;file name="ladybird.keystore"/&gt;
+                &lt;key-store-clear-password password="Elytron" /&gt;
+            &lt;/key-store&gt;
+            &lt;key-store name="ca" type="jks"&gt;
+                &lt;file name="ca.truststore"/&gt;
+                &lt;key-store-clear-password password="Elytron" /&gt;
+            &lt;/key-store&gt;
+        &lt;/key-stores&gt;
+        &lt;ssl-context-rules&gt;
+            &lt;rule use-ssl-context="default" /&gt;
+        &lt;/ssl-context-rules&gt;
+        &lt;ssl-contexts&gt;
+            &lt;ssl-context name="default"&gt;
+                &lt;key-store-ssl-certificate key-store-name="ladybird" alias="ladybird"&gt;
+                    &lt;key-store-clear-password password="Elytron" /&gt;
+                &lt;/key-store-ssl-certificate&gt;
+                &lt;trust-store key-store-name="ca" /&gt;
+            &lt;/ssl-context&gt;
+        &lt;/ssl-contexts&gt;
+    &lt;/authentication-client&gt;
+&lt;/configuration&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The CLI can now be started using the following command: -</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>./jboss-cli.sh -c -Dwildfly.config.url=wildfly-config.xml</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The :whoami command can be used within the CLI to double check the current identity.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>[standalone@localhost:9993 /] :whoami(verbose=true)
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; {
+        "identity" =&gt; {"username" =&gt; "Ladybird"},
+        "mapped-roles" =&gt; ["SuperUser"]
+    }
+}</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Apache CXF integration | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Apache CXF integration" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_developer-guide/jax-ws/Apache_CXF_integration.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_developer-guide/jax-ws/Apache_CXF_integration.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_developer-guide/jax-ws/Apache_CXF_integration.html","headline":"Apache CXF integration","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="sect1">
+<h2 id="jbossws-integration-layer-with-apache-cxf">JBossWS integration layer with Apache CXF</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>All JAX-WS functionalities provided by JBossWS on top of WildFly are
+currently served through a proper integration of the JBoss Web Services
+stack with most of the <a href="http://cxf.apache.org/">Apache CXF</a> project
+modules.</p>
+</div>
+<div class="paragraph">
+<p>Apache CXF is an open source services framework. It allows building and
+developing services using frontend programming APIs (including JAX-WS),
+with services speaking a variety of protocols such as SOAP and XML/HTTP
+over a variety of transports such as HTTP and JMS.</p>
+</div>
+<div class="paragraph">
+<p>The integration layer ( <em>JBossWS-CXF</em> in short hereafter) is mainly
+meant for:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>allowing using standard webservices APIs (including JAX-WS) on
+WildFly; this is performed internally leveraging Apache CXF without
+requiring the user to deal with it;</p>
+</li>
+<li>
+<p>allowing using Apache CXF advanced features (including WS-*) on top of
+WildFly without requiring the user to deal with / setup / care about the
+required integration steps for running in such a container.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>In order for achieving the goals above, the JBossWS-CXF integration
+supports the JBoss ws endpoint deployment mechanism and comes with many
+internal customizations on top of Apache CXF.</p>
+</div>
+<div class="paragraph">
+<p>In the next sections a list of technical suggestions and notes on the
+integration is provided; please also refer to the
+<a href="http://cxf.apache.org/docs/index.html">Apache CXF official documentation</a>
+for in-depth details on the CXF architecture.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="building-ws-applications-the-jboss-way">Building WS applications the JBoss way</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The Apache CXF client and endpoint configuration as explained in the
+<a href="http://cxf.apache.org/docs/index.html">Apache CXF official user guide</a> is
+heavily based on Spring. Apache CXF basically parses Spring <code>cxf.xml</code>
+descriptors; those may contain any basic bean plus specific ws client
+and endpoint beans which CXF has custom parsers for. Apache CXF can be
+used to deploy webservice endpoints on any servlet container by
+including its libraries in the deployment; in such a scenario Spring
+basically serves as a convenient configuration option, given direct
+Apache CXF API usage won&#8217;t be very handy. Similar reasoning applies on
+client side, where a Spring based descriptor offers a shortcut for
+setting up Apache CXF internals.</p>
+</div>
+<div class="paragraph">
+<p>This said, nowadays almost any Apache CXF functionality can be
+configured and used through direct API usage, without Spring. As a
+consequence of that and given the considerations in the sections below,
+the JBossWS integration with Apache CXF does not rely on Spring
+descriptors.</p>
+</div>
+<div class="sect2">
+<h3 id="portable-applications">Portable applications</h3>
+<div class="paragraph">
+<p>WildFly is much more then a servlet container; it actually provides
+users with a fully compliant target platform for Java EE applications.</p>
+</div>
+<div class="paragraph">
+<p>Generally speaking, <em>users are encouraged to write portable
+applications</em> by relying only on <em>JAX-WS specification</em> whenever
+possible. That would by the way ensure easy migrations to and from other
+compliant platforms. Being a Java EE container, WildFly already comes
+with a JAX-WS compliant implementation, which is basically Apache CXF
+plus the JBossWS-CXF integration layer. So users just need to write
+their JAX-WS application; <em>no need for embedding any Apache CXF or any
+ws related dependency library in user deployments</em>. Please refer to the
+<a href="#JAX-WS_User_Guide">JAX-WS User Guide</a> section of the documentation for
+getting started.</p>
+</div>
+<div class="paragraph">
+<p>WS-* usage (including WS-Security, WS-Addressing, WS-ReliableMessaging,
+&#8230;&#8203;) should also be configured in the most portable way; that is by
+<em>relying on proper WS-Policy assertions</em> on the endpoint WSDL contracts,
+so that client and endpoint configuration is basically a matter of
+setting few ws context properties. The WS-* related sections of this
+documentation cover all the details on configuring applications making
+use of WS-* through policies.</p>
+</div>
+<div class="paragraph">
+<p>As a consequence of the reasoning above, the JBossWS-CXF integration is
+currently built directly on the Apache CXF API and aims at allowing
+users to configure webservice clients and endpoints <em>without Spring
+descriptors</em>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="direct-apache-cxf-api-usage">Direct Apache CXF API usage</h3>
+<div class="paragraph">
+<p>Whenever users can&#8217;t really meet their application requirements with
+JAX-WS plus WS-Policy, it is of course still possible to rely on direct
+Apache CXF API usage (given that&#8217;s included in the AS), loosing the Java
+EE portability of the application. That could be the case of a user
+needing specific Apache CXF functionalities, or having to consume WS-*
+enabled endpoints advertised through legacy wsdl contracts without
+WS-Policy assertions.</p>
+</div>
+<div class="paragraph">
+<p>On server side, direct Apache CXF API usage might not be always possible
+or end up being not very easy. For this reason, the JBossWS integration
+comes with a convenient alternative through customization options in the
+<code>jboss-webservices.xml</code> descriptor described below on this page.
+Properties can be declared in <code>jboss-webservices.xml</code> to control Apache
+CXF internals like <em>interceptors</em>, <em>features</em>, etc.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="bus-usage">Bus usage</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="creating-a-bus-instance">Creating a Bus instance</h3>
+<div class="paragraph">
+<p>Most of the Apache CXF features are configurable using the
+<code>org.apache.cxf.Bus</code> class. While for basic JAX-WS usage the user might
+never need to explicitly deal with Bus, using Apache CXF specific
+features generally requires getting a handle to a <code>org.apache.cxf.Bus</code>
+instance. This can happen on client side as well as in a ws endpoint or
+handler business code.</p>
+</div>
+<div class="paragraph">
+<p>New Bus instances are produced by the currently configured
+<code>org.apache.cxf.BusFactory</code> implementation the following way:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">Bus bus = BusFactory.newInstance().createBus();</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The algorithm for selecting the actual implementation of <code>BusFactory</code> to
+be used leverages the Service API, basically looking for optional
+configurations in <em>META-INF/services/&#8230;&#8203;</em> location using the current
+thread context classloader. JBossWS-CXF integration comes with its own
+implementation of <code>BusFactory</code>,
+<code>org.jboss.wsf.stack.cxf.client.configuration.JBossWSBusFactory</code>, that
+allows for seamless setup of JBossWS customizations on top of Apache
+CXF. So, assuming the JBossWS-CXF libraries are available in the current
+thread context classloader, the <code>JBossWSBusFactory</code> is <em>automatically</em>
+retrieved by the <code>BusFactory.newInstance()</code> call above.</p>
+</div>
+<div class="paragraph">
+<p>JBossWS users willing to explicitly use functionalities of
+<code>org.apache.cxf.bus.CXFBusFactory</code> <em>,</em> get the same API with JBossWS
+additions through <code>JBossWSBusFactory</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">Map&lt;Class, Object&gt; myExtensions = new HashMap&lt;Class, Object&gt;();
+myExtensions.put(...);
+Bus bus = new JBossWSBusFactory().createBus(myExtensions);</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="using-existing-bus-instances">Using existing Bus instances</h3>
+<div class="paragraph">
+<p>Apache CXF keeps reference to a global default <code>Bus</code> instance as well as
+to a thread default bus for each thread. That is performed through
+static members in <code>org.apache.cxf.BusFactory</code> <em>,</em> which also comes with
+the following methods in the public API:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">public static synchronized Bus getDefaultBus()
+public static synchronized Bus getDefaultBus(boolean createIfNeeded)
+public static synchronized void setDefaultBus(Bus bus)
+public static Bus getThreadDefaultBus()
+public static Bus getThreadDefaultBus(boolean createIfNeeded)
+public static void setThreadDefaultBus(Bus bus)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Please note that the default behaviour of <code>getDefaultBus()</code> <em>/</em>
+<code>getDefaultBus(true)</code> <em>/</em> <code>getThreadDefaultBus()</code> <em>/</em>
+<code>getThreadDefaultBus(true)</code> is to create a new Bus instance if that&#8217;s
+not set yet. Moreover <em>getThreadDefaultBus()</em> and
+<em>getThreadDefaultBus(true)</em> first fallback to retrieving the configured
+global default bus before actually trying creating a new instance (and
+the created new instance is set as global default bus if that was not
+set there yet).</p>
+</div>
+<div class="paragraph">
+<p>The drawback of this mechanism (which is basically fine in JSE
+environment) is that when running in WildFly container you need to be
+careful in order not to (mis)use a bus over multiple applications
+(assuming the Apache CXF classes are loaded by the same classloader,
+which is currently the case with WildFly).</p>
+</div>
+<div class="paragraph">
+<p>Here is a list of general suggestions to avoid problems when running
+in-container:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>forget about the global default bus; you don&#8217;t need that, so don&#8217;t do
+<code>getDefaultBus()</code> <em>/</em> <code>getDefaultBus(true)</code> <em>/</em> <code>setDefaultBus()</code> in
+your code;</p>
+</li>
+<li>
+<p>avoid <code>getThreadDefaultBus()</code> <em>/</em> <code>getThreadDefaultBus(true)</code> unless
+you already know for sure the default bus is already set;</p>
+</li>
+<li>
+<p>keep in mind thread pooling whenever you customize a thread default
+bus instance (for instance adding bus scope interceptors, &#8230;&#8203;), as that
+thread and bus might be later reused; so either shutdown the bus when
+you&#8217;re done or explicitly remove it from the BusFactory thread
+association.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Finally, remember that each time you explictly create a new Bus instance
+(factory.createBus()) that is set as thread default bus and global
+default bus if those are not set yet. The JAXWS <code>Provider</code>
+implementation also creates <code>Bus</code> instances internally, in particular
+the JBossWS version of JAXWS <code>Provider</code> makes sure the default bus is
+never internally used and instead a new <code>Bus</code> is created if required
+(more details on this in the next paragraph).</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="bus-selection-strategies-for-jaxws-clients">Bus selection strategies for JAXWS clients</h3>
+<div class="paragraph">
+<p>JAXWS clients require an Apache CXF Bus to be available; the client is
+registered within the Bus and the Bus affects the client behavior (e.g.
+through the configured CXF interceptors). The way a bus is internally
+selected for serving a given JAXWS client is very important, especially
+for in-container clients; for this reason, JBossWS users can choose the
+preferred Bus selection strategy. The strategy is enforced in the
+<code>javax.xml.ws.spi.Provider</code> implementation from the JBossWS integration,
+being that called whenever a JAXWS <code>Service</code> (client) is requested.</p>
+</div>
+<div class="sect3">
+<h4 id="thread-bus-strategy-thread_bus">Thread bus strategy (THREAD_BUS)</h4>
+<div class="paragraph">
+<p>Each time the vanilla JAXWS api is used to create a Bus, the JBossWS-CXF
+integration will automatically make sure a Bus is currently associated
+to the current thread in the BusFactory. If that&#8217;s not the case, a new
+Bus is created and linked to the current thread (to prevent the user
+from relying on the default Bus). The Apache CXF engine will then create
+the client using the current thread Bus.</p>
+</div>
+<div class="paragraph">
+<p>This is the default strategy, and the most straightforward one in Java
+SE environments; it lets users automatically reuse a previously created
+Bus instance and allows using customized Bus that can possibly be
+created and associated to the thread before building up a JAXWS client.</p>
+</div>
+<div class="paragraph">
+<p>The drawback of the strategy is that the link between the Bus instance
+and the thread needs to be eventually cleaned up (when not needed
+anymore). This is really evident in a Java EE environment (hence when
+running in-container), as threads from pools (e.g. serving web requests)
+are re-used.</p>
+</div>
+<div class="paragraph">
+<p>When relying on this strategy, the safest approach to be sure of
+cleaning up the link is to surround the JAXWS client with a
+<code>try/finally</code> block as below:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">try {
+Service service = Service.create(wsdlURL, serviceQName);
+MyEndpoint port = service.getPort(MyEndpoint.class);
+//...
+} finally {
+BusFactory.setThreadDefaultBus(null);
+// OR (if you don't need the bus and the client anymore)
+ Bus bus = BusFactory.getThreadDefaultBus(false);
+bus.shutdown(true);
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="new-bus-strategy-new_bus">New bus strategy (NEW_BUS)</h4>
+<div class="paragraph">
+<p>Another strategy is to have the JAXWS Provider from the JBossWS
+integration create a new Bus each time a JAXWS client is built. The main
+benefit of this approach is that a fresh bus won&#8217;t rely on any formerly
+cached information (e.g. cached WSDL / schemas) which might have changed
+after the previous client creation. The main drawback is of course worse
+performance as the Bus creation takes time.</p>
+</div>
+<div class="paragraph">
+<p>If there&#8217;s a bus already associated to the current thread before the
+JAXWS client creation, that is automatically restored when returning
+control to the user; in other words, the newly created bus will be used
+only for the created JAXWS client but won&#8217;t stay associated to the
+current thread at the end of the process. Similarly, if the thread was
+not associated to any bus before the client creation, no bus will be
+associated to the thread at the end of the client creation.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="thread-context-classloader-bus-strategy-tccl_bus">Thread context classloader bus strategy (TCCL_BUS)</h4>
+<div class="paragraph">
+<p>The last strategy is to have the bus created for serving the client be
+associated to the current thread context classloader (TCCL). That
+basically means the same Bus instance is shared by JAXWS clients running
+when the same TCCL is set. This is particularly interesting as each web
+application deployment usually has its own context classloader, so this
+strategy is possibly a way to keep the number of created Bus instances
+bound to the application number in WildFly container.</p>
+</div>
+<div class="paragraph">
+<p>If there&#8217;s a bus already associated to the current thread before the
+JAXWS client creation, that is automatically restored when returning
+control to the user; in other words, the bus corresponding to the
+current thread context classloader will be used only for the created
+JAXWS client but won&#8217;t stay associated to the current thread at the end
+of the process. If the thread was not associated to any bus before the
+client creation, a new bus will be created (and later user for any other
+client built with this strategy and the same TCCL in place); no bus will
+be associated to the thread at the end of the client creation.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="strategy-configuration">Strategy configuration</h4>
+<div class="paragraph">
+<p>Users can request a given Bus selection strategy to be used for the
+client being built by specifying one of the following JBossWS features
+(which extend <code>javax</code> <code>.</code> <code>xml</code> <code>.</code> <code>ws</code> <code>.</code> <code>WebServiceFeature</code>):</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Feature</th>
+<th class="tableblock halign-left valign-top">Strategy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">org.jboss.wsf.stack.cxf.client.UseThreadBusFeature</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">THREAD_BUS</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">org.jboss.wsf.stack.cxf.client.UseNewBusFeature</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">NEW_BUS</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">org.jboss.wsf.stack.cxf.client.UseTCCLBusFeature</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TCCL_BUS</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>The feature is specified as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">Service service = Service.create(wsdlURL, serviceQName, new UseThreadBusFeature());</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If no feature is explicitly specified, the system default strategy is
+used, which can be modified through the
+<code>org.jboss.ws.cxf.jaxws-client.bus.strategy</code> system property when
+starting the JVM. The valid values for the property are <code>THREAD_BUS</code>,
+<code>NEW_BUS</code> and <code>TCCL_BUS</code>. The default is <code>THREAD_BUS</code>.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="server-side-integration-customization">Server Side Integration Customization</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The JBossWS-CXF server side integration takes care of internally
+creating proper Apache CXF structures (including a <code>Bus</code> instance, of
+course) for the provided ws deployment. Should the deployment include
+multiple endpoints, those would all live within the same Apache CXF Bus,
+which would of course be completely separated by the other deployments'
+bus instances.</p>
+</div>
+<div class="paragraph">
+<p>While JBossWS sets sensible defaults for most of the Apache CXF
+configuration options on server side, users might want to fine tune the
+<code>Bus</code> instance that&#8217;s created for their deployment; a
+<code>jboss-webservices.xml</code> descriptor can be used for deployment level
+customizations.</p>
+</div>
+<div class="sect2">
+<h3 id="deployment-descriptor-properties">Deployment descriptor properties</h3>
+<div class="paragraph">
+<p>The <code>jboss-webservices.xml</code> descriptor can be used to
+<a href="#JAX_WS_Advanced_User_Guide">provide property values</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;webservices xmlns="http://www.jboss.com/xml/ns/javaee" version="1.2"&gt;
+  ...
+  &lt;property&gt;
+    &lt;name&gt;...&lt;/name&gt;
+    &lt;value&gt;...&lt;/value&gt;
+  &lt;/property&gt;
+  ...
+&lt;/webservices&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>JBossWS-CXF integration comes with a set of allowed property names to
+control Apache CXF internals.</p>
+</div>
+<div class="sect3">
+<h4 id="workqueue-configuration">WorkQueue configuration</h4>
+<div class="paragraph">
+<p>Apache CXF uses WorkQueue instances for dealing with some operations
+(e.g. @Oneway requests processing). A
+<a href="http://cxf.apache.org/javadoc/latest-2.5.x/org/apache/cxf/workqueue/WorkQueueManager.html">WorkQueueManager</a>
+is installed in the Bus as an extension and allows for adding / removing
+queues as well as controlling the existing ones.</p>
+</div>
+<div class="paragraph">
+<p>On server side, queues can be provided by using the
+<code>cxf.queue.&lt;queue-name&gt;.*</code> properties in <code>jboss-webservices.xml</code> (e.g.
+<code>cxf.queue.default.maxQueueSize</code> for controlling the max queue size of
+the <code>default</code> workqueue). At deployment time, the JBossWS integration
+can add new instances of
+<a href="http://cxf.apache.org/javadoc/latest-2.5.x/org/apache/cxf/workqueue/AutomaticWorkQueueImpl.html">AutomaticWorkQueueImpl</a>
+to the currently configured WorkQueueManager; the properties below are
+used to fill in parameter into the
+<a href="http://cxf.apache.org/javadoc/latest-2.5.x/org/apache/cxf/workqueue/AutomaticWorkQueueImpl.html#AutomaticWorkQueueImpl(int,%20int,%20int,%20int,%20long,%20java.lang.String)">AutomaticWorkQueueImpl
+constructor</a>:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Property</th>
+<th class="tableblock halign-left valign-top">Default value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">cxf.queue.&lt;queue-name&gt;.maxQueueSize</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">256</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">cxf.queue.&lt;queue-name&gt;.initialThreads</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">cxf.queue.&lt;queue-name&gt;.highWaterMark</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">25</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">cxf.queue.&lt;queue-name&gt;.lowWaterMark</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">cxf.queue.&lt;queue-name&gt;.dequeueTimeout</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">120000</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="policy-alternative-selector">Policy alternative selector</h4>
+<div class="paragraph">
+<p>The Apache CXF policy engine supports different strategies to deal with
+policy alternatives. JBossWS-CXF integration currently defaults to the
+<a href="http://cxf.apache.org/javadoc/latest-2.5.x/org/apache/cxf/ws/policy/selector/MaximalAlternativeSelector.html">MaximalAlternativeSelector</a>,
+but still allows for setting different selector implementation using the
+<code>cxf.policy.alternativeSelector</code> property in <code>jboss-webservices.xml</code>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="mbean-management">MBean management</h4>
+<div class="paragraph">
+<p>Apache CXF allows managing its MBean objects that are installed into the
+WildFly MBean server. The feature is enabled on a deployment basis
+through the <code>cxf.management.enabled</code> property in
+<code>jboss-webservices.xml</code>. The
+<code>cxf.management.installResponseTimeInterceptors</code> property can also be
+used to control installation of CXF response time interceptors, which
+are added by default when enabling MBean management, but might not be
+desired in some cases. Here is an example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;webservices xmlns="http://www.jboss.com/xml/ns/javaee" version="1.2"&gt;
+&lt;property&gt;
+&lt;name&gt;cxf.management.enabled&lt;/name&gt;
+&lt;value&gt;true&lt;/value&gt;
+&lt;/property&gt;
+&lt;property&gt;
+&lt;name&gt;cxf.management.installResponseTimeInterceptors&lt;/name&gt;
+&lt;value&gt;false&lt;/value&gt;
+&lt;/property&gt;
+&lt;/webservices&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="schema-validation">Schema validation</h4>
+<div class="paragraph">
+<p>Schema validation of exchanged messages can also be enabled in
+<code>jboss-webservices.xml</code>. Further details available
+<a href="#JAX-WS_User_Guide">here</a>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="interceptors">Interceptors</h4>
+<div class="paragraph">
+<p>The <code>jboss-webservices.xml</code> descriptor also allows specifying the
+<code>cxf.interceptors.in</code> and <code>cxf.interceptors.out</code> properties; those
+allows declaring interceptors to be attached to the Bus instance that&#8217;s
+created for serving the deployment.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.1" encoding="UTF-8"?&gt;
+&lt;webservices
+xmlns="http://www.jboss.com/xml/ns/javaee"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+version="1.2"
+xsi:schemaLocation="http://www.jboss.com/xml/ns/javaee"&gt;
+ 
+&lt;property&gt;
+&lt;name&gt;cxf.interceptors.in&lt;/name&gt;
+&lt;value&gt;org.jboss.test.ws.jaxws.cxf.interceptors.BusInterceptor&lt;/value&gt;
+&lt;/property&gt;
+&lt;property&gt;
+&lt;name&gt;cxf.interceptors.out&lt;/name&gt;
+&lt;value&gt;org.jboss.test.ws.jaxws.cxf.interceptors.BusCounterInterceptor&lt;/value&gt;
+&lt;/property&gt;
+&lt;/webservices&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="features">Features</h4>
+<div class="paragraph">
+<p>The <code>jboss-webservices.xml</code> descriptor also allows specifying the
+<code>cxf.features</code> property; that allows declaring features to be attached
+to any endpoint belonging to the Bus instance that&#8217;s created for serving
+the deployment.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.1" encoding="UTF-8"?&gt;
+&lt;webservices
+xmlns="http://www.jboss.com/xml/ns/javaee"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+version="1.2"
+xsi:schemaLocation="http://www.jboss.com/xml/ns/javaee"&gt;
+ 
+&lt;property&gt;
+&lt;name&gt;cxf.features&lt;/name&gt;
+&lt;value&gt;org.apache.cxf.feature.FastInfosetFeature&lt;/value&gt;
+&lt;/property&gt;
+&lt;/webservices&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="ws-discovery-enablement">WS-Discovery enablement</h4>
+<div class="paragraph">
+<p>WS-Discovery support can be turned on in <code>jboss-webservices</code> for the
+current deployment. Further details available <a href="#JAX-WS_User_Guide">here</a>.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="apache-cxf-interceptors">Apache CXF interceptors</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Apache CXF supports declaring interceptors using one of the following
+approaches:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Annotation usage on endpoint classes (
+<code>@org.apache.cxf.interceptor.InInterceptor</code>,
+<code>@org.apache.cxf.interceptor.OutInterceptor</code>)</p>
+</li>
+<li>
+<p>Direct API usage on client side (through the
+<code>org.apache.cxf.interceptor.InterceptorProvider</code> interface)</p>
+</li>
+<li>
+<p>Spring descriptor usage ( <em>cxf.xml</em>)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>As the Spring descriptor usage is not supported, the JBossWS integration
+adds an additional descriptor based approach to avoid requiring
+modifications to the actual client/endpoint code. Users can declare
+interceptors within <a href="#Predefined_client_and_endpoint_configurations">predefined client and endpoint
+configurations</a> by specifying a list of interceptor class names for the
+<code>cxf.interceptors.in</code> and <code>cxf.interceptors.out</code> properties.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;jaxws-config xmlns="urn:jboss:jbossws-jaxws-config:4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:javaee="http://java.sun.com/xml/ns/javaee"
+xsi:schemaLocation="urn:jboss:jbossws-jaxws-config:4.0 schema/jbossws-jaxws-config_4_0.xsd"&gt;
+&lt;endpoint-config&gt;
+&lt;config-name&gt;org.jboss.test.ws.jaxws.cxf.interceptors.EndpointImpl&lt;/config-name&gt;
+&lt;property&gt;
+&lt;property-name&gt;cxf.interceptors.in&lt;/property-name&gt;
+&lt;property-value&gt;org.jboss.test.ws.jaxws.cxf.interceptors.EndpointInterceptor,org.jboss.test.ws.jaxws.cxf.interceptors.FooInterceptor&lt;/property-value&gt;
+&lt;/property&gt;
+&lt;property&gt;
+&lt;property-name&gt;cxf.interceptors.out&lt;/property-name&gt;
+&lt;property-value&gt;org.jboss.test.ws.jaxws.cxf.interceptors.EndpointCounterInterceptor&lt;/property-value&gt;
+&lt;/property&gt;
+&lt;/endpoint-config&gt;
+&lt;/jaxws-config&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A new instance of each specified interceptor class will be added to the
+client or endpoint the configuration is assigned to. The interceptor
+classes must have a no-argument constructor.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="apache-cxf-features">Apache CXF features</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Apache CXF supports declaring features using one of the following
+approaches:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Annotation usage on endpoint classes (
+<code>@org.apache.cxf.feature.Features</code>)</p>
+</li>
+<li>
+<p>Direct API usage on client side (through extensions of the
+<code>org.apache.cxf.feature.AbstractFeature</code> class)</p>
+</li>
+<li>
+<p>Spring descriptor usage ( <em>cxf.xml</em>)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>As the Spring descriptor usage is not supported, the JBossWS integration
+adds an additional descriptor based approach to avoid requiring
+modifications to the actual client/endpoint code. Users can declare
+features within <a href="#Predefined_client_and_endpoint_configurations">predefined client and endpoint
+configurations</a> by specifying a list of feature class names for the
+<code>cxf.features</code> property.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;jaxws-config xmlns="urn:jboss:jbossws-jaxws-config:4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:javaee="http://java.sun.com/xml/ns/javaee"
+xsi:schemaLocation="urn:jboss:jbossws-jaxws-config:4.0 schema/jbossws-jaxws-config_4_0.xsd"&gt;
+&lt;endpoint-config&gt;
+&lt;config-name&gt;Custom FI Config&lt;/config-name&gt;
+&lt;property&gt;
+&lt;property-name&gt;cxf.features&lt;/property-name&gt;
+&lt;property-value&gt;org.apache.cxf.feature.FastInfosetFeature&lt;/property-value&gt;
+&lt;/property&gt;
+&lt;/endpoint-config&gt;
+&lt;/jaxws-config&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A new instance of each specified feature class will be added to the
+client or endpoint the configuration is assigned to. The feature classes
+must have a no-argument constructor.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="properties-driven-bean-creation">Properties driven bean creation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Sections above explain how to declare CXF interceptors and features
+through properties either in a client/endpoint predefined configuration
+or in a <code>jboss-webservices.xml</code> descriptor. By getting the
+feature/interceptor class name only specified, the container simply
+tries to create a bean instance using the class default constructor.
+This sets a limitation on the feature/interceptor configuration, unless
+custom extensions of vanilla CXF classes are provided, with the default
+constructor setting properties before eventually using the super
+constructor.</p>
+</div>
+<div class="paragraph">
+<p>To cope with this issue, JBossWS integration comes with a mechanism for
+configuring simple bean hierarchies when building them up from
+properties. Properties can have bean reference values, that is strings
+starting with <code>##</code>. Property reference keys are used to specify the bean
+class name and the value for for each attribute. So for instance the
+following properties:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Key</th>
+<th class="tableblock halign-left valign-top">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">cxf.features</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><mark>foo, </mark>bar</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">##foo</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">org.jboss.Foo</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">##foo.par</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">34</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">##bar</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">org.jboss.Bar</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">##bar.color</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">blue</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>would result into the stack installing two feature instances, the same
+that would have been created by</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">import org.Bar;
+import org.Foo;
+ 
+...
+ 
+Foo foo = new Foo();
+foo.setPar(34);
+Bar bar = new Bar();
+bar.setColor("blue");</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The mechanism assumes that the classes are valid beans with proper
+getter and setter methods; value objects are cast to the correct
+primitive type by inspecting the class definition. Nested beans can of
+course be configured.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="httpconduit-configuration">HTTPConduit configuration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>HTTP transport setup in Apache CXF is achieved through
+<code>org.apache.cxf.transport.http.HTTPConduit</code>
+<a href="http://cxf.apache.org/docs/client-http-transport-including-ssl-support.html">configurations</a>.
+When running on top of the JBossWS integration, conduits can be
+programmatically modified using the Apache CXF API as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
+ 
+//set chunking threshold before using a JAX-WS port client
+...
+HTTPConduit conduit = (HTTPConduit)ClientProxy.getClient(port).getConduit();
+HTTPClientPolicy client = conduit.getClient();
+ 
+client.setChunkingThreshold(8192);
+...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Users can also control the default values for the most common
+HTTPConduit parameters by setting specific system properties; the
+provided values will override Apache CXF defaut values.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Property</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">cxf.client.allowChunking</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A boolean to tell Apache CXF whether to allow
+send messages using chunking.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">cxf.client.chunkingThreshold</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An integer value to tell Apache CXF the
+threshold at which switching from non-chunking to chunking mode.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">cxf.client.connectionTimeout</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A long value to tell Apache CXF how many
+milliseconds to set the connection timeout to</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">cxf.client.receiveTimeout</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A long value to tell Apache CXF how many
+milliseconds to set the receive timeout to</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">cxf.client.connection</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A string to tell Apache CXF to use Keep-Alive or
+close connection type</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">cxf.tls-client.disableCNCheck</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A boolean to tell Apache CXF whether
+disabling CN host name check or not</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>The vanilla Apache CXF defaults apply when the system properties above
+are not set.</p>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

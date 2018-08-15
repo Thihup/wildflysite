@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Core Management Subsystem Configuration | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Core Management Subsystem Configuration" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_admin-guide/subsystem-configuration/Core_Management.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_admin-guide/subsystem-configuration/Core_Management.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_admin-guide/subsystem-configuration/Core_Management.html","headline":"Core Management Subsystem Configuration","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>The core management subsystem is composed services used to manage the
+server or monitor its status.<br>
+The core management subsystem configuration may be used to:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>register a listener for a server lifecycle events.</p>
+</li>
+<li>
+<p>list the last configuration changes on a server.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="lifecycle-listener">Lifecycle listener</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>You can create an implementation of
+<em>org.wildfly.extension.core.management.client.ProcessStateListener</em>
+which will be notified on running and runtime configuration state
+changes thus enabling the developer to react to those changes.</p>
+</div>
+<div class="paragraph">
+<p>In order to use this feature you need to create your own module then
+configure and deploy it using the core management subsystem.</p>
+</div>
+<div class="paragraph">
+<p>For example let&#8217;s create a simple listener :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java"> public class SimpleListener implements ProcessStateListener {
+ 
+    private File file;
+    private FileWriter fileWriter;
+    private ProcessStateListenerInitParameters parameters;
+ 
+    @Override
+    public void init(ProcessStateListenerInitParameters parameters) {
+        this.parameters = parameters;
+        this.file = new File(parameters.getInitProperties().get("file"));
+        try {
+            fileWriter = new FileWriter(file, true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+ 
+    @Override
+    public void cleanup() {
+        try {
+            fileWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            fileWriter = null;
+        }
+    }
+ 
+    @Override
+    public void runtimeConfigurationStateChanged(RuntimeConfigurationStateChangeEvent evt) {
+        try {
+            fileWriter.write(String.format("%s %s %s %s\n", parameters.getProcessType(), parameters.getRunningMode(), evt.getOldState(), evt.getNewState()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+ 
+    @Override
+    public void runningStateChanged(RunningStateChangeEvent evt) {
+        try {
+            fileWriter.write(String.format("%s %s %s %s\n", parameters.getProcessType(), parameters.getRunningMode(), evt.getOldState(), evt.getNewState()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To compile it you need to depend on the
+<em>org.wildfly.core:wildfly-core-management-client</em> maven module. Now
+let&#8217;s add the module to the wildfly modules :</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>module add --name=org.simple.lifecycle.events.listener --dependencies=org.wildfly.extension.core-management-client --resources=/home/ehsavoie/dev/demo/simple-listener/target/simple-process-state-listener.jar</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now we can register or listener :</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>/subsystem=core-management/process-state-listener=simple-listener:add(class=org.simple.lifecycle.events.listener.SimpleListener, module=org.simple.lifecycle.events.listener, properties={file=/home/wildfly/tmp/events.txt})</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuration-changes">Configuration changes</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>You can use the core management subsystem to enable and configure an
+<strong>in-memory</strong> history of the last configuration changes.<br>
+For example to track the last 5 configuration changes let&#8217;s active this
+:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>/subsystem=core-management/service=configuration-changes:add(max-history=5)</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now we can list the last configuration changes :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">/subsystem=core-management/service=configuration-changes:list-changes()
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; [{
+        "operation-date" =&gt; "2016-12-05T11:05:12.867Z",
+        "access-mechanism" =&gt; "NATIVE",
+        "remote-address" =&gt; "/127.0.0.1",
+        "outcome" =&gt; "success",
+        "operations" =&gt; [{
+            "address" =&gt; [
+                ("subsystem" =&gt; "core-management"),
+                ("service" =&gt; "configuration-changes")
+            ],
+            "operation" =&gt; "add",
+            "max-history" =&gt; 5,
+            "operation-headers" =&gt; {
+                "caller-type" =&gt; "user",
+                "access-mechanism" =&gt; "NATIVE"
+            }
+        }]
+    }]
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

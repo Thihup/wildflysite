@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>XNIO Client Configuration | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="XNIO Client Configuration" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_client-guide/XNIO_Client_Configuration.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_client-guide/XNIO_Client_Configuration.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_client-guide/XNIO_Client_Configuration.html","headline":"XNIO Client Configuration","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="sect1">
+<h2 id="worker-xnio-client">&lt;worker /&gt; - XNIO Client</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>You can use the <code>worker</code> element, which is in the <code>urn:xnio:3.5</code> namespace, to configure a default XNIO worker using the <code>wildfly-config.xml</code> file. This section describes how to do this.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+
+&lt;configuration&gt;
+...
+    &lt;worker xmlns="urn:xnio:3.5"&gt;
+       ...
+    &lt;/worker&gt;
+...
+&lt;/configuration&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This section describes the child elements that can be configured within this root <code>worker</code> element.</p>
+</div>
+<div class="paragraph">
+<p>The <em>&lt;worker /&gt;</em> element can optionally contain the following child elements, as described in the next sections:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>&lt;daemon-threads /&gt;</strong></p>
+</li>
+<li>
+<p><strong>&lt;worker-name /&gt;</strong></p>
+</li>
+<li>
+<p><strong>&lt;pool-size /&gt;</strong></p>
+</li>
+<li>
+<p><strong>&lt;task-keepalive /&gt;</strong></p>
+</li>
+<li>
+<p><strong>&lt;io-threads /&gt;</strong></p>
+</li>
+<li>
+<p><strong>&lt;stack-size /&gt;</strong></p>
+</li>
+<li>
+<p><strong>&lt;outbound-bind-addresses /&gt;</strong></p>
+</li>
+</ul>
+</div>
+<div class="sect2">
+<h3 id="daemon-threads">&lt;daemon-threads /&gt;</h3>
+<div class="paragraph">
+<p>This optional element takes a single required attribute:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Attribute Name</th>
+<th class="tableblock halign-left valign-top">Attribute Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>value</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The value of the setting (required).  A value of <code>true</code> indicates that worker and task threads should be daemon threads, and <code>false</code> indicates that they should not be daemon threads.  If this element is not given, a value of <code>true</code> is assumed.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>This element has no content.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="worker-name">&lt;worker-name /&gt;</h3>
+<div class="paragraph">
+<p>This element defines the name of the worker.  The worker name will appear in thread dumps and in JMX.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Attribute Name</th>
+<th class="tableblock halign-left valign-top">Attribute Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>value</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The worker&#8217;s name (required).</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>This element has no content.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="pool-size">&lt;pool-size /&gt;</h3>
+<div class="paragraph">
+<p>This optional element defines the size parameters of the worker&#8217;s task thread pool.  The following attributes are allowed:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Attribute Name</th>
+<th class="tableblock halign-left valign-top">Attribute Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>max-threads</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A positive integer which specifies the maximum number of threads that should be created (required).</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="task-keepalive">&lt;task-keepalive /&gt;</h3>
+<div class="paragraph">
+<p>This optional element establishes the keep-alive time of task threads before they may be expired.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Attribute Name</th>
+<th class="tableblock halign-left valign-top">Attribute Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>value</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A positive integer which represents the minimum number of seconds to keep idle threads alive (required).</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="io-threads">&lt;io-threads /&gt;</h3>
+<div class="paragraph">
+<p>This optional element determines how many I/O (selector) threads should be maintained.  Generally this number should be a small constant multiple of the number of available cores.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Attribute Name</th>
+<th class="tableblock halign-left valign-top">Attribute Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>value</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A positive integer value for the number of I/O threads (required).</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="stack-size">&lt;stack-size /&gt;</h3>
+<div class="paragraph">
+<p>This optional element establishes the desired minimum thread stack size for worker threads.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Attribute Name</th>
+<th class="tableblock halign-left valign-top">Attribute Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>value</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A positive integer value which indicates the requested stack size, in bytes (required).</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="outbound-bind-addresses">&lt;outbound-bind-addresses /&gt;</h3>
+<div class="paragraph">
+<p>This optional element specifies bind addresses to use for outbound connections.  Each bind address mapping consists of a destination IP address block, and a bind address and optional port number to use for connections to destinations within that block.</p>
+</div>
+<div class="sect3">
+<h4 id="bind-address">&lt;bind-address /&gt;</h4>
+<div class="paragraph">
+<p>This element defines an individual bind address mapping.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Attribute Name</th>
+<th class="tableblock halign-left valign-top">Attribute Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>match</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The IP address block in CIDR notation to match (required).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bind-address</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The IP address to bind to if the address block matches (required).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bind-port</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A specific port number to bind to if the address block matches (optional, defaults to 0 meaning "any port").</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

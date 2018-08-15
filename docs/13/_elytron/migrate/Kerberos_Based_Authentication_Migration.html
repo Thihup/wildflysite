@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Kerberos Authentication Migration | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Kerberos Authentication Migration" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_elytron/migrate/Kerberos_Based_Authentication_Migration.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_elytron/migrate/Kerberos_Based_Authentication_Migration.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_elytron/migrate/Kerberos_Based_Authentication_Migration.html","headline":"Kerberos Authentication Migration","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>When working with Kerberos configuration it is possible for the
+application server to rely on configuration from the environment or the
+key configuration can be specified using system properties, for the
+purpose of these examples I define system properties - these properties
+are applicable to both the legacy configuration and the migrated Elytron
+configuration.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">./system-property=sun.security.krb5.debug:add(value=true)
+./system-property=java.security.krb5.realm:add(value=ELYTRON.ORG)
+./system-property=java.security.krb5.kdc:add(value=kdc.elytron.org)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The first line makes debugging easier but the last two lines specify the
+Kerberos realm in use and the address of the KDC.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">  &lt;system-properties&gt;
+    &lt;property name="sun.security.krb5.debug" value="true"/&gt;
+    &lt;property name="java.security.krb5.realm" value="ELYTRON.ORG"/&gt;
+    &lt;property name="java.security.krb5.kdc" value="kdc.elytron.org"/&gt;
+  &lt;/system-properties&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="http-authentication">HTTP Authentication</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="legacy-security-realm">Legacy Security Realm</h3>
+<div class="paragraph">
+<p>A legacy security realm can be define so that SPNEGO authentication can
+be enabled for the HTTP management interface.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">./core-service=management/security-realm=Kerberos:add
+./core-service=management/security-realm=Kerberos/server-identity=kerberos:add
+./core-service=management/security-realm=Kerberos/server-identity=kerberos/keytab=HTTP\/test-server.elytron.org@ELYTRON.ORG:add(path=/home/darranl/src/kerberos/test-server.keytab, debug=true)
+./core-service=management/security-realm=Kerberos/authentication=kerberos:add(remove-realm=true)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This results in the following configuration: -</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">  &lt;security-realms&gt;
+    ...
+    &lt;security-realm name="Kerberos"&gt;
+      &lt;server-identities&gt;
+        &lt;kerberos&gt;
+          &lt;keytab principal="HTTP/test-server.elytron.org@ELYTRON.ORG" path="/home/darranl/src/kerberos/test-server.keytab" debug="true"/&gt;
+        &lt;/kerberos&gt;
+      &lt;/server-identities&gt;
+      &lt;authentication&gt;
+        &lt;kerberos remove-realm="true"/&gt;
+      &lt;/authentication&gt;
+    &lt;/security-realm&gt;
+  &lt;/security-realms&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="application-spnego">Application SPNEGO</h3>
+<div class="paragraph">
+<p>Alternatively deployed applications would make use of a pair of security
+domains.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">./subsystem=security/security-domain=host:add
+./subsystem=security/security-domain=host/authentication=classic:add
+./subsystem=security/security-domain=host/authentication=classic/login-module=1:add(code=Kerberos, flag=Required, module-options={storeKey=true, useKeyTab=true, principal=HTTP/test-server.elytron.org@ELYTRON.ORG, keyTab=/home/darranl/src/kerberos/test-server.keytab, debug=true}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">./subsystem=security/security-domain=SPNEGO:add
+./subsystem=security/security-domain=SPNEGO/authentication=classic:add
+./subsystem=security/security-domain=SPNEGO/authentication=classic/login-module=1:add(code=SPNEGO, flag=requisite,  module-options={password-stacking=useFirstPass, serverSecurityDomain=host})
+./subsystem=security/security-domain=SPNEGO/authentication=classic/login-module=1:write-attribute(name=module, value=org.jboss.security.negotiation)
+./subsystem=security/security-domain=SPNEGO/authentication=classic/login-module=2:add(code=UsersRoles, flag=required, module-options={password-stacking=useFirstPass, usersProperties=file:///home/darranl/src/kerberos/spnego-users.properties, rolesProperties=file:///home/darranl/src/kerberos/spnego-roles.properties, defaultUsersProperties=file:///home/darranl/src/kerberos/spnego-users.properties, defaultRolesProperties=file:///home/darranl/src/kerberos/spnego-roles.properties})</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This results in: -</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">  &lt;subsystem xmlns="urn:jboss:domain:security:2.0"&gt;
+    &lt;security-domains&gt;
+      ...
+      &lt;security-domain name="host"&gt;
+        &lt;authentication&gt;
+          &lt;login-module name="1" code="Kerberos" flag="required"&gt;
+            &lt;module-option name="storeKey" value="true"/&gt;
+            &lt;module-option name="useKeyTab" value="true"/&gt;
+            &lt;module-option name="principal" value="HTTP/test-server.elytron.org@ELYTRON.ORG"/&gt;
+            &lt;module-option name="keyTab" value="/home/darranl/src/kerberos/test-server.keytab"/&gt;
+            &lt;module-option name="debug" value="true"/&gt;
+          &lt;/login-module&gt;
+        &lt;/authentication&gt;
+      &lt;/security-domain&gt;
+      &lt;security-domain name="SPNEGO"&gt;
+        &lt;authentication&gt;
+          &lt;login-module name="1" code="SPNEGO" flag="requisite" module="org.jboss.security.negotiation"&gt;
+            &lt;module-option name="password-stacking" value="useFirstPass"/&gt;
+            &lt;module-option name="serverSecurityDomain" value="host"/&gt;
+          &lt;/login-module&gt;
+          &lt;login-module name="2" code="UsersRoles" flag="required"&gt;
+            &lt;module-option name="password-stacking" value="useFirstPass"/&gt;
+            &lt;module-option name="usersProperties" value="file:///home/darranl/src/kerberos/spnego-users.properties"/&gt;
+            &lt;module-option name="rolesProperties" value="file:///home/darranl/src/kerberos/spnego-roles.properties"/&gt;
+            &lt;module-option name="defaultUsersProperties" value="file:///home/darranl/src/kerberos/spnego-users.properties"/&gt;
+            &lt;module-option name="defaultRolesProperties" value="file:///home/darranl/src/kerberos/spnego-roles.properties"/&gt;
+          &lt;/login-module&gt;
+        &lt;/authentication&gt;
+      &lt;/security-domain&gt;
+    &lt;/security-domains&gt;
+  &lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>An application can now be deployed referencing the SPNEGO security
+domain and secured with SPNEGO mechanism.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="migrated-spnego">Migrated SPNEGO</h3>
+<div class="paragraph">
+<p>The equivalent configuration can be achieved with WildFly Elytron by
+first defining a security realm which will be used to load identity
+information.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">./subsystem=elytron/properties-realm=spnego-properties:add(users-properties={path=/home/darranl/src/kerberos/spnego-users.properties, plain-text=true, digest-realm-name=ELYTRON.ORG}, groups-properties={path=/home/darranl/src/kerberos/spnego-roles.properties})</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Next a Kerberos security factory is defined which allows the server to
+load it&#8217;s own Kerberos identity.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">./subsystem=elytron/kerberos-security-factory=test-server:add(path=/home/darranl/src/kerberos/test-server.keytab, principal=HTTP/test-server.elytron.org@ELYTRON.ORG, debug=true)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As with the previous examples we define a security realm to pull
+together the policy as well as a HTTP authentication factory for the
+authentication policy.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">./subsystem=elytron/security-domain=SPNEGODomain:add(default-realm=spnego-properties, realms=[{realm=spnego-properties, role-decoder=groups-to-roles}], permission-mapper=default-permission-mapper)
+./subsystem=elytron/http-authentication-factory=spnego-http-authentication:add(security-domain=SPNEGODomain, http-server-mechanism-factory=global,mechanism-configurations=[{mechanism-name=SPNEGO, credential-security-factory=test-server}])</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Overall this results in the following configuration: -</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">  &lt;subsystem xmlns="urn:wildfly:elytron:1.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto"&gt;
+    ...
+    &lt;security-domains&gt;
+    ...
+      &lt;security-domain name="SPNEGODomain" default-realm="spnego-properties" permission-mapper="default-permission-mapper"&gt;
+        &lt;realm name="spnego-properties" role-decoder="groups-to-roles"/&gt;
+      &lt;/security-domain&gt;
+    &lt;/security-domains&gt;
+    &lt;security-realms&gt;
+      ...
+      &lt;properties-realm name="spnego-properties"&gt;
+        &lt;users-properties path="/home/darranl/src/kerberos/spnego-users.properties" digest-realm-name="ELYTRON.ORG" plain-text="true"/&gt;
+        &lt;groups-properties path="/home/darranl/src/kerberos/spnego-roles.properties"/&gt;
+      &lt;/properties-realm&gt;
+    &lt;/security-realms&gt;
+    &lt;credential-security-factories&gt;
+      &lt;kerberos-security-factory name="test-server" principal="HTTP/test-server.elytron.org@ELYTRON.ORG" path="/home/darranl/src/kerberos/test-server.keytab" debug="true"/&gt;
+    &lt;/credential-security-factories&gt;
+    ...
+    &lt;http&gt;
+      ...
+      &lt;http-authentication-factory name="spnego-http-authentication" http-server-mechanism-factory="global" security-domain="SPNEGODomain"&gt;
+        &lt;mechanism-configuration&gt;
+          &lt;mechanism mechanism-name="SPNEGO" credential-security-factory="test-server"/&gt;
+        &lt;/mechanism-configuration&gt;
+      &lt;/http-authentication-factory&gt;
+      ...
+    &lt;/http&gt;
+    ...
+  &lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now, to enable SPNEGO authentication for the HTTP management interface,
+update this interface to reference the <code>http-authentication-factory</code>
+defined above, as described in the
+<a href="https://docs.jboss.org/author/display/WFLY/Migrate+Legacy+Security+to+Elytron+Security#MigrateLegacySecuritytoElytronSecurity-MigratedConfiguration">properties
+authentication section</a>.</p>
+</div>
+<div class="paragraph">
+<p>Alternatively, to secure an application using SPNEGO authentication, an
+application security domain can be defined in the Undertow subsystem to
+map security domains to the <code>http-authentication-factory</code> defined above,
+as described in the
+<a href="https://docs.jboss.org/author/display/WFLY/Migrate+Legacy+Security+to+Elytron+Security#MigrateLegacySecuritytoElytronSecurity-FullyMigratedConfiguration">properties
+authentication section</a>.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="remoting-sasl-authentication">Remoting / SASL Authentication</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="legacy-security-realm-1">Legacy Security Realm</h3>
+<div class="paragraph">
+<p>It is also possible to define a legacy security realm for Kerberos /
+GSSAPI SASL authenticatio for Remoting authentication such as the native
+management interface.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">./core-service=management/security-realm=Kerberos:add
+./core-service=management/security-realm=Kerberos/server-identity=kerberos:add
+./core-service=management/security-realm=Kerberos/server-identity=kerberos/keytab=remote\/test-server.elytron.org@ELYTRON.ORG:add(path=/home/darranl/src/kerberos/remote-test-server.keytab, debug=true)
+./core-service=management/security-realm=Kerberos/authentication=kerberos:add(remove-realm=true)</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">  &lt;management&gt;
+    &lt;security-realms&gt;
+      ...
+      &lt;security-realm name="Kerberos"&gt;
+        &lt;server-identities&gt;
+          &lt;kerberos&gt;
+            &lt;keytab principal="remote/test-server.elytron.org@ELYTRON.ORG" path="/home/darranl/src/kerberos/remote-test-server.keytab" debug="true"/&gt;
+          &lt;/kerberos&gt;
+        &lt;/server-identities&gt;
+        &lt;authentication&gt;
+          &lt;kerberos remove-realm="true"/&gt;
+        &lt;/authentication&gt;
+      &lt;/security-realm&gt;
+    &lt;/security-realms&gt;
+    ...
+  &lt;/management&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="migrated-gssapi">Migrated GSSAPI</h3>
+<div class="paragraph">
+<p>The steps to define the equivalent Elytron configuration are very
+similar to the HTTP example.</p>
+</div>
+<div class="paragraph">
+<p>First define the security realm to load the identity from: -</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">./path=kerberos:add(relative-to=user.home, path=src/kerberos)
+./subsystem=elytron/properties-realm=kerberos-properties:add(users-properties={path=kerberos-users.properties, relative-to=kerberos, digest-realm-name=ELYTRON.ORG}, groups-properties={path=kerberos-groups.properties, relative-to=kerberos})</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then define the Kerberos security factory for the server&#8217;s identity.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">./subsystem=elytron/kerberos-security-factory=test-server:add(relative-to=kerberos, path=remote-test-server.keytab, principal=remote/test-server.elytron.org@ELYTRON.ORG)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Finally define the security domain and this time a SASL authentication
+factory.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">./subsystem=elytron/security-domain=KerberosDomain:add(default-realm=kerberos-properties, realms=[{realm=kerberos-properties, role-decoder=groups-to-roles}], permission-mapper=default-permission-mapper)
+./subsystem=elytron/sasl-authentication-factory=gssapi-authentication-factory:add(security-domain=KerberosDomain, sasl-server-factory=elytron, mechanism-configurations=[{mechanism-name=GSSAPI, credential-security-factory=test-server}])</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This results in the following subsystem configuration: -</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">  &lt;subsystem xmlns="urn:wildfly:elytron:1.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto"&gt;
+    ...
+    &lt;security-domains&gt;
+      ...
+      &lt;security-domain name="KerberosDomain" default-realm="kerberos-properties" permission-mapper="default-permission-mapper"&gt;
+        &lt;realm name="kerberos-properties" role-decoder="groups-to-roles"/&gt;
+      &lt;/security-domain&gt;
+    &lt;/security-domains&gt;
+    &lt;security-realms&gt;
+     ...
+       &lt;properties-realm name="kerberos-properties"&gt;
+         &lt;users-properties path="kerberos-users.properties" relative-to="kerberos" digest-realm-name="ELYTRON.ORG"/&gt;
+         &lt;groups-properties path="kerberos-groups.properties" relative-to="kerberos"/&gt;
+       &lt;/properties-realm&gt;
+     &lt;/security-realms&gt;
+     &lt;credential-security-factories&gt;
+       &lt;kerberos-security-factory name="test-server" principal="remote/test-server.elytron.org@ELYTRON.ORG" path="remote-test-server.keytab" relative-to="kerberos"/&gt;
+     &lt;/credential-security-factories&gt;
+     ...
+     &lt;sasl&gt;
+       ...
+       &lt;sasl-authentication-factory name="gssapi-authentication-factory" sasl-server-factory="elytron" security-domain="KerberosDomain"&gt;
+         &lt;mechanism-configuration&gt;
+           &lt;mechanism mechanism-name="GSSAPI" credential-security-factory="test-server"/&gt;
+         &lt;/mechanism-configuration&gt;
+       &lt;/sasl-authentication-factory&gt;
+       ...
+     &lt;/sasl&gt;
+   &lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The management interface or Remoting connectors can now be updated to
+reference the SASL authentication factory.</p>
+</div>
+<div class="paragraph">
+<p>The two Elytron examples defined here could also be combined into one to
+use a shared security domain and security realm and just use protocol
+specific authentication factories each referencing their own Kerberos
+security factory.</p>
+</div>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Batch_(jsr 352) | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Batch_(jsr 352)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="[[Batch_(JSR-352)]] = Batch (JSR-352) Subsystem Configuration" />
+<meta property="og:description" content="[[Batch_(JSR-352)]] = Batch (JSR-352) Subsystem Configuration" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_admin-guide/subsystem-configuration/Batch_(JSR-352).html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_admin-guide/subsystem-configuration/Batch_(JSR-352).html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_admin-guide/subsystem-configuration/Batch_(JSR-352).html","headline":"Batch_(jsr 352)","description":"[[Batch_(JSR-352)]] = Batch (JSR-352) Subsystem Configuration","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="paragraph">
+<p>[[Batch_(JSR-352)]]
+= Batch (JSR-352) Subsystem Configuration</p>
+</div>
+<div class="quoteblock abstract">
+<blockquote>
+The batch subsystem is used to configure an environment for running
+batch applications. <a href="http://wildfly.org">WildFly</a> uses
+<a href="https://github.com/jberet/jsr352">JBeret</a> for it&#8217;s batch implementation.
+Specific information about JBeret can be found in the
+<a href="http://jberet.gitbooks.io/jberet-user-guide/content/">user guide</a>. The
+resource path, in <a href="#CLI_Recipes">CLI notation</a>, for the subsystem
+is <code>subsystem=batch-jberet</code>.
+</blockquote>
+</div>
+<div class="sect1">
+<h2 id="default-subsystem-configuration">Default Subsystem Configuration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>For up to date information about subsystem configuration options see
+<a href="http://wildscribe.github.io/" class="bare">http://wildscribe.github.io/</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="security">Security</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A new <code>security-domain</code> attribute was added to the <code>batch-jberet</code>
+subsystem to allow batch jobs to be executed under that security domain.
+Jobs that are stopped as part of a <code>suspend</code> operation will be restarted
+on execution of a <code>resume</code> with the original user that started job.</p>
+</div>
+<div class="paragraph">
+<p>There was a
+<code>org.wildfly.extension.batch.jberet.deployment.BatchPermission</code> added to
+allow a security restraint to various batch functions. The following
+functions can be controlled with this permission.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>start</p>
+</li>
+<li>
+<p>stop</p>
+</li>
+<li>
+<p>restart</p>
+</li>
+<li>
+<p>abandon</p>
+</li>
+<li>
+<p>read</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The read function allows users to use the getter methods from the
+<code>javax.batch.operations.JobOperator</code> or read the <code>batch-jberet</code>
+deployment resource, for example
+<code>/deployment=my.war/subsystem=batch-jberet:read-resource</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="deployment-descriptors">Deployment Descriptors</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>There are no deployment descriptors for configuring a batch environment
+defined by the <a href="https://www.jcp.org/en/jsr/detail?id=352">JSR-352
+specification</a>. In <a href="http://wildfly.org">WildFly</a> you can use a
+<code>jboss-all.xml</code> deployment descriptor to define aspects of the batch
+environment for your deployment.</p>
+</div>
+<div class="paragraph">
+<p>In the <code>jboss-all.xml</code> deployment descriptor you can define a named job
+repository, a new job repository and/or a named thread pool. A named job
+repository and named thread pool are resources defined on the batch
+subsystem. Only a named thread pool is allowed to be defined in the
+deployment descriptor.</p>
+</div>
+<div class="listingblock">
+<div class="title">Example Named Job Repository and Thread Pool</div>
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;jboss umlns="urn:jboss:1.0"&gt;
+    &lt;batch xmlns="urn:jboss:batch-jberet:1.0"&gt;
+      &lt;job-repository&gt;
+        &lt;named name="batch-ds"/&gt;
+      &lt;/job-repository&gt;
+      &lt;thread-pool name="deployment-thread-pool"/&gt;
+    &lt;/batch&gt;
+&lt;/jboss&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Example new Job Repository</div>
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;jboss umlns="urn:jboss:1.0"&gt;
+    &lt;batch xmlns="urn:jboss:batch-jberet:1.0"&gt;
+        &lt;job-repository&gt;
+            &lt;jdbc jndi-name="java:jboss/datasources/ExampleDS"/&gt;
+        &lt;/job-repository&gt;
+    &lt;/batch&gt;
+&lt;/jboss&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="deployment-resources">Deployment Resources</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Some subsystems in <a href="http://wildfly.org">WildFly</a> register runtime
+resources for deployments. The batch subsystem registers jobs and
+executions. The jobs are registered using the job name, this is <em>not</em>
+the job XML name. Executions are registered using the execution id.</p>
+</div>
+<div class="listingblock">
+<div class="title">Batch application in a standalone server</div>
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9990 /] /deployment=batch-jdbc-chunk.war/subsystem=batch-jberet:read-resource(recursive=true,include-runtime=true)
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; {"job" =&gt; {
+        "reader-3" =&gt; {
+            "instance-count" =&gt; 1,
+            "running-executions" =&gt; 0,
+            "execution" =&gt; {"1" =&gt; {
+                "batch-status" =&gt; "COMPLETED",
+                "create-time" =&gt; "2015-08-07T15:37:06.416-0700",
+                "end-time" =&gt; "2015-08-07T15:37:06.519-0700",
+                "exit-status" =&gt; "COMPLETED",
+                "instance-id" =&gt; 1L,
+                "last-updated-time" =&gt; "2015-08-07T15:37:06.519-0700",
+                "start-time" =&gt; "2015-08-07T15:37:06.425-0700"
+            }}
+        },
+        "reader-5" =&gt; {
+            "instance-count" =&gt; 0,
+            "running-executions" =&gt; 0,
+            "execution" =&gt; undefined
+        }
+    }}
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The batch subsystem resource on a deployment also has 3 operations to
+interact with batch jobs on the selected deployment. There is a
+<code>start-job</code>, <code>stop-job</code> and <code>restart-job</code> operation. The <code>execution</code>
+resource also has a <code>stop-job</code> and <code>restart-job</code> operation.</p>
+</div>
+<div class="listingblock">
+<div class="title">Example start-job</div>
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9990 /] /deployment=batch-chunk.war/subsystem=batch-jberet:start-job(job-xml-name=simple, properties={writer.sleep=5000})
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; 1L
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Example stop-job</div>
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9990 /] /deployment=batch-chunk.war/subsystem=batch-jberet:stop-job(execution-id=2)</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Example restart-job</div>
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9990 /] /deployment=batch-chunk.war/subsystem=batch-jberet:restart-job(execution-id=2)
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; 3L
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result of resource after the 3 executions</div>
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9990 /] /deployment=batch-chunk.war/subsystem=batch-jberet:read-resource(recursive=true, include-runtime=true)
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; {"job" =&gt; {"chunkPartition" =&gt; {
+        "instance-count" =&gt; 2,
+        "running-executions" =&gt; 0,
+        "execution" =&gt; {
+            "1" =&gt; {
+                "batch-status" =&gt; "COMPLETED",
+                "create-time" =&gt; "2015-08-07T15:41:55.504-0700",
+                "end-time" =&gt; "2015-08-07T15:42:15.513-0700",
+                "exit-status" =&gt; "COMPLETED",
+                "instance-id" =&gt; 1L,
+                "last-updated-time" =&gt; "2015-08-07T15:42:15.513-0700",
+                "start-time" =&gt; "2015-08-07T15:41:55.504-0700"
+            },
+            "2" =&gt; {
+                "batch-status" =&gt; "STOPPED",
+                "create-time" =&gt; "2015-08-07T15:44:39.879-0700",
+                "end-time" =&gt; "2015-08-07T15:44:54.882-0700",
+                "exit-status" =&gt; "STOPPED",
+                "instance-id" =&gt; 2L,
+                "last-updated-time" =&gt; "2015-08-07T15:44:54.882-0700",
+                "start-time" =&gt; "2015-08-07T15:44:39.879-0700"
+            },
+            "3" =&gt; {
+                "batch-status" =&gt; "COMPLETED",
+                "create-time" =&gt; "2015-08-07T15:45:48.162-0700",
+                "end-time" =&gt; "2015-08-07T15:45:53.165-0700",
+                "exit-status" =&gt; "COMPLETED",
+                "instance-id" =&gt; 2L,
+                "last-updated-time" =&gt; "2015-08-07T15:45:53.165-0700",
+                "start-time" =&gt; "2015-08-07T15:45:48.163-0700"
+            }
+        }
+    }}}
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Pro Tip</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Tip</div>
+</td>
+<td class="content">
+You can filter jobs by an attribute on the execution resource with the
+<code>query</code> operation.
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">View all stopped jobs</div>
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">/deployment=batch-chunk.war/subsystem=batch-jberet/job=*/execution=*:query(where=["batch-status", "STOPPED"])</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As with all operations you can see details about the operation using the
+<code>:read-operation-description</code> operation.</p>
+</div>
+<div class="paragraph">
+<p>Tab completion</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Tip</div>
+</td>
+<td class="content">
+Don&#8217;t forget that CLI has tab completion which will complete operations
+and attributes (arguments) on operations.
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">Example start-job operation description</div>
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9990 /] /deployment=batch-chunk.war/subsystem=batch-jberet:read-operation-description(name=start-job)
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; {
+        "operation-name" =&gt; "start-job",
+        "description" =&gt; "Starts a batch job.",
+        "request-properties" =&gt; {
+            "job-xml-name" =&gt; {
+                "type" =&gt; STRING,
+                "description" =&gt; "The name of the job XML file to use when starting the job.",
+                "expressions-allowed" =&gt; false,
+                "required" =&gt; true,
+                "nillable" =&gt; false,
+                "min-length" =&gt; 1L,
+                "max-length" =&gt; 2147483647L
+            },
+            "properties" =&gt; {
+                "type" =&gt; OBJECT,
+                "description" =&gt; "Optional properties to use when starting the batch job.",
+                "expressions-allowed" =&gt; false,
+                "required" =&gt; false,
+                "nillable" =&gt; true,
+                "value-type" =&gt; STRING
+            }
+        },
+        "reply-properties" =&gt; {"type" =&gt; LONG},
+        "read-only" =&gt; false,
+        "runtime-only" =&gt; true
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

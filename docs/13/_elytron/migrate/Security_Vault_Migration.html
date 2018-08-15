@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Security Vault Migration | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Security Vault Migration" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_elytron/migrate/Security_Vault_Migration.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_elytron/migrate/Security_Vault_Migration.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_elytron/migrate/Security_Vault_Migration.html","headline":"Security Vault Migration","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Security Vault is primarily used in legacy configurations, a vault is
+used to store sensitive strings outside of the configuration files.
+WildFly server may only contain a single security vault.</p>
+</div>
+<div class="paragraph">
+<p>Credential Store introduced in WildFly 11 is meant to expand Security
+Vault in terms of storing different credential types and introduce easy
+to implemnent SPI which allows to deploy custom implemenations of
+CredentialStore SPI. Credentials are stored safely encrypted in storage
+file outside WildFly configuration files. Each WildFly server may
+contain multiple credential stores.</p>
+</div>
+<div class="paragraph">
+<p>To easily migrate vault content into credential store we have added
+"vault" command into WildFly Elytron Tool. The tool could be found at
+$JBOSS_HOME/bin directory. It has several scripts named "elytron-tool.*"
+dependent on your platform of choice. One can use also simple form "java
+-jar $JBOSS_HOME/bin/wildfly-elytron-tool.jar &lt;command&gt; &lt;arguments&gt;" if
+it better suites ones needs.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="single-security-vault-conversion">Single Security Vault Conversion</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To convert <strong>single</strong> security vault credential store use following
+example:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>to get sample vault use testing resources of Elytron Tool project from
+<a href="https://github.com/wildfly-security/wildfly-elytron-tool/tree/master/src/test/resources/vault-v1">GitHub</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Command to run actual conversion:</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="paragraph">
+<p><code>./bin/elytron-tool.sh vault --enc-dir vault_data/ --keystore vault-jceks.keystore --keystore-password MASK-2hKo56F1a3jYGnJwhPmiF5 --iteration 34 --salt 12345678 --alias test --location cs-v1.store --summary</code></p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Output:</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="paragraph">
+<p><code>Vault (enc-dir="vault_data/";keystore="vault-jceks.keystore") converted to credential store "cs-v1.store"</code><br>
+<code>Vault Conversion summary:</code><br>
+<code>--------------------------------------</code><br>
+<code>Vault Conversion Successful</code><br>
+<code>CLI command to add new credential store:</code><br>
+<code>/subsystem=elytron/credential-store=test:add(relative-to=jboss.server.data.dir,create=true,modifiable=true,location="cs-v1.store",implementation-properties={"keyStoreType"&#8658;"JCEKS"},credential-reference={clear-text="MASK-2hKo56F1a3jYGnJwhPmiF5;12345678;34"})</code></p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Use elytron-tool.sh vault --help to get description of all parameters.</p>
+</div>
+<div class="sect2">
+<h3 id="notes">Notes:</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Elytron Tool cannot handle very first version of Security Vault data
+file.<br></p>
+</li>
+<li>
+<p>--keystore-password can come in two forms (1) masked as shown in the
+example or (2) clear text. Parameter --salt and --iteration are there to
+supply information to decrypt the masked password or to generate masked
+password in output. In case --salt and --iteration are omitted default
+values are used.<br></p>
+</li>
+<li>
+<p>When --summary parameter is specified, one can see nice output with
+CLI command to be used in WildFly console to add converted credential
+store to the configuration.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="bulk-security-vault-conversion">Bulk Security Vault Conversion</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>There is possibility to convert multiple vaults to credential store
+using --bulk-convert parameter with description file.<br>
+Example of description file from our <a href="https://github.com/wildfly-security/wildfly-elytron-tool/blob/master/src/test/java/org/wildfly/security/tool/VaultCommandTest.java">tests</a>:</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="paragraph">
+<p><code># Bulk conversion descriptor</code><br>
+<code>keystore:target/test-classes/vault-v1/vault-jceks.keystore</code><br>
+<code>keystore-password:MASK-2hKo56F1a3jYGnJwhPmiF5</code><br>
+<code>enc-dir:target/test-classes/vault-v1/vault_data/</code><br>
+<code>salt:12345678</code><br>
+<code>iteration:34</code><br>
+<code>location:target/v1-cs-1.store</code><br>
+<code>alias:test</code></p>
+</div>
+<div class="paragraph">
+<p><code>keystore:target/test-classes/vault-v1/vault-jceks.keystore</code><br>
+<code>keystore-password:secretsecret</code><br>
+<code>enc-dir:target/test-classes/vault-v1/vault_data/</code><br>
+<code>location:target/v1-cs-2.store</code><br>
+<code>alias:test</code></p>
+</div>
+<div class="paragraph">
+<p><code># different vault vault-v1-more</code><br>
+<code>keystore:target/test-classes/vault-v1-more/vault-jceks.keystore</code><br>
+<code>keystore-password:MASK-2hKo56F1a3jYGnJwhPmiF5</code><br>
+<code>enc-dir:target/test-classes/vault-v1-more/vault_data/</code><br>
+<code>salt:12345678</code><br>
+<code>iteration:34</code><br>
+<code>location:target/v1-cs-more.store</code><br>
+<code>alias:test</code></p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>After each "keystore:" option new conversion starts. All options are
+mandatory except "salt:", "iteration:" and "properties:"</p>
+</div>
+<div class="paragraph">
+<p>Execute following command:</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="paragraph">
+<p><code>./bin/elytron-tool.sh vault --bulk-convert bulk-vault-conversion-desc --summary</code></p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Output:</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="paragraph">
+<p><code>Vault (enc-dir="vault-v1/vault_data/";keystore="vault-v1/vault-jceks.keystore") converted to credential store "v1-cs-1.store"</code><br>
+<code>Vault Conversion summary:</code><br>
+<code>--------------------------------------</code><br>
+<code>Vault Conversion Successful</code><br>
+<code>CLI command to add new credential store:</code><br>
+<code>/subsystem=elytron/credential-store=test:add(relative-to=jboss.server.data.dir,create=true,modifiable=true,location="v1-cs-1.store",implementation-properties={"keyStoreType"&#8658;"JCEKS"},credential-reference={clear-text="MASK-2hKo56F1a3jYGnJwhPmiF5;12345678;34"})</code><br>
+<code>--------------------------------------</code></p>
+</div>
+<div class="paragraph">
+<p><code>Vault (enc-dir="vault-v1/vault_data/";keystore="vault-v1/vault-jceks.keystore") converted to credential store "v1-cs-2.store"</code><br>
+<code>Vault Conversion summary:</code><br>
+<code>--------------------------------------</code><br>
+<code>Vault Conversion Successful</code><br>
+<code>CLI command to add new credential store:</code><br>
+<code>/subsystem=elytron/credential-store=test:add(relative-to=jboss.server.data.dir,create=true,modifiable=true,location="v1-cs-2.store",implementation-properties={"keyStoreType"&#8658;"JCEKS"},credential-reference={clear-text="secretsecret"})</code><br>
+<code>--------------------------------------</code></p>
+</div>
+<div class="paragraph">
+<p><code>Vault (enc-dir="vault-v1-more/vault_data/";keystore="vault-v1-more/vault-jceks.keystore") converted to credential store "v1-cs-more.store"</code><br>
+<code>Vault Conversion summary:</code><br>
+<code>--------------------------------------</code><br>
+<code>Vault Conversion Successful</code><br>
+<code>CLI command to add new credential store:</code><br>
+<code>/subsystem=elytron/credential-store=test:add(relative-to=jboss.server.data.dir,create=true,modifiable=true,location="v1-cs-more.store",implementation-properties={"keyStoreType"&#8658;"JCEKS"},credential-reference={clear-text="MASK-2hKo56F1a3jYGnJwhPmiF5;12345678;34"})</code><br>
+<code>--------------------------------------</code></p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>The result is conversion of all vaults with proper CLI commands.</p>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

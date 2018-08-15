@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Starting_&amp;_stopping_servers_in_a_managed_domain | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Starting_&amp;_stopping_servers_in_a_managed_domain" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="[[Starting_&amp;_stopping_Servers_in_a_Managed_Domain]] = Starting &amp; stopping Servers in a Managed Domain" />
+<meta property="og:description" content="[[Starting_&amp;_stopping_Servers_in_a_Managed_Domain]] = Starting &amp; stopping Servers in a Managed Domain" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_admin-guide/management-tasks/Starting_&_stopping_Servers_in_a_Managed_Domain.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_admin-guide/management-tasks/Starting_&_stopping_Servers_in_a_Managed_Domain.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_admin-guide/management-tasks/Starting_&_stopping_Servers_in_a_Managed_Domain.html","headline":"Starting_&amp;_stopping_servers_in_a_managed_domain","description":"[[Starting_&amp;_stopping_Servers_in_a_Managed_Domain]] = Starting &amp; stopping Servers in a Managed Domain","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="paragraph">
+<p>[[Starting_&amp;_stopping_Servers_in_a_Managed_Domain]]
+= Starting &amp; stopping Servers in a Managed Domain</p>
+</div>
+<div class="paragraph">
+<p>Starting a standalone server is done through the <code>bin/standalone.sh</code>
+script. However in a managed domain server instances are managed by the
+domain controller and need to be started through the management layer:</p>
+</div>
+<div class="paragraph">
+<p>First of all, get to know which <code>servers</code> are configured on a particular
+<code>host</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[domain@localhost:9990 /] :read-children-names(child-type=host)
+{
+   "outcome" =&gt; "success",
+   "result" =&gt; ["local"]
+}
+ 
+ 
+[domain@localhost:9990 /] /host=local:read-children-names(child-type=server-config)
+{
+   "outcome" =&gt; "success",
+   "result" =&gt; [
+       "my-server",
+       "server-one",
+       "server-three"
+   ]
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now that we know, that there are two <code>servers</code> configured on <code>host</code> "
+<em>local</em>", we can go ahead and check their status:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[domain@localhost:9990 /] /host=local/server-config=server-one:read-resource(include-runtime=true)
+{
+   "outcome" =&gt; "success",
+   "result" =&gt; {
+       "auto-start" =&gt; true,
+       "group" =&gt; "main-server-group",
+       "interface" =&gt; undefined,
+       "name" =&gt; "server-one",
+       "path" =&gt; undefined,
+       "socket-binding-group" =&gt; undefined,
+       "socket-binding-port-offset" =&gt; undefined,
+       "status" =&gt; "STARTED",
+       "system-property" =&gt; undefined,
+       "jvm" =&gt; {"default" =&gt; undefined}
+   }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can change the server state through the " <em>start</em>" and " <em>stop</em>"
+operations</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[domain@localhost:9990 /] /host=local/server-config=server-one:stop
+{
+   "outcome" =&gt; "success",
+   "result" =&gt; "STOPPING"
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Tip</div>
+</td>
+<td class="content">
+Navigating through the domain topology is much more simple when you use
+the web interface.
+</td>
+</tr>
+</table>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>EJB3 subsystem configuration guide | Wildfly</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="EJB3 subsystem configuration guide" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/wildflysite/docs/13/_admin-guide/subsystem-configuration/EJB3.html" />
+<meta property="og:url" content="http://localhost:4000/wildflysite/docs/13/_admin-guide/subsystem-configuration/EJB3.html" />
+<meta property="og:site_name" content="Wildfly" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/wildflysite/docs/13/_admin-guide/subsystem-configuration/EJB3.html","headline":"EJB3 subsystem configuration guide","@type":"WebPage","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/wildflysite/feed.xml" title="Wildfly" /></head>
+<body><div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          <a href="/wildflysite/docs/" class="">Docs</a>
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>This page lists the options that are available for configuring the EJB
+subsystem.</p>
+</div>
+<div class="paragraph">
+<p>A complete example of the config is shown below, with a full explanation
+of each</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;subsystem xmlns="urn:jboss:domain:ejb3:1.2"&gt;
+  &lt;session-bean&gt;
+    &lt;stateless&gt;
+      &lt;bean-instance-pool-ref pool-name="slsb-strict-max-pool"/&gt;
+    &lt;/stateless&gt;
+    &lt;stateful default-access-timeout="5000" cache-ref="simple" clustered-cache-ref="clustered"/&gt;
+    &lt;singleton default-access-timeout="5000"/&gt;
+  &lt;/session-bean&gt;
+  &lt;mdb&gt;
+    &lt;resource-adapter-ref resource-adapter-name="hornetq-ra"/&gt;
+    &lt;bean-instance-pool-ref pool-name="mdb-strict-max-pool"/&gt;
+  &lt;/mdb&gt;
+  &lt;entity-bean&gt;
+    &lt;bean-instance-pool-ref pool-name="entity-strict-max-pool"/&gt;
+  &lt;/entity-bean&gt;
+  &lt;pools&gt;
+    &lt;bean-instance-pools&gt;
+      &lt;strict-max-pool name="slsb-strict-max-pool" max-pool-size="20" instance-acquisition-timeout="5" instance-acquisition-timeout-unit="MINUTES"/&gt;
+      &lt;strict-max-pool name="mdb-strict-max-pool" max-pool-size="20" instance-acquisition-timeout="5" instance-acquisition-timeout-unit="MINUTES"/&gt;
+      &lt;strict-max-pool name="entity-strict-max-pool" max-pool-size="100" instance-acquisition-timeout="5" instance-acquisition-timeout-unit="MINUTES"/&gt;
+  &lt;/bean-instance-pools&gt;
+  &lt;/pools&gt;
+  &lt;caches&gt;
+    &lt;cache name="simple" aliases="NoPassivationCache"/&gt;
+    &lt;cache name="passivating" passivation-store-ref="file" aliases="SimpleStatefulCache"/&gt;
+    &lt;cache name="clustered" passivation-store-ref="infinispan" aliases="StatefulTreeCache"/&gt;
+  &lt;/caches&gt;
+  &lt;passivation-stores&gt;
+    &lt;file-passivation-store name="file"/&gt;
+    &lt;cluster-passivation-store name="infinispan" cache-container="ejb"/&gt;
+  &lt;/passivation-stores&gt;
+  &lt;async thread-pool-name="default"/&gt;
+  &lt;timer-service thread-pool-name="default"&gt;
+    &lt;data-store path="timer-service-data" relative-to="jboss.server.data.dir"/&gt;
+  &lt;/timer-service&gt;
+  &lt;remote connector-ref="remoting-connector" thread-pool-name="default"/&gt;
+  &lt;thread-pools&gt;
+    &lt;thread-pool name="default"&gt;
+      &lt;max-threads count="10"/&gt;
+      &lt;keepalive-time time="100" unit="milliseconds"/&gt;
+      &lt;/thread-pool&gt;
+  &lt;/thread-pools&gt;
+  &lt;iiop enable-by-default="false" use-qualified-name="false"/&gt;
+  &lt;in-vm-remote-interface-invocation pass-by-value="false"/&gt; &lt;!-- Warning see notes below about possible issues --&gt;
+&lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="session-bean">&lt;session-bean&gt;</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="stateless">&lt;stateless&gt;</h3>
+<div class="paragraph">
+<p>This element is used to configure the instance pool that is used by
+default for stateless session beans. If it is not present stateless
+session beans are not pooled, but are instead created on demand for
+every invocation. The instance pool can be overridden on a per
+deployment or per bean level using <code>jboss-ejb3.xml</code> or the
+<code>org.jboss.ejb3.annotation.Pool</code> annotation. The instance pools
+themselves are configured in the <code>&lt;pools&gt;</code> element.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="stateful">&lt;stateful&gt;</h3>
+<div class="paragraph">
+<p>This element is used to configure Stateful Session Beans.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>default-access-timeout</code> This attribute specifies the default time
+concurrent invocations on the same bean instance will wait to acquire
+the instance lock. It can be overridden via the deployment descriptor or
+via the <code>javax.ejb.AccessTimeout</code> annotation.</p>
+</li>
+<li>
+<p><code>cache-ref</code> This attribute is used to set the default cache for
+non-clustered beans. It can be overridden by <code>jboss-ejb3.xml</code>, or via
+the <code>org.jboss.ejb3.annotation.Cache</code> annotation.</p>
+</li>
+<li>
+<p><code>clustered-cache-ref</code> This attribute is used to set the default cache
+for clustered beans.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="singleton">&lt;singleton&gt;</h3>
+<div class="paragraph">
+<p>This element is used to configure Singleton Session Beans.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>default-access-timeout</code> This attribute specifies the default time
+concurrent invocations will wait to acquire the instance lock. It can be
+overridden via the deployment descriptor or via the
+<code>javax.ejb.AccessTimeout</code> annotation.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="mdb">&lt;mdb&gt;</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="resource-adaptor-ref">&lt;resource-adaptor-ref&gt;</h3>
+<div class="paragraph">
+<p>This element sets the default resource adaptor for Message Driven Beans.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="bean-instance-pool-ref">&lt;bean-instance-pool-ref&gt;</h3>
+<div class="paragraph">
+<p>This element is used to configure the instance pool that is used by
+default for Message Driven Beans. If it is not present they are not
+pooled, but are instead created on demand for every invocation. The
+instance pool can be overridden on a per deployment or per bean level
+using <code>jboss-ejb3.xml</code> or the <code>org.jboss.ejb3.annotation.Pool</code>
+annotation. The instance pools themselves are configured in the
+<code>&lt;pools&gt;</code> element.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="entity-bean">&lt;entity-bean&gt;</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This element is used to configure the behavior for EJB2 EntityBeans.</p>
+</div>
+<div class="sect2">
+<h3 id="bean-instance-pool-ref-1">&lt;bean-instance-pool-ref&gt;</h3>
+<div class="paragraph">
+<p>This element is used to configure the instance pool that is used by
+default for Entity Beans. If it is not present they are not pooled, but
+are instead created on demand for every invocation. The instance pool
+can be overridden on a per deployment or per bean level using
+<code>jboss-ejb3.xml</code> or the <code>org.jboss.ejb3.annotation.Pool</code> annotation. The
+instance pools themselves are configured in the <code>&lt;pools&gt;</code> element.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="pools">&lt;pools&gt;</h2>
+<div class="sectionbody">
+
+</div>
+</div>
+<div class="sect1">
+<h2 id="caches">&lt;caches&gt;</h2>
+<div class="sectionbody">
+
+</div>
+</div>
+<div class="sect1">
+<h2 id="passivation-stores">&lt;passivation-stores&gt;</h2>
+<div class="sectionbody">
+
+</div>
+</div>
+<div class="sect1">
+<h2 id="async">&lt;async&gt;</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This element enables async EJB invocations. It is also used to specify
+the thread pool that these invocations will use.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="timer-service">&lt;timer-service&gt;</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This element enables the EJB timer service. It is also used to specify
+the thread pool that these invocations will use.</p>
+</div>
+<div class="sect2">
+<h3 id="data-store">&lt;data-store&gt;</h3>
+<div class="paragraph">
+<p>This is used to configure the directory that persistent timer
+information is saved to.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="remote">&lt;remote&gt;</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This is used to enable remote EJB invocations. It specifies the remoting
+connector to use (as defined in the remoting subsystem configuration),
+and the thread pool to use for remote invocations.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="thread-pools">&lt;thread-pools&gt;</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This is used to configure the thread pools used by async, timer and
+remote invocations.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="iiop">&lt;iiop&gt;</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This is used to enable IIOP (i.e. CORBA) invocation of EJB&#8217;s. If this
+element is present then the JacORB subsystem must also be installed. It
+supports the following two attributes:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>enable-by-default</code> If this is true then all EJB&#8217;s with EJB2.x home
+interfaces are exposed via IIOP, otherwise they must be explicitly
+enabled via <code>jboss-ejb3.xml</code>.</p>
+</li>
+<li>
+<p><code>use-qualified-name</code> If this is true then EJB&#8217;s are bound to the corba
+naming context with a binding name that contains the application and
+modules name of the deployment (e.g. myear/myejbjar/MyBean), if this is
+false the default binding name is simply the bean name.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="in-vm-remote-interface-invocation">&lt;in-vm-remote-interface-invocation&gt;</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>By default remote interface invocations use pass by value, as required
+by the EJB spec. This element can use used to enable pass by reference,
+which can give you a performance boost. Note WildFly will do a shallow
+check to see if the caller and the EJB have access to the same class
+definitions, which means if you are passing something such as a
+List&lt;MyObject&gt;, WildFly only checks the List to see if it is the same
+class definition on the call &amp; EJB side. If the top level class
+definition is the same, JBoss will make the call using pass by
+reference, which means that if MyObject or any objects beneath it are
+loaded from different classloaders, you would get a ClassCastException.
+If the top level class definitions are loaded from different
+classloaders, JBoss will use pass by value. JBoss cannot do a deep check
+of all of the classes to ensure no ClassCastExceptions will occur
+because doing a deep check would eliminate any performance boost you
+would have received by using call by reference. It is recommended that
+you configure pass by reference only on callers that you are sure will
+use the same class definitions and not globally. This can be done via a
+configuration in the jboss-ejb-client.xml as shown below.</p>
+</div>
+<div class="paragraph">
+<p>To configure a caller/client use pass by reference, you configure your
+top level deployment with a META-INF/jboss-ejb-client.xml containing:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;jboss-ejb-client xmlns="urn:jboss:ejb-client:1.0"&gt;
+    &lt;client-context&gt;
+        &lt;ejb-receivers local-receiver-pass-by-value="false"/&gt;
+    &lt;/client-context&gt;
+&lt;/jboss-ejb-client&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/wildflysite/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Wildfly</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Wildfly</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
