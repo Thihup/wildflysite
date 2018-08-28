@@ -1,21 +1,19 @@
 <!DOCTYPE html>
-<html lang="en"><head>
+<html>
+
+<head>
   <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
-<title>Developer Guide | Wildfly</title>
-<meta name="generator" content="Jekyll v3.8.3" />
-<meta property="og:title" content="Developer Guide" />
-<meta name="author" content="WildFly developer team" />
-<meta property="og:locale" content="en_US" />
-<link rel="canonical" href="https://jbossorg.github.io/wildflysite/docs/13/Developer_Guide.html" />
-<meta property="og:url" content="https://jbossorg.github.io/wildflysite/docs/13/Developer_Guide.html" />
-<meta property="og:site_name" content="Wildfly" />
-<script type="application/ld+json">
-{"@type":"WebPage","url":"https://jbossorg.github.io/wildflysite/docs/13/Developer_Guide.html","headline":"Developer Guide","author":{"@type":"Person","name":"WildFly developer team"},"@context":"http://schema.org"}</script>
-<!-- End Jekyll SEO tag -->
-<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://jbossorg.github.io/wildflysite/feed.xml" title="Wildfly" /></head>
-<body><div class="header navigation">
+  <meta name="description" content="">
+  <link rel="shortcut icon" type="image/png" href="/wildflysite/favicon.ico" >
+  <link rel="stylesheet" href="/wildflysite/assets/css/main.css" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+
+
+</head>
+
+<body class="Developer Guide">
+  <div class="content">
+    <div class="header navigation">
   <div class="logo-wrapper">
     <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
   </div>
@@ -48,9 +46,756 @@
     </nav>
   </div>
 </div>
-<main class="page-content" aria-label="Content">
-      <div class="wrapper">
-        <div id="preamble">
+
+    <div class="docs-page grid-wrapper">
+  <div class="grid__item width-12-12 docs-v-icons">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-13-active.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-12-inactive.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-11-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-10-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-09-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-08-coming.png">
+  </div>
+  <div class="grid__item width-12-12"><h1 class="title">Developer Guide</h1></div>
+  <div class="grid__item width-2-12 doc-toc"><ul class="inline_toc">
+  <li><a href="#Class_Loading_in_WildFly">1. Class Loading in WildFly</a>
+    <ul>
+      <li><a href="#deployment-module-names">1.1. Deployment Module Names</a></li>
+      <li><a href="#automatic-dependencies">1.2. Automatic Dependencies</a></li>
+      <li><a href="#class-loading-precedence">1.3. Class Loading Precedence</a></li>
+      <li><a href="#war-class-loading">1.4. WAR Class Loading</a></li>
+      <li><a href="#ear-class-loading">1.5. EAR Class Loading</a>
+        <ul>
+          <li><a href="#class-path-entries">1.5.1. Class Path Entries</a></li>
+        </ul>
+      </li>
+      <li><a href="#global-modules">1.6. Global Modules</a></li>
+      <li><a href="#jboss-deployment-structure-file">1.7. JBoss Deployment Structure File</a></li>
+      <li><a href="#accessing-jdk-classes">1.8. Accessing JDK classes</a></li>
+      <li><a href="#the-jboss.api-property-and-application-use-of-modules-shipped-with-wildfly">1.9. The “jboss.api” property and application use of modules shipped with</a></li>
+    </ul>
+  </li>
+  <li><a href="#Implicit_module_dependencies_for_deployments">2. Implicit module dependencies for deployments</a>
+    <ul>
+      <li><a href="#whats-an-implicit-module-dependency">2.1. What’s an implicit module dependency?</a></li>
+      <li><a href="#how-and-when-is-an-implicit-module-dependency-added">2.2. How and when is an implicit module dependency added?</a></li>
+      <li><a href="#which-are-the-implicit-module-dependencies">2.3. Which are the implicit module dependencies?</a></li>
+    </ul>
+  </li>
+  <li><a href="#Deployment_Descriptors_used_In_WildFly">3. Deployment Descriptors used In WildFly</a></li>
+  <li><a href="#Development_Guidelines_and_Recommended_Practices">4. Development Guidelines and Recommended Practices</a></li>
+  <li><a href="#Application_Client_Reference">5. Application Client Reference</a>
+    <ul>
+      <li><a href="#getting-started">5.1. Getting Started</a></li>
+      <li><a href="#connecting-to-more-than-one-host">5.2. Connecting to more than one host</a></li>
+      <li><a href="#example">5.3. Example</a></li>
+    </ul>
+  </li>
+  <li><a href="#embedded-api">6. Embedded API</a>
+    <ul>
+      <li><a href="#standalone-api">6.1. Standalone API</a>
+        <ul>
+          <li><a href="#examples">6.1.1. Examples</a></li>
+        </ul>
+      </li>
+      <li><a href="#host-controller-api">6.2. Host Controller API</a>
+        <ul>
+          <li><a href="#example-2">6.2.1. Example</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#CDI_Reference">7. CDI Reference</a>
+    <ul>
+      <li><a href="#using-cdi-beans-from-outside-the-deployment">7.1. Using CDI Beans from outside the deployment</a></li>
+      <li><a href="#suppressing-implicit-bean-archives">7.2. Suppressing implicit bean archives</a>
+        <ul>
+          <li><a href="#per-deployment-configuration">7.2.1. Per-deployment configuration</a></li>
+          <li><a href="#global-configuration">7.2.2. Global configuration</a></li>
+        </ul>
+      </li>
+      <li><a href="#development-mode">7.3. Development mode</a>
+        <ul>
+          <li><a href="#per-deployment-configuration-1">7.3.1. Per-deployment configuration</a></li>
+          <li><a href="#global-configuration-1">7.3.2. Global configuration</a></li>
+        </ul>
+      </li>
+      <li><a href="#non-portable-mode">7.4. Non-portable mode</a>
+        <ul>
+          <li><a href="#per-deployment-configuration-2">7.4.1. Per-deployment configuration</a></li>
+          <li><a href="#global-configuration-2">7.4.2. Global configuration</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#EE_Concurrency_Utilities">8. EE Concurrency Utilities</a>
+    <ul>
+      <li><a href="#context-service">8.1. Context Service</a></li>
+      <li><a href="#managed-thread-factory">8.2. Managed Thread Factory</a></li>
+      <li><a href="#managed-executor-service">8.3. Managed Executor Service</a></li>
+      <li><a href="#managed-scheduled-executor-service">8.4. Managed Scheduled Executor Service</a></li>
+    </ul>
+  </li>
+  <li><a href="#EJB3_Reference_Guide">9. EJB 3 Reference Guide</a>
+    <ul>
+      <li><a href="#resource-adapter-for-message-driven-beans">9.1. Resource Adapter for Message Driven Beans</a>
+        <ul>
+          <li><a href="#specification-of-resource-adapter-using-metadata-annotations">9.1.1. Specification of Resource Adapter using Metadata Annotations</a></li>
+        </ul>
+      </li>
+      <li><a href="#run-as-principal">9.2. Run-as Principal</a>
+        <ul>
+          <li><a href="#specification-of-run-as-principal-using-metadata-annotations">9.2.1. Specification of Run-as Principal using Metadata Annotations</a></li>
+        </ul>
+      </li>
+      <li><a href="#security-domain">9.3. Security Domain</a>
+        <ul>
+          <li><a href="#specification-of-security-domain-using-metadata-annotations">9.3.1. Specification of Security Domain using Metadata Annotations</a></li>
+        </ul>
+      </li>
+      <li><a href="#transaction-timeout">9.4. Transaction Timeout</a>
+        <ul>
+          <li><a href="#specification-of-transaction-timeout-with-metadata-annotations">9.4.1. Specification of Transaction Timeout with Metadata Annotations</a></li>
+          <li><a href="#specification-of-transaction-timeout-in-the-deployment-descriptor">9.4.2. Specification of Transaction Timeout in the Deployment Descriptor</a>
+            <ul>
+              <li><a href="#example-of-trans-timeout">Example of trans-timeout</a></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><a href="#timer-service">9.5. Timer service</a>
+        <ul>
+          <li><a href="#single-event-timer">9.5.1. Single event timer</a></li>
+          <li><a href="#recurring-timer">9.5.2. Recurring timer</a></li>
+          <li><a href="#calendar-timer">9.5.3. Calendar timer</a>
+            <ul>
+              <li><a href="#programmatic-calendar-timer">Programmatic calendar timer</a></li>
+              <li><a href="#annotated-calendar-timer">Annotated calendar timer</a></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><a href="#Container_interceptors">9.6. Container interceptors</a>
+        <ul>
+          <li><a href="#typical-ejb-invocation-call-path-on-the-server">9.6.1. Typical EJB invocation call path on the server</a></li>
+          <li><a href="#configuring-container-interceptors">9.6.2. Configuring container interceptors</a></li>
+          <li><a href="#container-interceptor-positioning-in-the-interceptor-chain">9.6.3. Container interceptor positioning in the interceptor chain</a></li>
+          <li><a href="#semantic-difference-between-container-interceptors-and-java-ee-interceptors-api">9.6.4. Semantic difference between container interceptor(s) and Java EE</a></li>
+          <li><a href="#testcase">9.6.5. Testcase</a></li>
+        </ul>
+      </li>
+      <li><a href="#EJB3_Clustered_Database_Timers">9.7. EJB3 Clustered Database Timers</a>
+        <ul>
+          <li><a href="#setup">9.7.1. Setup</a>
+            <ul>
+              <li><a href="#non-clustered-timers">Non clustered timers</a></li>
+            </ul>
+          </li>
+          <li><a href="#using-clustered-timers-in-a-deployment">9.7.2. Using clustered timers in a deployment</a></li>
+          <li><a href="#technical-details">9.7.3. Technical details</a></li>
+        </ul>
+      </li>
+      <li><a href="#EJB_IIOP_Guide">9.8. EJB IIOP Guide</a>
+        <ul>
+          <li><a href="#enabling-iiop">9.8.1. Enabling IIOP</a></li>
+          <li><a href="#enabling-jts">9.8.2. Enabling JTS</a></li>
+          <li><a href="#dynamic-stubs">9.8.3. Dynamic Stub’s</a></li>
+          <li><a href="#configuring-ejb-iiop-settings-via-jboss-ejb3.xml">9.8.4. Configuring EJB IIOP settings via jboss-ejb3.xml</a></li>
+        </ul>
+      </li>
+      <li><a href="#EJB_over_HTTP">9.9. EJB over HTTP</a>
+        <ul>
+          <li><a href="#server-configuration">9.9.1. Server Configuration</a></li>
+          <li><a href="#performing-invocations">9.9.2. Performing Invocations</a></li>
+          <li><a href="#implementation-details">9.9.3. Implementation details</a></li>
+        </ul>
+      </li>
+      <li><a href="#jboss-ejb3">9.10. jboss-ejb3.xml Reference</a>
+        <ul>
+          <li><a href="#example-file">9.10.1. Example File</a>
+            <ul>
+              <li><a href="#the-root-namespace-httpwww.jboss.comxmlnsjavaee">The root namespace <a href="http://www.jboss.com/xml/ns/javaee" class="bare">http://www.jboss.com/xml/ns/javaee</a></a></li>
+              <li><a href="#assembly-descriptor-namespaces">Assembly descriptor namespaces</a>
+                <ul>
+                  <li><a href="#the-security-namespace-urnsecurity">The security namespace urn:security</a></li>
+                  <li><a href="#the-resource-adaptor-namespace-urnresource-adapter-binding">The resource adaptor namespace urn:resource-adapter-binding</a></li>
+                  <li><a href="#the-iiop-namespace-urniiop">The IIOP namespace urn:iiop</a></li>
+                  <li><a href="#the-pool-namespace-urnejb-pool1.0">The pool namespace urn:ejb-pool:1.0</a></li>
+                  <li><a href="#the-cache-namespace-urnejb-cache1.0">The cache namespace urn:ejb-cache:1.0</a></li>
+                  <li><a href="#the-clustering-namespace-urnclustering1.0">The clustering namespace urn:clustering:1.0</a></li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><a href="#Message_Driven_Beans_Controlled_Delivery">9.11. Message Driven Beans Controlled Delivery</a>
+        <ul>
+          <li><a href="#delivery-active">9.11.1. Delivery Active</a>
+            <ul>
+              <li><a href="#start-delivery-and-stop-delivery">Start-delivery and Stop-Delivery</a></li>
+            </ul>
+          </li>
+          <li><a href="#delivery-groups">9.11.2. Delivery Groups</a>
+            <ul>
+              <li><a href="#reading-and-writing-the-delivery-state-of-a-delivery-group">Reading and Writing the Delivery State of a Delivery Group</a></li>
+              <li><a href="#using-delivery-groups">Using Delivery Groups</a></li>
+            </ul>
+          </li>
+          <li><a href="#clustered-singleton-delivery">9.11.3. Clustered Singleton Delivery</a></li>
+          <li><a href="#using-multiple-mdb-delivery-control-mechanisms">9.11.4. Using Multiple MDB Delivery Control Mechanisms</a></li>
+        </ul>
+      </li>
+      <li><a href="#Securing_EJBs">9.12. Securing EJBs</a>
+        <ul>
+          <li><a href="#security-domain-2">9.12.1. Security Domain</a></li>
+          <li><a href="#absence-of-security-domain-configuration-but-presence-of-other-security-metadata">9.12.2. Absence of security domain configuration but presence of other</a></li>
+          <li><a href="#access-to-methods-without-explicit-security-metadata-on-a-secured-bean">9.12.3. Access to methods without explicit security metadata, on a secured</a></li>
+        </ul>
+      </li>
+      <li><a href="#ejb-client-interceptors">9.13. EJB Client Interceptors</a>
+        <ul>
+          <li><a href="#implementing-client-interceptors">9.13.1. Implementing Client Interceptors</a></li>
+          <li><a href="#accessing-invocation-context-data">9.13.2. Accessing invocation context data</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#JPA_Reference_Guide">10. JPA Reference Guide</a>
+    <ul>
+      <li><a href="#introduction">10.1. Introduction</a></li>
+      <li><a href="#update-your-persistence.xml-for-hibernate-5.1">10.2. Update your Persistence.xml for Hibernate 5.1</a></li>
+      <li><a href="#entity-manager">10.3. Entity manager</a></li>
+      <li><a href="#container-managed-entity-manager">10.4. Container-managed entity manager</a></li>
+      <li><a href="#application-managed-entity-manager">10.5. Application-managed entity manager</a></li>
+      <li><a href="#persistence-context">10.6. Persistence Context</a></li>
+      <li><a href="#transaction-scoped-persistence-context">10.7. Transaction-scoped Persistence Context</a></li>
+      <li><a href="#extended-persistence-context">10.8. Extended Persistence Context</a>
+        <ul>
+          <li><a href="#extended-persistence-context-inheritance">10.8.1. Extended Persistence Context Inheritance</a></li>
+        </ul>
+      </li>
+      <li><a href="#entities">10.9. Entities</a></li>
+      <li><a href="#deployment">10.10. Deployment</a></li>
+      <li><a href="#troubleshooting">10.11. Troubleshooting</a></li>
+      <li><a href="#using-the-infinispan-second-level-cache">10.12. Using the Infinispan second level cache</a></li>
+      <li><a href="#replacing-the-current-hibernate-5.x-jars-with-a-newer-version">10.13. Replacing the current Hibernate 5.x jars with a newer version</a></li>
+      <li><a href="#using-hibernate-search">10.14. Using Hibernate Search</a></li>
+      <li><a href="#packaging-the-hibernate-jpa-persistence-provider-with-your-application">10.15. Packaging the Hibernate JPA persistence provider with your application</a></li>
+      <li><a href="#migrating-from-openjpa">10.16. Migrating from OpenJPA</a></li>
+      <li><a href="#migrating-from-eclipselink">10.17. Migrating from EclipseLink</a></li>
+      <li><a href="#migrating-from-datanucleus">10.18. Migrating from DataNucleus</a></li>
+      <li><a href="#native-hibernate-use">10.19. Native Hibernate use</a></li>
+      <li><a href="#injection-of-hibernate-session-and-sessionfactoryinjection-of-hibernate-session-and-sessionfactory">10.20. Injection of Hibernate Session and SessionFactoryInjection of</a></li>
+      <li><a href="#hibernate-properties">10.21. Hibernate properties</a></li>
+      <li><a href="#persistence-unit-properties">10.22. Persistence unit properties</a></li>
+      <li><a href="#determine-the-persistence-provider-module">10.23. Determine the persistence provider module</a></li>
+      <li><a href="#binding-entitymanagerfactoryentitymanager-to-jndi">10.24. Binding EntityManagerFactory/EntityManager to JNDI</a></li>
+      <li><a href="#community">10.25. Community</a>
+        <ul>
+          <li><a href="#people-who-have-contributed-to-the-wildfly-jpa-layer">10.25.1. People who have contributed to the WildFly JPA layer:</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#JNDI_Reference">11. JNDI Reference</a>
+    <ul>
+      <li><a href="#JNDI_Local_Reference">11.1. Local JNDI</a></li>
+      <li><a href="#binding-entries-to-jndi">11.2. Binding entries to JNDI</a>
+        <ul>
+          <li><a href="#using-a-deployment-descriptor">11.2.1. Using a deployment descriptor</a></li>
+          <li><a href="#programatically">11.2.2. Programatically</a>
+            <ul>
+              <li><a href="#java-ee-applications">Java EE Applications</a></li>
+              <li><a href="#wildfly-modules-and-extensions">WildFly Modules and Extensions</a></li>
+            </ul>
+          </li>
+          <li><a href="#naming-subsystem-configuration">11.2.3. Naming Subsystem Configuration</a></li>
+        </ul>
+      </li>
+      <li><a href="#retrieving-entries-from-jndi">11.3. Retrieving entries from JNDI</a>
+        <ul>
+          <li><a href="#resource-injection">11.3.1. Resource Injection</a></li>
+          <li><a href="#standard-java-se-jndi-api">11.3.2. Standard Java SE JNDI API</a></li>
+        </ul>
+      </li>
+      <li><a href="#JNDI_Remote_Reference">11.4. Remote JNDI Access</a></li>
+      <li><a href="#http-remoting">11.5. http-remoting:</a></li>
+      <li><a href="#ejb">11.6. ejb:</a></li>
+    </ul>
+  </li>
+  <li><a href="#JAX-RS_Reference_Guide">12. JAX-RS Reference Guide</a>
+    <ul>
+      <li><a href="#subclassing-javax.ws.rs.core.application-and-using-applicationpath">12.1. Subclassing javax.ws.rs.core.Application and using @ApplicationPath</a></li>
+      <li><a href="#subclassing-javax.ws.rs.core.application-and-using-web.xml">12.2. Subclassing javax.ws.rs.core.Application and using web.xml</a></li>
+      <li><a href="#using-web.xml">12.3. Using web.xml</a></li>
+    </ul>
+  </li>
+  <li><a href="#JAX-WS_Reference_guide">13. Webservices reference guide</a>
+    <ul>
+      <li><a href="#JAX-WS_User_Guide">13.1. JAX-WS User Guide</a>
+        <ul>
+          <li><a href="#web-service-endpoints">13.1.1. Web Service Endpoints</a>
+            <ul>
+              <li><a href="#plain-old-java-object-pojo">Plain old Java Object (POJO)</a>
+                <ul>
+                  <li><a href="#the-endpoint-as-a-web-application">The endpoint as a web application</a></li>
+                  <li><a href="#packaging-the-endpoint">Packaging the endpoint</a></li>
+                  <li><a href="#accessing-the-generated-wsdl">Accessing the generated WSDL</a></li>
+                </ul>
+              </li>
+              <li><a href="#ejb3-stateless-session-bean-slsb">EJB3 Stateless Session Bean (SLSB)</a>
+                <ul>
+                  <li><a href="#packaging-the-endpoint-1">Packaging the endpoint</a></li>
+                  <li><a href="#accessing-the-generated-wsdl-1">Accessing the generated WSDL</a></li>
+                </ul>
+              </li>
+              <li><a href="#endpoint-provider">Endpoint Provider</a></li>
+            </ul>
+          </li>
+          <li><a href="#web-service-clients">13.1.2. Web Service Clients</a>
+            <ul>
+              <li><a href="#service">Service</a>
+                <ul>
+                  <li><a href="#service-usage">Service Usage</a></li>
+                  <li><a href="#handler-resolver">Handler Resolver</a></li>
+                  <li><a href="#executor">Executor</a></li>
+                </ul>
+              </li>
+              <li><a href="#dynamic-proxy">Dynamic Proxy</a></li>
+              <li><a href="#webserviceref">WebServiceRef</a></li>
+              <li><a href="#dispatch">Dispatch</a></li>
+              <li><a href="#asynchronous-invocations">Asynchronous Invocations</a></li>
+              <li><a href="#oneway-invocations">Oneway Invocations</a></li>
+              <li><a href="#timeout-configuration">Timeout Configuration</a></li>
+            </ul>
+          </li>
+          <li><a href="#common-api">13.1.3. Common API</a>
+            <ul>
+              <li><a href="#handler-framework">Handler Framework</a>
+                <ul>
+                  <li><a href="#logical-handler">Logical Handler</a></li>
+                  <li><a href="#protocol-handler">Protocol Handler</a></li>
+                  <li><a href="#service-endpoint-handlers">Service endpoint handlers</a></li>
+                  <li><a href="#service-client-handlers">Service client handlers</a></li>
+                </ul>
+              </li>
+              <li><a href="#message-context">Message Context</a>
+                <ul>
+                  <li><a href="#logical-message-context">Logical Message Context</a></li>
+                  <li><a href="#soap-message-context">SOAP Message Context</a></li>
+                </ul>
+              </li>
+              <li><a href="#fault-handling">Fault Handling</a></li>
+            </ul>
+          </li>
+          <li><a href="#jax-ws-annotations">13.1.4. JAX-WS Annotations</a>
+            <ul>
+              <li><a href="#javax.xml.ws.servicemode">javax.xml.ws.ServiceMode</a></li>
+              <li><a href="#javax.xml.ws.webfault">javax.xml.ws.WebFault</a></li>
+              <li><a href="#javax.xml.ws.requestwrapper">javax.xml.ws.RequestWrapper</a></li>
+              <li><a href="#javax.xml.ws.responsewrapper">javax.xml.ws.ResponseWrapper</a></li>
+              <li><a href="#javax.xml.ws.webserviceclient">javax.xml.ws.WebServiceClient</a></li>
+              <li><a href="#javax.xml.ws.webendpoint">javax.xml.ws.WebEndpoint</a></li>
+              <li><a href="#javax.xml.ws.webserviceprovider">javax.xml.ws.WebServiceProvider</a></li>
+              <li><a href="#javax.xml.ws.bindingtype">javax.xml.ws.BindingType</a></li>
+              <li><a href="#javax.xml.ws.webserviceref">javax.xml.ws.WebServiceRef</a></li>
+              <li><a href="#javax.xml.ws.webservicerefs">javax.xml.ws.WebServiceRefs</a></li>
+              <li><a href="#javax.xml.ws.action">javax.xml.ws.Action</a></li>
+              <li><a href="#javax.xml.ws.faultaction">javax.xml.ws.FaultAction</a></li>
+            </ul>
+          </li>
+          <li><a href="#jsr-181-annotations">13.1.5. JSR-181 Annotations</a>
+            <ul>
+              <li><a href="#javax.jws.webservice">javax.jws.WebService</a></li>
+              <li><a href="#javax.jws.webmethod">javax.jws.WebMethod</a></li>
+              <li><a href="#javax.jws.oneway">javax.jws.OneWay</a></li>
+              <li><a href="#javax.jws.webparam">javax.jws.WebParam</a></li>
+              <li><a href="#javax.jws.webresult">javax.jws.WebResult</a></li>
+              <li><a href="#javax.jws.soapbinding">javax.jws.SOAPBinding</a></li>
+              <li><a href="#javax.jws.handlerchain">javax.jws.HandlerChain</a></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><a href="#JAX-WS_Tools">13.2. JAX-WS Tools</a>
+        <ul>
+          <li><a href="#server-side">13.2.1. Server side</a>
+            <ul>
+              <li><a href="#bottom-up-using-wsprovide">Bottom-Up (Using wsprovide)</a></li>
+              <li><a href="#top-down-using-wsconsume">Top-Down (Using wsconsume)</a></li>
+            </ul>
+          </li>
+          <li><a href="#client-side">13.2.2. Client Side</a></li>
+          <li><a href="#wsconsume">13.2.3. wsconsume</a></li>
+          <li><a href="#command-line-tool">13.2.4. Command Line Tool</a>
+            <ul>
+              <li><a href="#examples">Examples</a></li>
+            </ul>
+          </li>
+          <li><a href="#maven-plugin">13.2.5. Maven Plugin</a>
+            <ul>
+              <li><a href="#examples-1">Examples</a></li>
+            </ul>
+          </li>
+          <li><a href="#ant-task">13.2.6. Ant Task</a>
+            <ul>
+              <li><a href="#examples-2">Examples</a></li>
+            </ul>
+          </li>
+          <li><a href="#wsprovide">13.2.7. wsprovide</a></li>
+          <li><a href="#command-line-tool">13.2.8. Command Line Tool</a>
+            <ul>
+              <li><a href="#examples">Examples</a></li>
+            </ul>
+          </li>
+          <li><a href="#maven-plugin">13.2.9. Maven Plugin</a>
+            <ul>
+              <li><a href="#examples-1">Examples</a></li>
+            </ul>
+          </li>
+          <li><a href="#ant-task">13.2.10. Ant Task</a>
+            <ul>
+              <li><a href="#examples-2">Examples</a></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><a href="#JAX_WS_Advanced_User_Guide">13.3. Advanced User Guide</a>
+        <ul>
+          <li><a href="#logging">13.3.1. Logging</a>
+            <ul>
+              <li><a href="#jax-ws-handler-approach">JAX-WS Handler approach</a></li>
+              <li><a href="#apache-cxf-approach">Apache CXF approach</a>
+                <ul>
+                  <li><a href="#system-property">System property</a></li>
+                  <li><a href="#manual-interceptor-addition-and-logging-feature">Manual interceptor addition and logging feature</a></li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li><a href="#ws--support">13.3.2. WS-* support</a></li>
+          <li><a href="#address-rewrite">13.3.3. Address rewrite</a>
+            <ul>
+              <li><a href="#server-configuration-options">Server configuration options</a></li>
+              <li><a href="#dynamic-rewrite">Dynamic rewrite</a></li>
+            </ul>
+          </li>
+          <li><a href="#configuration-through-deployment-descriptor">13.3.4. Configuration through deployment descriptor</a>
+            <ul>
+              <li><a href="#context-root-element">context-root element</a></li>
+              <li><a href="#config-name-and-config-file-elements">config-name and config-file elements</a></li>
+              <li><a href="#property-element">property element</a></li>
+              <li><a href="#port-component-element">port-component element</a></li>
+              <li><a href="#webservice-description-element">webservice-description element</a></li>
+            </ul>
+          </li>
+          <li><a href="#schema-validation-of-soap-messages">13.3.5. Schema validation of SOAP messages</a></li>
+          <li><a href="#jaxb-introductions">13.3.6. JAXB Introductions</a></li>
+          <li><a href="#wsdl-system-properties-expansion">13.3.7. WSDL system properties expansion</a></li>
+          <li><a href="#Predefined_client_and_endpoint_configurations">13.3.8. Predefined client and endpoint configurations</a>
+            <ul>
+              <li><a href="#assigning-configurations">Assigning configurations</a>
+                <ul>
+                  <li><a href="#endpoint-configuration-assignment">Endpoint configuration assignment</a></li>
+                  <li><a href="#endpoint-configuration-deployment-descriptor">Endpoint Configuration Deployment Descriptor</a></li>
+                  <li><a href="#automatic-configuration-from-default-descriptors">Automatic configuration from default descriptors</a></li>
+                  <li><a href="#automatic-configuration-assignment-from-container-setup">Automatic configuration assignment from container setup</a></li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li><a href="#jax-ws-Authentication">13.3.9. Authentication</a>
+            <ul>
+              <li><a href="#jax-ws-authentication">Authentication</a>
+                <ul>
+                  <li><a href="#specify-the-security-domain">Specify the security domain</a></li>
+                  <li><a href="#use-bindingprovider-to-set-principalcredential">Use BindingProvider to set principal/credential</a></li>
+                  <li><a href="#using-http-basic-auth-for-security">Using HTTP Basic Auth for security</a></li>
+                </ul>
+              </li>
+              <li><a href="#jaspi-authentication">JASPI Authentication</a></li>
+            </ul>
+          </li>
+          <li><a href="#Apache_CXF_integration">13.3.10. Apache CXF integration</a>
+            <ul>
+              <li><a href="#jbossws-integration-layer-with-apache-cxf">JBossWS integration layer with Apache CXF</a></li>
+              <li><a href="#building-ws-applications-the-jboss-way">Building WS applications the JBoss way</a>
+                <ul>
+                  <li><a href="#portable-applications">Portable applications</a></li>
+                  <li><a href="#direct-apache-cxf-api-usage">Direct Apache CXF API usage</a></li>
+                </ul>
+              </li>
+              <li><a href="#bus-usage">Bus usage</a>
+                <ul>
+                  <li><a href="#creating-a-bus-instance">Creating a Bus instance</a></li>
+                  <li><a href="#using-existing-bus-instances">Using existing Bus instances</a></li>
+                  <li><a href="#bus-selection-strategies-for-jaxws-clients">Bus selection strategies for JAXWS clients</a></li>
+                </ul>
+              </li>
+              <li><a href="#server-side-integration-customization">Server Side Integration Customization</a>
+                <ul>
+                  <li><a href="#deployment-descriptor-properties">Deployment descriptor properties</a></li>
+                </ul>
+              </li>
+              <li><a href="#apache-cxf-interceptors">Apache CXF interceptors</a></li>
+              <li><a href="#apache-cxf-features">Apache CXF features</a></li>
+              <li><a href="#properties-driven-bean-creation">Properties driven bean creation</a></li>
+              <li><a href="#httpconduit-configuration">HTTPConduit configuration</a></li>
+            </ul>
+          </li>
+          <li><a href="#WS-Addressing">13.3.11. WS-Addressing</a>
+            <ul>
+              <li><a href="#enabling-ws-addressing">Enabling WS-Addressing</a></li>
+              <li><a href="#ws-addressing-policy">WS-Addressing Policy</a></li>
+              <li><a href="#example">Example</a>
+                <ul>
+                  <li><a href="#endpoint">Endpoint</a></li>
+                  <li><a href="#client">Client</a></li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li><a href="#WS-Security">13.3.12. WS-Security</a>
+            <ul>
+              <li><a href="#ws-security-overview">WS-Security overview</a></li>
+              <li><a href="#jboss-ws-security-support">JBoss WS-Security support</a>
+                <ul>
+                  <li><a href="#apache-cxf-ws-security-implementation">Apache CXF WS-Security implementation</a></li>
+                  <li><a href="#jbossws-configuration-additions">JBossWS configuration additions</a></li>
+                  <li><a href="#apache-cxf-annotations">Apache CXF annotations</a></li>
+                </ul>
+              </li>
+              <li><a href="#examples">Examples</a>
+                <ul>
+                  <li><a href="#signature-and-encryption">Signature and encryption</a></li>
+                  <li><a href="#authentication-and-authorization">Authentication and authorization</a></li>
+                  <li><a href="#secure-transport">Secure transport</a></li>
+                  <li><a href="#secure-conversation">Secure conversation</a></li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li><a href="#WS-Trust_and_STS">13.3.13. WS-Trust and STS</a>
+            <ul>
+              <li><a href="#ws-trust-overview">WS-Trust overview</a></li>
+              <li><a href="#security-token-service">Security Token Service</a></li>
+              <li><a href="#apache-cxf-support">Apache CXF support</a></li>
+              <li><a href="#a-basic-ws-trust-scenario">A Basic WS-Trust Scenario</a>
+                <ul>
+                  <li><a href="#web-service-provider">Web service provider</a></li>
+                  <li><a href="#security-token-service-sts">Security Token Service (STS)</a></li>
+                  <li><a href="#web-service-requester">Web service requester</a></li>
+                  <li><a href="#picketlink-sts">PicketLink STS</a></li>
+                </ul>
+              </li>
+              <li><a href="#ActAs_WS-Trust_Scenario">ActAs WS-Trust Scenario</a>
+                <ul>
+                  <li><a href="#web-service-provider-2">Web service provider</a></li>
+                  <li><a href="#security-token-service">Security Token Service</a></li>
+                  <li><a href="#web-service-requester">Web service requester</a></li>
+                </ul>
+              </li>
+              <li><a href="#OnBehalfOf_WS-Trust_Scenario">OnBehalfOf WS-Trust Scenario</a>
+                <ul>
+                  <li><a href="#web-service-provider-3">Web service provider</a></li>
+                  <li><a href="#web-service-requester">Web service requester</a></li>
+                </ul>
+              </li>
+              <li><a href="#SAML_Bearer_Assertion_Scenario">SAML Bearer Assertion Scenario</a>
+                <ul>
+                  <li><a href="#web-service-provider-4">Web service Provider</a></li>
+                  <li><a href="#bearer-security-token-service">Bearer Security Token Service</a></li>
+                  <li><a href="#web-service-requester">Web service requester</a></li>
+                </ul>
+              </li>
+              <li><a href="#SAML_Holder-Of-Key_Assertion_Scenario">SAML Holder-Of-Key Assertion Scenario</a>
+                <ul>
+                  <li><a href="#web-service-provider-5">Web service Provider</a></li>
+                  <li><a href="#security-token-service">Security Token Service</a></li>
+                  <li><a href="#web-service-requester">Web service requester</a></li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li><a href="#WS-Reliable_Messaging">13.3.14. WS-Reliable Messaging</a>
+            <ul>
+              <li><a href="#enabling-ws-reliable-messaging">Enabling WS-Reliable Messaging</a></li>
+              <li><a href="#example">Example</a>
+                <ul>
+                  <li><a href="#endpoint">Endpoint</a></li>
+                  <li><a href="#client">Client</a></li>
+                  <li><a href="#additional-configuration">Additional configuration</a></li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li><a href="#SOAP_over_JMS">13.3.15. SOAP over JMS</a>
+            <ul>
+              <li><a href="#configuring-soap-over-jms">Configuring SOAP over JMS</a></li>
+              <li><a href="#examples">Examples</a>
+                <ul>
+                  <li><a href="#jms-endpoint-only-deployment">JMS endpoint only deployment</a></li>
+                  <li><a href="#jms-and-http-endpoints-deployment">JMS and HTTP endpoints deployment</a></li>
+                  <li><a href="#use-of-endpoint.publish-api">Use of Endpoint.publish() API</a></li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li><a href="#HTTP_Proxy">13.3.16. HTTP Proxy</a>
+            <ul>
+              <li><a href="#configuration">Configuration</a></li>
+            </ul>
+          </li>
+          <li><a href="#WS-Discovery">13.3.17. WS-Discovery</a>
+            <ul>
+              <li><a href="#enabling-ws-discovery">Enabling WS-Discovery</a></li>
+              <li><a href="#probing-services">Probing services</a></li>
+            </ul>
+          </li>
+          <li><a href="#WS-Policy">13.3.18. WS-Policy</a>
+            <ul>
+              <li><a href="#apache-cxf-ws-policy-support">Apache CXF WS-Policy support</a>
+                <ul>
+                  <li><a href="#contract-first-approach">Contract-first approach</a></li>
+                  <li><a href="#code-first-approach">Code-first approach</a></li>
+                </ul>
+              </li>
+              <li><a href="#jbossws-additions">JBossWS additions</a>
+                <ul>
+                  <li><a href="#policy-sets">Policy sets</a></li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li><a href="#Published_WSDL_customization">13.3.19. Published WSDL customization</a>
+            <ul>
+              <li><a href="#endpoint-address-rewrite">Endpoint address rewrite</a></li>
+              <li><a href="#system-property-references">System property references</a></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><a href="#JAX_WS_JBoss_Modules_and_WS_applications">13.4. JBoss Modules and WS applications</a>
+        <ul>
+          <li><a href="#setting-module-dependencies">13.4.1. Setting module dependencies</a>
+            <ul>
+              <li><a href="#using-manifest.mf">Using MANIFEST.MF</a>
+                <ul>
+                  <li><a href="#using-jaxb">Using JAXB</a></li>
+                  <li><a href="#using-apache-cxf">Using Apache CXF</a></li>
+                  <li><a href="#client-side-ws-aggregation-module">Client side WS aggregation module</a></li>
+                  <li><a href="#annotation-scanning">Annotation scanning</a></li>
+                </ul>
+              </li>
+              <li><a href="#using-jboss-deployment-descriptor.xml">Using jboss-deployment-descriptor.xml</a></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#Scoped_EJB_client_contexts">14. Scoped EJB client contexts</a>
+    <ul>
+      <li><a href="#potential-shortcomings-of-a-single-ejb-client-context">14.1. Potential shortcomings of a single EJB client context</a></li>
+      <li><a href="#scoped-ejb-client-contexts">14.2. Scoped EJB client contexts</a></li>
+      <li><a href="#lifecycle-management-of-scoped-ejb-client-contexts">14.3. Lifecycle management of scoped EJB client contexts</a>
+        <ul>
+          <li><a href="#how-to-close-ejb-client-contexts">14.3.1. How to close EJB client contexts?</a></li>
+          <li><a href="#how-to-close-scoped-ejb-client-contexts">14.3.2. How to close scoped EJB client contexts?</a>
+            <ul>
+              <li><a href="#can-that-code-be-simplified-a-bit">Can that code be simplified a bit?</a></li>
+            </ul>
+          </li>
+          <li><a href="#cant-the-scoped-ejb-client-context-be-automatically-closed-by-the-ejb-client-api-when-the-jndi-context-is-no-longer-in-scope-i.e.-on-gc">14.3.3. Can’t the scoped EJB client context be automatically closed by the</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#EJB_invocations_from_a_remote_client_using_JNDI">15. EJB invocations from a remote client using JNDI</a>
+    <ul>
+      <li><a href="#deploying-your-ejbs-on-the-server-side">15.1. Deploying your EJBs on the server side:</a></li>
+      <li><a href="#writing-a-remote-client-application-for-accessing-and-invoking-the-ejbs-deployed-on-the-server">15.2. Writing a remote client application for accessing and invoking the</a></li>
+      <li><a href="#setting-up-ejb-client-context-properties">15.3. Setting up EJB client context properties</a></li>
+      <li><a href="#summary">Summary</a></li>
+    </ul>
+  </li>
+  <li><a href="#EJB_invocations_from_a_remote_server_instance">16. EJB invocations from a remote server instance</a>
+    <ul>
+      <li><a href="#application-packaging">16.1. Application packaging</a></li>
+      <li><a href="#beans">16.2. Beans</a></li>
+      <li><a href="#security">16.3. Security</a></li>
+      <li><a href="#configuring-a-user-on-the-destination-server">16.4. Configuring a user on the “Destination Server”</a></li>
+      <li><a href="#start-the-destination-server">16.5. Start the “Destination Server”</a></li>
+      <li><a href="#deploying-the-application">16.6. Deploying the application</a></li>
+      <li><a href="#configuring-the-client-server-to-point-to-the-ejb-remoting-connector-on-the-destination-server">16.7. Configuring the “Client Server” to point to the EJB remoting connector</a></li>
+      <li><a href="#start-the-client-server">16.8. Start the “Client Server”</a></li>
+      <li><a href="#create-a-security-realm-on-the-client-server">16.9. Create a security realm on the client server</a></li>
+      <li><a href="#create-a-outbound-socket-binding-on-the-client-server">16.10. Create a outbound-socket-binding on the “Client Server”</a></li>
+      <li><a href="#create-a-remote-outbound-connection-which-uses-this-newly-created-outbound-socket-binding">16.11. Create a “remote-outbound-connection” which uses this newly created</a></li>
+      <li><a href="#packaging-the-client-application-on-the-client-server">16.12. Packaging the client application on the “Client Server”</a></li>
+      <li><a href="#contents-on-jboss-ejb-client.xml">16.13. Contents on jboss-ejb-client.xml</a></li>
+      <li><a href="#deploy-the-client-application">16.14. Deploy the client application</a></li>
+      <li><a href="#client-code-invoking-the-bean">16.15. Client code invoking the bean</a></li>
+    </ul>
+  </li>
+  <li><a href="#Remote_EJB_invocations_via_JNDI_-_EJB_client_API_or_remote-naming_project">17. Remote EJB invocations via JNDI - EJB client API or remote-naming project</a>
+    <ul>
+      <li><a href="#purpose">17.1. Purpose</a></li>
+      <li><a href="#history">17.2. History</a></li>
+      <li><a href="#overview">17.3. Overview</a>
+        <ul>
+          <li><a href="#client-code-relying-on-jndi.properties-in-classpath">17.3.1. Client code relying on jndi.properties in classpath</a></li>
+          <li><a href="#how-does-remoting-naming-work">17.3.2. How does remoting naming work</a></li>
+          <li><a href="#jndi-operations-allowed-using-remote-naming-project">17.3.3. JNDI operations allowed using remote-naming project</a></li>
+          <li><a href="#pre-requisites-of-remotely-accessible-jndi-objects">17.3.4. Pre-requisites of remotely accessible JNDI objects</a></li>
+          <li><a href="#jndi-lookup-strings-for-remote-clients-backed-by-the-remote-naming-project">17.3.5. JNDI lookup strings for remote clients backed by the remote-naming</a></li>
+          <li><a href="#how-does-remote-naming-project-implementation-transfer-the-jndi-objects-to-the-clients">17.3.6. How does remote-naming project implementation transfer the JNDI</a></li>
+        </ul>
+      </li>
+      <li><a href="#summary">17.4. Summary</a></li>
+      <li><a href="#remote-ejb-invocations-backed-by-the-remote-naming-project">17.5. Remote EJB invocations backed by the remote-naming project</a></li>
+      <li><a href="#why-use-the-ejb-client-api-approach-then">17.6. Why use the EJB client API approach then?</a>
+        <ul>
+          <li><a href="#is-the-lookup-optimization-applicable-for-all-bean-types">17.6.1. Is the lookup optimization applicable for all bean types?</a></li>
+          <li><a href="#restrictions-for-ejbs">17.6.2. Restrictions for EJB’s</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#Migrated_to_WildFly_Example_Applications">18. Example Applications - Migrated to WildFly</a>
+    <ul>
+      <li><a href="#example-applications-migrated-from-previous-releases">18.1. Example Applications Migrated from Previous Releases</a>
+        <ul>
+          <li><a href="#seam-2-dvd-store-example">18.1.1. Seam 2 DVD Store example</a></li>
+          <li><a href="#seam-2-booking-example">18.1.2. Seam 2 Booking example</a></li>
+          <li><a href="#seam-2-booking---step-by-step-migration-of-binaries">18.1.3. Seam 2 Booking - step-by-step migration of binaries</a></li>
+          <li><a href="#jbpm-console-application">18.1.4. jBPM-Console application</a></li>
+          <li><a href="#order-application-used-for-performance-testing">18.1.5. Order application used for performance testing</a></li>
+          <li><a href="#migrate-example-application">18.1.6. Migrate example application</a></li>
+        </ul>
+      </li>
+      <li><a href="#example-applications-based-on-ee6">18.2. Example Applications Based on EE6</a></li>
+      <li><a href="#Migrate_Order_Application_from_EAP5">18.3. Porting the Order Application from EAP 5.1 to WildFly 13</a></li>
+      <li><a href="#overview-of-the-application">18.4. Overview of the application</a></li>
+      <li><a href="#summary-of-changes">18.5. Summary of changes</a>
+        <ul>
+          <li><a href="#code-changes">18.5.1. Code Changes</a>
+            <ul>
+              <li><a href="#modify-jndi-lookup-code">Modify JNDI lookup code</a></li>
+            </ul>
+          </li>
+          <li><a href="#modify-logging-code">18.5.2. Modify logging code</a></li>
+          <li><a href="#modify-the-code-to-use-infinispan-for-2nd-level-cache">18.5.3. Modify the code to use Infinispan for 2nd level cache</a></li>
+          <li><a href="#ear-packaging-changes">18.5.4. EAR Packaging Changes</a></li>
+          <li><a href="#summary">18.5.5. Summary</a></li>
+        </ul>
+      </li>
+      <li><a href="#Migrate_Seam_2_Booking_EAR_Binaries_-_Step_by_Step">18.6. Seam 2 Booking Application - Migration of Binaries from EAP5.1 to</a></li>
+    </ul>
+  </li>
+</ul></div>
+  <div class="grid__item width-10-12 doc-content"><div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
 <p>&#169; 2017 The original authors.</p>
@@ -1312,6 +2057,11 @@ which is located on Github .</p>
 <div class="sect1">
 <h2 id="embedded-api">6. Embedded API</h2>
 <div class="sectionbody">
+<hr>
+<div class="paragraph">
+<p>layout: docs
+---</p>
+</div>
 <div class="paragraph">
 <p>The embedded API can be used to launch WildFly within a currently running process.</p>
 </div>
@@ -25249,32 +25999,160 @@ applications to WildFly.</p>
 </div>
 </div>
 </div>
-</div>
-      </div>
-    </main><footer class="site-footer h-card">
-  <data class="u-url" href="/wildflysite/"></data>
-
-  <div class="wrapper">
-
-    <h2 class="footer-heading">Wildfly</h2>
-
-    <div class="footer-col-wrapper">
-      <div class="footer-col footer-col-1">
-        <ul class="contact-list">
-          <li class="p-name">Wildfly</li></ul>
-      </div>
-
-      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div></div>
 </div>
 
-      <div class="footer-col footer-col-3">
-        <p></p>
-      </div>
-    </div>
+
 
   </div>
 
-</footer>
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">WildFly is open. All dependencies of this project are available under the <a href='https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html' class='dark-background' target='_blank'>LGPL 2.1</a> or compatible license.<br/><br/>This website was built with <a href='https://jekyllrb.com/' class='dark-background' target='_blank'>Jekyll</a> is hosted on <a href='https://pages.github.com/' class='dark-background' target='_blank'>Github Pages</a> and is completely open source. If you want to make it better, <a href='https://github.com/wildfly/wildfly.org/fork' class='dark-background' target='_blank'>fork it</a> and show us what you’ve got.</p>
+
+    
+      <div class="width-1-12 project-links">
+        <strong>Navigation</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="/wildflysite/downloads" class="dark-background">Downloads</a></li>
+          
+            <li><a href="/wildflysitef/docs" class="dark-background">Docs</a></li>
+          
+            <li><a href="https://github.com/wildfly/wildfly" class="dark-background">Github</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <strong>Contribute</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="https://issues.jboss.org/browse/WFLY" class="dark-background">Submit a bug</a></li>
+          
+            <li><a href="https://community.jboss.org/en/wildfly?view=discussion" class="dark-background">Join the forum</a></li>
+          
+            <li><a href="https://github.com/wildfly/wildfly/fork" class="dark-background">Fork WildFly</a></li>
+          
+            <li><a href="https://twitter.com/WildFlyAS" class="dark-background">Follow us</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <strong>Get Help</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="https://community.jboss.org/en/wildfly?view=discussion" class="dark-background">Join the forum</a></li>
+          
+            <li><a href="https://www.hipchat.com/gFOhnVQke" class="dark-background">Join HipChat</a></li>
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-6-12 more-links">
+        <strong>Find more Red Hat Middleware Community Projects</strong>
+        <ul class="footer-links">
+          
+            <li><a href="https://www.apiman.io/" class="dark-background">APIMan</a></li>
+          
+            <li><a href="http://arquillian.org" class="dark-background">Arquillian</a></li>
+          
+            <li><a href="http://byteman.jboss.org/" class="dark-background">Byteman</a></li>
+          
+            <li><a href="http://capedwarf.org/" class="dark-background">CapeDwarf</a></li>
+          
+            <li><a href="https://github.com/alechenninger/chronicler" class="dark-background">Chronicler</a></li>
+          
+            <li><a href="https://github.com/darcy-framework" class="dark-background">Darcy</a></li>
+          
+            <li><a href="http://debezium.io/" class="dark-background">Debezium</a></li>
+          
+            <li><a href="https://www.drools.org/" class="dark-background">Drools</a></li>
+          
+            <li><a href="http://gatein.jboss.org/" class="dark-background">GateIn</a></li>
+          
+            <li><a href="http://www.hawkular.org/" class="dark-background">Hawkular</a></li>
+          
+            <li><a href="http://hawt.io/" class="dark-background">Hawtio</a></li>
+          
+            <li><a href="http://hibernate.org/" class="dark-background">Hibernate</a></li>
+          
+            <li><a href="http://www.infinispan.org/" class="dark-background">Infinispan</a></li>
+          
+            <li><a href="https://devstudio.jboss.com/" class="dark-background">JBoss DevStudio</a></li>
+          
+            <li><a href="http://forge.jboss.org/" class="dark-background">JBoss Forge</a></li>
+          
+            <li><a href="https://github.com/jboss-logging" class="dark-background">JBoss Logging</a></li>
+          
+            <li><a href="http://jbossremoting.jboss.org/" class="dark-background">JBoss Remoting</a></li>
+          
+            <li><a href="https://www.jbpm.org/" class="dark-background">jBPM</a></li>
+          
+            <li><a href="https://jsfunit.jboss.org/" class="dark-background">JSFUnit</a></li>
+          
+            <li><a href="https://www.keycloak.org/" class="dark-background">Keycloak</a></li>
+          
+            <li><a href="http://modcluster.io/" class="dark-background">Mod Cluster</a></li>
+          
+            <li><a href="http://modeshape.jboss.org/" class="dark-background">ModeShape</a></li>
+          
+            <li><a href="https://www.optaplanner.org/" class="dark-background">OptaPlanner</a></li>
+          
+            <li><a href="https://picketbox.jboss.org/" class="dark-background">Picketbox</a></li>
+          
+            <li><a href="http://resteasy.jboss.org/" class="dark-background">RESTEasy</a></li>
+          
+            <li><a href="https://riftsaw.jboss.org/" class="dark-background">Riftsaw</a></li>
+          
+            <li><a href="http://savara.jboss.org/" class="dark-background">Savara</a></li>
+          
+            <li><a href="http://seamframework.org/" class="dark-background">Seam</a></li>
+          
+            <li><a href="http://arquillian.org/" class="dark-background">Shrinkwrap</a></li>
+          
+            <li><a href="http://snowdrop.jboss.org/" class="dark-background">Snowdrop</a></li>
+          
+            <li><a href="https://switchyard.jboss.org/" class="dark-background">Switchyard</a></li>
+          
+            <li><a href="https://tattletale.jboss.org/" class="dark-background">Tattletale</a></li>
+          
+            <li><a href="http://teiid.jboss.org/" class="dark-background">Teiid</a></li>
+          
+            <li><a href="http://wildfly-swarm.io/" class="dark-background">WildFly Swarm</a></li>
+          
+            <li><a href="http://wise.jboss.org/" class="dark-background">Wise</a></li>
+          
+            <li><a href="https://xnio.jboss.org/" class="dark-background">XNIO</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" class="dark-background" target="_blank">CC by 3.0</a>
+    </span>
+    <span class="redhat">
+      a Red Hat sponsored project   
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/"><img src="/wildflysite/assets/img/RHLogo_white.svg"></a>
+    </span>
+  </div>
+</div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script type="text/javascript" src="/wildflysite/assets/javascript/mobile-nav.js"></script>
 </body>
 
 </html>

@@ -1,21 +1,19 @@
 <!DOCTYPE html>
-<html lang="en"><head>
+<html>
+
+<head>
   <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
-<title>WildFly Testsuite | Wildfly</title>
-<meta name="generator" content="Jekyll v3.8.3" />
-<meta property="og:title" content="WildFly Testsuite" />
-<meta name="author" content="WildFly team" />
-<meta property="og:locale" content="en_US" />
-<link rel="canonical" href="https://jbossorg.github.io/wildflysite/docs/13/Testsuite.html" />
-<meta property="og:url" content="https://jbossorg.github.io/wildflysite/docs/13/Testsuite.html" />
-<meta property="og:site_name" content="Wildfly" />
-<script type="application/ld+json">
-{"@type":"WebPage","url":"https://jbossorg.github.io/wildflysite/docs/13/Testsuite.html","headline":"WildFly Testsuite","author":{"@type":"Person","name":"WildFly team"},"@context":"http://schema.org"}</script>
-<!-- End Jekyll SEO tag -->
-<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://jbossorg.github.io/wildflysite/feed.xml" title="Wildfly" /></head>
-<body><div class="header navigation">
+  <meta name="description" content="">
+  <link rel="shortcut icon" type="image/png" href="/wildflysite/favicon.ico" >
+  <link rel="stylesheet" href="/wildflysite/assets/css/main.css" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+
+
+</head>
+
+<body class="WildFly Testsuite">
+  <div class="content">
+    <div class="header navigation">
   <div class="logo-wrapper">
     <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
   </div>
@@ -48,9 +46,153 @@
     </nav>
   </div>
 </div>
-<main class="page-content" aria-label="Content">
-      <div class="wrapper">
-        <div id="preamble">
+
+    <div class="docs-page grid-wrapper">
+  <div class="grid__item width-12-12 docs-v-icons">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-13-active.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-12-inactive.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-11-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-10-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-09-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-08-coming.png">
+  </div>
+  <div class="grid__item width-12-12"><h1 class="title">WildFly Testsuite</h1></div>
+  <div class="grid__item width-2-12 doc-toc"><ul class="inline_toc">
+  <li><a href="#WildFly_Testsuite_Overview">1. WildFly Testsuite Overview</a>
+    <ul>
+      <li><a href="#test-suite-organization">1.1. Test Suite Organization</a></li>
+      <li><a href="#profiles">1.2. Profiles</a></li>
+      <li><a href="#integration-tests">1.3. Integration tests</a>
+        <ul>
+          <li><a href="#smoke--dts.smoke--dts.nosmoke">1.3.1. Smoke -Dts.smoke, -Dts.noSmoke</a></li>
+          <li><a href="#basic--dts.basic">1.3.2. Basic -Dts.basic</a></li>
+          <li><a href="#cluster--dts.clust">1.3.3. Cluster -Dts.clust</a></li>
+          <li><a href="#iiop--dts.iiop">1.3.4. IIOP -Dts.iiop</a></li>
+        </ul>
+      </li>
+      <li><a href="#xts--dts.xts">1.4. XTS -Dts.XTS</a>
+        <ul>
+          <li><a href="#multinode--dts.multinode">1.4.1. Multinode -Dts.multinode</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#WildFly_Integration_Testsuite_User_Guide">2. WildFly Integration Testsuite User Guide</a>
+    <ul>
+      <li><a href="#running-the-testsuite">2.1. Running the testsuite</a>
+        <ul>
+          <li><a href="#supported-maven-phases">2.1.1. Supported Maven phases</a></li>
+          <li><a href="#testsuite-structure">2.1.2. Testsuite structure</a></li>
+          <li><a href="#test-groups">2.1.3. Test groups</a></li>
+        </ul>
+      </li>
+      <li><a href="#examples">2.2. Examples</a>
+        <ul>
+          <li><a href="#output-to-console">2.2.1. Output to console</a></li>
+          <li><a href="#other-options">2.2.2. Other options</a></li>
+          <li><a href="#timeouts">2.2.3. Timeouts</a>
+            <ul>
+              <li><a href="#surefire-execution-timeout">Surefire execution timeout</a></li>
+              <li><a href="#in-test-timeout-ratios">In-test timeout ratios</a></li>
+            </ul>
+          </li>
+          <li><a href="#running-a-single-test-or-specified-tests">2.2.4. Running a single test (or specified tests)</a></li>
+          <li><a href="#running-against-existing-as-copy-not-the-one-from-buildtargetjboss-as-">2.2.5. Running against existing AS copy (not the one from</a>
+            <ul>
+              <li><a href="#running-against-a-running-jboss-as-instance">Running against a running JBoss AS instance</a></li>
+              <li><a href="#running-against-jboss-enterprise-application-platform-eap-6.0">Running against JBoss Enterprise Application Platform (EAP) 6.0</a></li>
+            </ul>
+          </li>
+          <li><a href="#running-with-a-debugger">2.2.6. Running with a debugger</a>
+            <ul>
+              <li><a href="#examples-1">Examples</a></li>
+            </ul>
+          </li>
+          <li><a href="#running-tests-with-custom-database">2.2.7. Running tests with custom database</a>
+            <ul>
+              <li><a href="#default-values">Default values</a></li>
+            </ul>
+          </li>
+          <li><a href="#running-tests-with-ipv6">2.2.8. Running tests with IPv6</a></li>
+          <li><a href="#running-tests-with-security-manager-custom-security-policy">2.2.9. Running tests with security manager / custom security policy</a></li>
+          <li><a href="#creating-test-reports">2.2.10. Creating test reports</a></li>
+          <li><a href="#creating-coverage-reports">2.2.11. Creating coverage reports</a>
+            <ul>
+              <li><a href="#usage">Usage</a></li>
+            </ul>
+          </li>
+          <li><a href="#cleaning-the-project">2.2.12. Cleaning the project</a></li>
+        </ul>
+      </li>
+      <li><a href="#WildFly_Testsuite_Harness_Developer_Guide">2.3. WildFly Testsuite Harness Developer Guide</a></li>
+      <li><a href="#testsuite-requirements">2.4. Testsuite requirements</a></li>
+      <li><a href="#adding-a-new-maven-plugin">2.5. Adding a new maven plugin</a></li>
+      <li><a href="#shortened-maven-run-overview">2.6. Shortened Maven run overview</a></li>
+      <li><a href="#how-the-as-instance-is-built">2.7. How the AS instance is built</a></li>
+      <li><a href="#properties-and-their-propagation">2.8. Properties and their propagation</a>
+        <ul>
+          <li><a href="#jboss-as-instance-dir">2.8.1. JBoss AS instance dir</a></li>
+          <li><a href="#server-jvm-arguments">2.8.2. Server JVM arguments</a></li>
+          <li><a href="#ip-settings">2.8.3. IP settings</a></li>
+          <li><a href="#testsuite-directories">2.8.4. Testsuite directories</a></li>
+          <li><a href="#clustering-properties">2.8.5. Clustering properties</a></li>
+        </ul>
+      </li>
+      <li><a href="#debug-parameters-propagation">2.9. Debug parameters propagation</a></li>
+      <li><a href="#How_the_server_is_built_and_configured_for_testsuite_modules">2.10. How the WildFly is built and configured for testsuite modules.</a></li>
+      <li><a href="#arquillian-config-file-location">2.11. Arquillian config file location</a></li>
+    </ul>
+  </li>
+  <li><a href="#Plugin_executions_matrix">3. Plugin executions matrix</a>
+    <ul>
+      <li><a href="#Shortened_Maven_Run_Overview">3.1. Shortened Maven Run Overview</a></li>
+      <li><a href="#how-to-get-it">3.2. How to get it</a></li>
+      <li><a href="#how-its-done">3.3. How it’s done</a></li>
+      <li><a href="#example-output-with-comments.">3.4. Example output with comments.</a></li>
+      <li><a href="#example-output-unchanged">3.5. Example output, unchanged</a></li>
+      <li><a href="#WildFly_Testsuite_Test_Developer_Guide">3.6. WildFly Testsuite Test Developer Guide</a></li>
+      <li><a href="#pre-requisites">3.7. Pre-requisites</a></li>
+      <li><a href="#arquillian-container-configuration">3.8. Arquillian container configuration</a></li>
+      <li><a href="#managementclient-and-modelnode-usage-example">3.9. ManagementClient and ModelNode usage example</a></li>
+      <li><a href="#arquillian-features-available-in-tests">3.10. Arquillian features available in tests</a></li>
+      <li><a href="#properties-available-in-tests">3.11. Properties available in tests</a>
+        <ul>
+          <li><a href="#directories">3.11.1. Directories</a></li>
+          <li><a href="#networking">3.11.2. Networking</a></li>
+          <li><a href="#time-related-coefficients-ratios">3.11.3. Time-related coefficients (ratios)</a></li>
+        </ul>
+      </li>
+      <li><a href="#negative-tests">3.12. Negative tests</a></li>
+      <li><a href="#clustering-tests-wfly-616">3.13. Clustering tests (WFLY-616)</a></li>
+      <li><a href="#how-to-get-the-tests-to-master">3.14. How to get the tests to master</a></li>
+      <li><a href="#How_to_Add_a_Test_Case">3.15. How to Add a Test Case</a></li>
+      <li><a href="#create-a-test-case.">3.16. 1) Create a test case.</a></li>
+      <li><a href="#push-your-test-case-to-github-and-create-a-pull-request.">3.17. 2) Push your test case to GitHub and create a pull request.</a></li>
+      <li><a href="#wait-for-the-outcome.">3.18. 3) Wait for the outcome.</a></li>
+      <li><a href="#Pre-requisites_-_test_quality_standards">3.19. Before you add a test</a></li>
+      <li><a href="#verify-the-test-belongs-in-wildfly">3.20. Verify the test belongs in WildFly</a></li>
+      <li><a href="#only-add-correct-and-understandable-tests">3.21. Only add CORRECT and UNDERSTANDABLE tests</a></li>
+      <li><a href="#do-not-add-duplicate-tests">3.22. Do not add duplicate tests</a></li>
+      <li><a href="#dont-name-tests-after-jiras">3.23. Don’t name tests after JIRAs</a></li>
+      <li><a href="#tests-should-contain-javadoc-that-explains-what-is-being-tested">3.24. Tests should contain javadoc that explains what is being tested</a></li>
+      <li><a href="#prefer-expanding-an-existing-test-over-a-new-test-class">3.25. Prefer expanding an EXISTING test over a new test class</a></li>
+      <li><a href="#organize-tests-by-subsystem">3.26. Organize tests by subsystem</a></li>
+      <li><a href="#explain-non-obvious-spec-behavior-in-comments">3.27. Explain non-obvious spec behavior in comments</a></li>
+      <li><a href="#put-integration-test-resources-in-the-source-directory-of-the-test">3.28. Put integration test resources in the source directory of the test</a></li>
+      <li><a href="#do-not-hard-code-values-likely-to-need-configuration-urls-ports">3.29. Do not hard-code values likely to need configuration (URLs, ports, …​)</a></li>
+      <li><a href="#follow-best-committing-practices">3.30. Follow best committing practices</a></li>
+      <li><a href="#do-not-use-blind-timeouts">3.31. Do not use blind timeouts</a></li>
+      <li><a href="#provide-messages-in-assert-and-fail-calls">3.32. Provide messages in assert*() and fail() calls</a></li>
+      <li><a href="#provide-configuration-properties-hints-in-exceptions">3.33. Provide configuration properties hints in exceptions</a></li>
+      <li><a href="#clean-up">3.34. Clean up</a></li>
+      <li><a href="#keep-the-tests-configurable">3.35. Keep the tests configurable</a></li>
+      <li><a href="#Shared_Test_Classes_and_Resources">3.36. Shared Test Classes and Resources</a></li>
+      <li><a href="#among-testsuite-modules">3.37. Among Testsuite Modules</a></li>
+      <li><a href="#between-components-and-testsuite-modules">3.38. Between Components and Testsuite Modules</a></li>
+    </ul>
+  </li>
+</ul></div>
+  <div class="grid__item width-10-12 doc-content"><div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
 <p>&#169; 2017 The original authors.</p>
@@ -3020,32 +3162,160 @@ dependency to a testsuite module:</p>
 </div>
 </div>
 </div>
-</div>
-      </div>
-    </main><footer class="site-footer h-card">
-  <data class="u-url" href="/wildflysite/"></data>
-
-  <div class="wrapper">
-
-    <h2 class="footer-heading">Wildfly</h2>
-
-    <div class="footer-col-wrapper">
-      <div class="footer-col footer-col-1">
-        <ul class="contact-list">
-          <li class="p-name">Wildfly</li></ul>
-      </div>
-
-      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div></div>
 </div>
 
-      <div class="footer-col footer-col-3">
-        <p></p>
-      </div>
-    </div>
+
 
   </div>
 
-</footer>
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">WildFly is open. All dependencies of this project are available under the <a href='https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html' class='dark-background' target='_blank'>LGPL 2.1</a> or compatible license.<br/><br/>This website was built with <a href='https://jekyllrb.com/' class='dark-background' target='_blank'>Jekyll</a> is hosted on <a href='https://pages.github.com/' class='dark-background' target='_blank'>Github Pages</a> and is completely open source. If you want to make it better, <a href='https://github.com/wildfly/wildfly.org/fork' class='dark-background' target='_blank'>fork it</a> and show us what you’ve got.</p>
+
+    
+      <div class="width-1-12 project-links">
+        <strong>Navigation</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="/wildflysite/downloads" class="dark-background">Downloads</a></li>
+          
+            <li><a href="/wildflysitef/docs" class="dark-background">Docs</a></li>
+          
+            <li><a href="https://github.com/wildfly/wildfly" class="dark-background">Github</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <strong>Contribute</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="https://issues.jboss.org/browse/WFLY" class="dark-background">Submit a bug</a></li>
+          
+            <li><a href="https://community.jboss.org/en/wildfly?view=discussion" class="dark-background">Join the forum</a></li>
+          
+            <li><a href="https://github.com/wildfly/wildfly/fork" class="dark-background">Fork WildFly</a></li>
+          
+            <li><a href="https://twitter.com/WildFlyAS" class="dark-background">Follow us</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <strong>Get Help</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="https://community.jboss.org/en/wildfly?view=discussion" class="dark-background">Join the forum</a></li>
+          
+            <li><a href="https://www.hipchat.com/gFOhnVQke" class="dark-background">Join HipChat</a></li>
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-6-12 more-links">
+        <strong>Find more Red Hat Middleware Community Projects</strong>
+        <ul class="footer-links">
+          
+            <li><a href="https://www.apiman.io/" class="dark-background">APIMan</a></li>
+          
+            <li><a href="http://arquillian.org" class="dark-background">Arquillian</a></li>
+          
+            <li><a href="http://byteman.jboss.org/" class="dark-background">Byteman</a></li>
+          
+            <li><a href="http://capedwarf.org/" class="dark-background">CapeDwarf</a></li>
+          
+            <li><a href="https://github.com/alechenninger/chronicler" class="dark-background">Chronicler</a></li>
+          
+            <li><a href="https://github.com/darcy-framework" class="dark-background">Darcy</a></li>
+          
+            <li><a href="http://debezium.io/" class="dark-background">Debezium</a></li>
+          
+            <li><a href="https://www.drools.org/" class="dark-background">Drools</a></li>
+          
+            <li><a href="http://gatein.jboss.org/" class="dark-background">GateIn</a></li>
+          
+            <li><a href="http://www.hawkular.org/" class="dark-background">Hawkular</a></li>
+          
+            <li><a href="http://hawt.io/" class="dark-background">Hawtio</a></li>
+          
+            <li><a href="http://hibernate.org/" class="dark-background">Hibernate</a></li>
+          
+            <li><a href="http://www.infinispan.org/" class="dark-background">Infinispan</a></li>
+          
+            <li><a href="https://devstudio.jboss.com/" class="dark-background">JBoss DevStudio</a></li>
+          
+            <li><a href="http://forge.jboss.org/" class="dark-background">JBoss Forge</a></li>
+          
+            <li><a href="https://github.com/jboss-logging" class="dark-background">JBoss Logging</a></li>
+          
+            <li><a href="http://jbossremoting.jboss.org/" class="dark-background">JBoss Remoting</a></li>
+          
+            <li><a href="https://www.jbpm.org/" class="dark-background">jBPM</a></li>
+          
+            <li><a href="https://jsfunit.jboss.org/" class="dark-background">JSFUnit</a></li>
+          
+            <li><a href="https://www.keycloak.org/" class="dark-background">Keycloak</a></li>
+          
+            <li><a href="http://modcluster.io/" class="dark-background">Mod Cluster</a></li>
+          
+            <li><a href="http://modeshape.jboss.org/" class="dark-background">ModeShape</a></li>
+          
+            <li><a href="https://www.optaplanner.org/" class="dark-background">OptaPlanner</a></li>
+          
+            <li><a href="https://picketbox.jboss.org/" class="dark-background">Picketbox</a></li>
+          
+            <li><a href="http://resteasy.jboss.org/" class="dark-background">RESTEasy</a></li>
+          
+            <li><a href="https://riftsaw.jboss.org/" class="dark-background">Riftsaw</a></li>
+          
+            <li><a href="http://savara.jboss.org/" class="dark-background">Savara</a></li>
+          
+            <li><a href="http://seamframework.org/" class="dark-background">Seam</a></li>
+          
+            <li><a href="http://arquillian.org/" class="dark-background">Shrinkwrap</a></li>
+          
+            <li><a href="http://snowdrop.jboss.org/" class="dark-background">Snowdrop</a></li>
+          
+            <li><a href="https://switchyard.jboss.org/" class="dark-background">Switchyard</a></li>
+          
+            <li><a href="https://tattletale.jboss.org/" class="dark-background">Tattletale</a></li>
+          
+            <li><a href="http://teiid.jboss.org/" class="dark-background">Teiid</a></li>
+          
+            <li><a href="http://wildfly-swarm.io/" class="dark-background">WildFly Swarm</a></li>
+          
+            <li><a href="http://wise.jboss.org/" class="dark-background">Wise</a></li>
+          
+            <li><a href="https://xnio.jboss.org/" class="dark-background">XNIO</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" class="dark-background" target="_blank">CC by 3.0</a>
+    </span>
+    <span class="redhat">
+      a Red Hat sponsored project   
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/"><img src="/wildflysite/assets/img/RHLogo_white.svg"></a>
+    </span>
+  </div>
+</div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script type="text/javascript" src="/wildflysite/assets/javascript/mobile-nav.js"></script>
 </body>
 
 </html>

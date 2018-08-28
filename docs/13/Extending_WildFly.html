@@ -1,21 +1,19 @@
 <!DOCTYPE html>
-<html lang="en"><head>
+<html>
+
+<head>
   <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
-<title>Extending WildFly | Wildfly</title>
-<meta name="generator" content="Jekyll v3.8.3" />
-<meta property="og:title" content="Extending WildFly" />
-<meta name="author" content="WildFly code development team" />
-<meta property="og:locale" content="en_US" />
-<link rel="canonical" href="https://jbossorg.github.io/wildflysite/docs/13/Extending_WildFly.html" />
-<meta property="og:url" content="https://jbossorg.github.io/wildflysite/docs/13/Extending_WildFly.html" />
-<meta property="og:site_name" content="Wildfly" />
-<script type="application/ld+json">
-{"@type":"WebPage","url":"https://jbossorg.github.io/wildflysite/docs/13/Extending_WildFly.html","headline":"Extending WildFly","author":{"@type":"Person","name":"WildFly code development team"},"@context":"http://schema.org"}</script>
-<!-- End Jekyll SEO tag -->
-<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://jbossorg.github.io/wildflysite/feed.xml" title="Wildfly" /></head>
-<body><div class="header navigation">
+  <meta name="description" content="">
+  <link rel="shortcut icon" type="image/png" href="/wildflysite/favicon.ico" >
+  <link rel="stylesheet" href="/wildflysite/assets/css/main.css" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+
+
+</head>
+
+<body class="Extending WildFly">
+  <div class="content">
+    <div class="header navigation">
   <div class="logo-wrapper">
     <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
   </div>
@@ -48,9 +46,291 @@
     </nav>
   </div>
 </div>
-<main class="page-content" aria-label="Content">
-      <div class="wrapper">
-        <div id="preamble">
+
+    <div class="docs-page grid-wrapper">
+  <div class="grid__item width-12-12 docs-v-icons">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-13-active.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-12-inactive.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-11-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-10-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-09-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-08-coming.png">
+  </div>
+  <div class="grid__item width-12-12"><h1 class="title">Extending WildFly</h1></div>
+  <div class="grid__item width-2-12 doc-toc"><ul class="inline_toc">
+  <li><a href="#target-audience">1. Target Audience</a>
+    <ul>
+      <li><a href="#prerequisites">1.1. Prerequisites</a></li>
+      <li><a href="#examples-in-this">1.2. Examples in this guide</a></li>
+    </ul>
+  </li>
+  <li><a href="#Example_subsystem">2. Example subsystem</a>
+    <ul>
+      <li><a href="#create-the-skeleton-project">2.1. Create the skeleton project</a></li>
+      <li><a href="#create-the-schema">2.2. Create the schema</a></li>
+      <li><a href="#design-and-define-the-model-structure">2.3. Design and define the model structure</a>
+        <ul>
+          <li><a href="#registering-the-core-subsystem-model">2.3.1. Registering the core subsystem model</a></li>
+          <li><a href="#registering-the-subsystem-child">2.3.2. Registering the subsystem child</a></li>
+        </ul>
+      </li>
+      <li><a href="#parsing-and-marshalling-of-the-subsystem-xml">2.4. Parsing and marshalling of the subsystem xml</a>
+        <ul>
+          <li><a href="#testing-the-parsers">2.4.1. Testing the parsers</a></li>
+        </ul>
+      </li>
+      <li><a href="#add-the-deployers">2.5. Add the deployers</a>
+        <ul>
+          <li><a href="#deployment-phases-and-attachments">2.5.1. Deployment phases and attachments</a>
+            <ul>
+              <li><a href="#structure">STRUCTURE</a></li>
+              <li><a href="#parse">PARSE</a></li>
+              <li><a href="#dependencies">DEPENDENCIES</a></li>
+              <li><a href="#configure_module">CONFIGURE_MODULE</a></li>
+              <li><a href="#post_module">POST_MODULE</a></li>
+              <li><a href="#install">INSTALL</a></li>
+              <li><a href="#cleanup">CLEANUP</a></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><a href="#integrate-with-wildfly">2.6. Integrate with WildFly</a></li>
+      <li><a href="#expressions">2.7. Expressions</a>
+        <ul>
+          <li><a href="#what-expression-types-are-supported">2.7.1. What expression types are supported</a></li>
+          <li><a href="#how-to-support-expressions-in-subsystems">2.7.2. How to support expressions in subsystems</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#Working_with_WildFly_Capabilities">3. Working with WildFly Capabilities</a>
+    <ul>
+      <li><a href="#capabilities">3.1. Capabilities</a>
+        <ul>
+          <li><a href="#comparison-to-other-concepts">3.1.1. Comparison to other concepts</a>
+            <ul>
+              <li><a href="#capabilities-vs-modules">Capabilities vs modules</a></li>
+              <li><a href="#capabilities-vs-extensions">Capabilities vs Extensions</a></li>
+            </ul>
+          </li>
+          <li><a href="#capability-names">3.1.2. Capability Names</a></li>
+          <li><a href="#statically-vs-dynamically-named-capabilities">3.1.3. Statically vs Dynamically Named Capabilities</a></li>
+          <li><a href="#service-provided-by-a-capability">3.1.4. Service provided by a capability</a></li>
+          <li><a href="#custom-integration-apis-provided-by-a-capability">3.1.5. Custom integration APIs provided by a capability</a></li>
+          <li><a href="#capability-requirements">3.1.6. Capability Requirements</a>
+            <ul>
+              <li><a href="#supporting-runtime-only-requirements">Supporting runtime-only requirements</a></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><a href="#capability-contract">3.2. Capability Contract</a></li>
+      <li><a href="#capability-registry">3.3. Capability Registry</a></li>
+      <li><a href="#using-capabilities">3.4. Using Capabilities</a>
+        <ul>
+          <li><a href="#basics-of-using-your-own-capability">3.4.1. Basics of Using Your Own Capability</a>
+            <ul>
+              <li><a href="#creating-your-capability">Creating your capability</a></li>
+              <li><a href="#registering-and-unregistering-your-capability">Registering and unregistering your capability</a></li>
+              <li><a href="#installing-accessing-and-removing-the-service-provided-by-your-capability">Installing, accessing and removing the service provided by your</a></li>
+            </ul>
+          </li>
+          <li><a href="#basics-of-using-other-capabilities">3.4.2. Basics of Using Other Capabilities</a>
+            <ul>
+              <li><a href="#registering-a-hard-requirement-for-a-static-capability">Registering a hard requirement for a static capability</a></li>
+              <li><a href="#registering-a-requirement-for-a-dynamically-named-capability">Registering a requirement for a dynamically named capability</a></li>
+              <li><a href="#depending-upon-a-service-provided-by-another-capability">Depending upon a service provided by another capability</a></li>
+              <li><a href="#using-a-custom-integration-api-provided-by-another-capability">Using a custom integration API provided by another capability</a></li>
+              <li><a href="#runtime-only-requirements">Runtime-only requirements</a></li>
+              <li><a href="#using-a-capability-in-a-deploymentunitprocessor">Using a capability in a DeploymentUnitProcessor</a></li>
+            </ul>
+          </li>
+          <li><a href="#detailed-api">3.4.3. Detailed API</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#Domain_Mode_Subsystem_Transformers">4. Domain Mode Subsystem Transformers</a>
+    <ul>
+      <li><a href="#background">4.1. Background</a>
+        <ul>
+          <li><a href="#getting-the-initial-domain-model">4.1.1. Getting the initial domain model</a></li>
+          <li><a href="#an-operation-changes-something-in-the-domain-configuration">4.1.2. An operation changes something in the domain configuration</a></li>
+        </ul>
+      </li>
+      <li><a href="#versions-and-backward-compatibility">4.2. Versions and backward compatibility</a>
+        <ul>
+          <li><a href="#versioning-of-subsystems">4.2.1. Versioning of subsystems</a></li>
+        </ul>
+      </li>
+      <li><a href="#the-role-of-transformers">4.3. The role of transformers</a>
+        <ul>
+          <li><a href="#resource-transformers">4.3.1. Resource transformers</a>
+            <ul>
+              <li><a href="#rejection-in-resource-transformers">Rejection in resource transformers</a></li>
+            </ul>
+          </li>
+          <li><a href="#operation-transformers">4.3.2. Operation transformers</a>
+            <ul>
+              <li><a href="#rejection-in-operation-transformers">Rejection in operation transformers</a></li>
+            </ul>
+          </li>
+          <li><a href="#different-profiles-for-different-versions">4.3.3. Different profiles for different versions</a>
+            <ul>
+              <li><a href="#ignoring-resources-on-legacy-hosts">Ignoring resources on legacy hosts</a></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><a href="#how-do-i-know-what-needs-to-be-transformed">4.4. How do I know what needs to be transformed?</a>
+        <ul>
+          <li><a href="#getting-data-for-a-previous-version">4.4.1. Getting data for a previous version</a></li>
+          <li><a href="#see-what-changed">4.4.2. See what changed</a></li>
+        </ul>
+      </li>
+      <li><a href="#how-do-i-write-a-transformer">4.5. How do I write a transformer?</a>
+        <ul>
+          <li><a href="#resourcetransformationdescriptionbuilder">4.5.1. ResourceTransformationDescriptionBuilder</a>
+            <ul>
+              <li><a href="#silently-discard-child-resources">Silently discard child resources</a></li>
+              <li><a href="#reject-child-resource">Reject child resource</a></li>
+              <li><a href="#redirect-address-for-child-resource">Redirect address for child resource</a></li>
+              <li><a href="#getting-a-child-resource-builder">Getting a child resource builder</a></li>
+            </ul>
+          </li>
+          <li><a href="#attributetransformationdescriptionbuilder">4.5.2. AttributeTransformationDescriptionBuilder</a>
+            <ul>
+              <li><a href="#attribute-transformation-lifecycle">Attribute transformation lifecycle</a></li>
+              <li><a href="#discarding-attributes">Discarding attributes</a>
+                <ul>
+                  <li><a href="#the-discardattributechecker-interface">The DiscardAttributeChecker interface</a></li>
+                  <li><a href="#discardattributechecker-helper-classesimplementations">DiscardAttributeChecker helper classes/implementations</a></li>
+                </ul>
+              </li>
+              <li><a href="#rejecting-attributes">Rejecting attributes</a>
+                <ul>
+                  <li><a href="#the-rejectattributechecker-interface">The RejectAttributeChecker interface</a></li>
+                  <li><a href="#rejectattributechecker-helper-classesimplementations">RejectAttributeChecker helper classes/implementations</a></li>
+                </ul>
+              </li>
+              <li><a href="#converting-attributes">Converting attributes</a>
+                <ul>
+                  <li><a href="#the-attributeconverter-interface">The AttributeConverter interface</a></li>
+                </ul>
+              </li>
+              <li><a href="#renaming-attributes">Renaming attributes</a></li>
+            </ul>
+          </li>
+          <li><a href="#operationtransformationoverridebuilder">4.5.3. OperationTransformationOverrideBuilder</a></li>
+        </ul>
+      </li>
+      <li><a href="#evolving-transformers-with-subsystem-modelversions">4.6. Evolving transformers with subsystem ModelVersions</a>
+        <ul>
+          <li><a href="#the-old-way">4.6.1. The old way</a></li>
+          <li><a href="#chained-transformers">4.6.2. Chained transformers</a></li>
+        </ul>
+      </li>
+      <li><a href="#testing-transformers">4.7. Testing transformers</a>
+        <ul>
+          <li><a href="#testing-a-configuration-that-works">4.7.1. Testing a configuration that works</a></li>
+          <li><a href="#testing-a-configuration-that-does-not-work">4.7.2. Testing a configuration that does not work</a></li>
+        </ul>
+      </li>
+      <li><a href="#common-transformation-use-cases">4.8. Common transformation use-cases</a>
+        <ul>
+          <li><a href="#child-resource-type-does-not-exist-in-legacy-model">4.8.1. Child resource type does not exist in legacy model</a></li>
+          <li><a href="#attribute-does-not-exist-in-the-legacy-subsystem">4.8.2. Attribute does not exist in the legacy subsystem</a>
+            <ul>
+              <li><a href="#default-value-of-the-attribute-is-the-same-as-legacy-implied-behavior">Default value of the attribute is the same as legacy implied</a></li>
+              <li><a href="#default-value-of-the-attribute-is-different-from-legacy-implied-behaviour">Default value of the attribute is different from legacy implied</a></li>
+            </ul>
+          </li>
+          <li><a href="#attribute-has-a-different-default-value">4.8.3. Attribute has a different default value</a></li>
+          <li><a href="#attribute-has-a-different-type">4.8.4. Attribute has a different type</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#Key_Interfaces_and_Classes_Relevant_to_Extension_Developers">5. Key Interfaces and Classes Relevant to Extension Developers</a>
+    <ul>
+      <li><a href="#extension-interface">5.1. Extension Interface</a></li>
+      <li><a href="#wildfly-managed-resources">5.2. WildFly Managed Resources</a></li>
+      <li><a href="#managementresourceregistration-interface">5.3. ManagementResourceRegistration Interface</a></li>
+      <li><a href="#resourcedefinition-interface">5.4. ResourceDefinition Interface</a>
+        <ul>
+          <li><a href="#resourcedescriptionresolver">5.4.1. ResourceDescriptionResolver</a></li>
+        </ul>
+      </li>
+      <li><a href="#attributedefinition-class">5.5. AttributeDefinition Class</a>
+        <ul>
+          <li><a href="#key-uses-of-attributedefinition">5.5.1. Key Uses of AttributeDefinition</a>
+            <ul>
+              <li><a href="#use-in-xml-parsing">Use in XML Parsing</a></li>
+              <li><a href="#use-in-storing-data-provided-by-the-user-to-the-configuration-model">Use in Storing Data Provided by the User to the Configuration Model</a></li>
+              <li><a href="#use-in-extracting-data-from-the-configuration-model-for-use-in-runtime-services">Use in Extracting Data from the Configuration Model for Use in</a></li>
+              <li><a href="#use-in-marshaling-configuration-model-data-to-xml">Use in Marshaling Configuration Model Data to XML</a></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><a href="#operationdefinition-and-operationstephandler-interfaces">5.6. OperationDefinition and OperationStepHandler Interfaces</a></li>
+      <li><a href="#operation-execution-and-the-operationcontext">5.7. Operation Execution and the OperationContext</a>
+        <ul>
+          <li><a href="#execution-process">5.7.1. Execution Process</a>
+            <ul>
+              <li><a href="#stage.model">Stage.MODEL</a></li>
+              <li><a href="#stage.runtime">Stage.RUNTIME</a></li>
+              <li><a href="#stage.verify">Stage.VERIFY</a></li>
+              <li><a href="#stage.domain">Stage.DOMAIN</a></li>
+              <li><a href="#stage.done-and-resulthandler-rollbackhandler-execution">Stage.DONE and ResultHandler / RollbackHandler Execution</a></li>
+              <li><a href="#tips-about-adding-steps">Tips About Adding Steps</a>
+                <ul>
+                  <li><a href="#passing-data-to-an-added-step">Passing Data to an Added Step</a></li>
+                  <li><a href="#controlling-output-from-an-added-step">Controlling Output from an Added Step</a></li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li><a href="#operationstephandler-use-of-the-operationcontext">5.7.2. OperationStepHandler use of the OperationContext</a></li>
+          <li><a href="#locking-and-change-visibility">5.7.3. Locking and Change Visibility</a></li>
+        </ul>
+      </li>
+      <li><a href="#resource-interface">5.8. Resource Interface</a>
+        <ul>
+          <li><a href="#creating-resources">5.8.1. Creating Resources</a></li>
+          <li><a href="#runtime-only-and-synthetic-resources-and-the-placeholderresourceentry-class">5.8.2. Runtime-Only and Synthetic Resources and the PlaceholderResourceEntry Class</a></li>
+        </ul>
+      </li>
+      <li><a href="#deploymentunitprocessor-interface">5.9. DeploymentUnitProcessor Interface</a></li>
+      <li><a href="#useful-classes-for-implementing-operationstephandler">5.10. Useful classes for implementing OperationStepHandler</a>
+        <ul>
+          <li><a href="#add-handlers">5.10.1. Add Handlers</a></li>
+          <li><a href="#remove-handlers">5.10.2. Remove Handlers</a></li>
+          <li><a href="#write-attribute-handlers">5.10.3. Write attribute handlers</a></li>
+          <li><a href="#reload-required-handlers">5.10.4. Reload-required handlers</a></li>
+          <li><a href="#restart-parent-resource-handlers">5.10.5. Restart Parent Resource Handlers</a></li>
+          <li><a href="#model-only-handlers">5.10.6. Model Only Handlers</a></li>
+          <li><a href="#misc">5.10.7. Misc</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#WildFly_JNDI_Implementation">6. WildFly JNDI Implementation</a>
+    <ul>
+      <li><a href="#introduction">6.1. Introduction</a></li>
+      <li><a href="#architecture">6.2. Architecture</a></li>
+      <li><a href="#binding-apis">6.3. Binding APIs</a>
+        <ul>
+          <li><a href="#subsystem">6.3.1. Subsystem</a></li>
+          <li><a href="#ee-deployment">6.3.2. EE Deployment</a></li>
+        </ul>
+      </li>
+      <li><a href="#resource-ref-processing">6.4. Resource Ref Processing</a></li>
+    </ul>
+  </li>
+  <li><a href="#CLI_extensibility_for_layered_products">7. CLI extensibility for layered products</a></li>
+</ul></div>
+  <div class="grid__item width-10-12 doc-content"><div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
 <p>In this document we provide an example of how to extend the kernel
@@ -8344,32 +8624,160 @@ the JAR file containing the classes above with value
 <strong>org.jboss.as.test.cli.extensions.ExtCommandHandlerProvider</strong>.</p>
 </div>
 </div>
-</div>
-      </div>
-    </main><footer class="site-footer h-card">
-  <data class="u-url" href="/wildflysite/"></data>
-
-  <div class="wrapper">
-
-    <h2 class="footer-heading">Wildfly</h2>
-
-    <div class="footer-col-wrapper">
-      <div class="footer-col footer-col-1">
-        <ul class="contact-list">
-          <li class="p-name">Wildfly</li></ul>
-      </div>
-
-      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div></div>
 </div>
 
-      <div class="footer-col footer-col-3">
-        <p></p>
-      </div>
-    </div>
+
 
   </div>
 
-</footer>
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">WildFly is open. All dependencies of this project are available under the <a href='https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html' class='dark-background' target='_blank'>LGPL 2.1</a> or compatible license.<br/><br/>This website was built with <a href='https://jekyllrb.com/' class='dark-background' target='_blank'>Jekyll</a> is hosted on <a href='https://pages.github.com/' class='dark-background' target='_blank'>Github Pages</a> and is completely open source. If you want to make it better, <a href='https://github.com/wildfly/wildfly.org/fork' class='dark-background' target='_blank'>fork it</a> and show us what you’ve got.</p>
+
+    
+      <div class="width-1-12 project-links">
+        <strong>Navigation</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="/wildflysite/downloads" class="dark-background">Downloads</a></li>
+          
+            <li><a href="/wildflysitef/docs" class="dark-background">Docs</a></li>
+          
+            <li><a href="https://github.com/wildfly/wildfly" class="dark-background">Github</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <strong>Contribute</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="https://issues.jboss.org/browse/WFLY" class="dark-background">Submit a bug</a></li>
+          
+            <li><a href="https://community.jboss.org/en/wildfly?view=discussion" class="dark-background">Join the forum</a></li>
+          
+            <li><a href="https://github.com/wildfly/wildfly/fork" class="dark-background">Fork WildFly</a></li>
+          
+            <li><a href="https://twitter.com/WildFlyAS" class="dark-background">Follow us</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <strong>Get Help</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="https://community.jboss.org/en/wildfly?view=discussion" class="dark-background">Join the forum</a></li>
+          
+            <li><a href="https://www.hipchat.com/gFOhnVQke" class="dark-background">Join HipChat</a></li>
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-6-12 more-links">
+        <strong>Find more Red Hat Middleware Community Projects</strong>
+        <ul class="footer-links">
+          
+            <li><a href="https://www.apiman.io/" class="dark-background">APIMan</a></li>
+          
+            <li><a href="http://arquillian.org" class="dark-background">Arquillian</a></li>
+          
+            <li><a href="http://byteman.jboss.org/" class="dark-background">Byteman</a></li>
+          
+            <li><a href="http://capedwarf.org/" class="dark-background">CapeDwarf</a></li>
+          
+            <li><a href="https://github.com/alechenninger/chronicler" class="dark-background">Chronicler</a></li>
+          
+            <li><a href="https://github.com/darcy-framework" class="dark-background">Darcy</a></li>
+          
+            <li><a href="http://debezium.io/" class="dark-background">Debezium</a></li>
+          
+            <li><a href="https://www.drools.org/" class="dark-background">Drools</a></li>
+          
+            <li><a href="http://gatein.jboss.org/" class="dark-background">GateIn</a></li>
+          
+            <li><a href="http://www.hawkular.org/" class="dark-background">Hawkular</a></li>
+          
+            <li><a href="http://hawt.io/" class="dark-background">Hawtio</a></li>
+          
+            <li><a href="http://hibernate.org/" class="dark-background">Hibernate</a></li>
+          
+            <li><a href="http://www.infinispan.org/" class="dark-background">Infinispan</a></li>
+          
+            <li><a href="https://devstudio.jboss.com/" class="dark-background">JBoss DevStudio</a></li>
+          
+            <li><a href="http://forge.jboss.org/" class="dark-background">JBoss Forge</a></li>
+          
+            <li><a href="https://github.com/jboss-logging" class="dark-background">JBoss Logging</a></li>
+          
+            <li><a href="http://jbossremoting.jboss.org/" class="dark-background">JBoss Remoting</a></li>
+          
+            <li><a href="https://www.jbpm.org/" class="dark-background">jBPM</a></li>
+          
+            <li><a href="https://jsfunit.jboss.org/" class="dark-background">JSFUnit</a></li>
+          
+            <li><a href="https://www.keycloak.org/" class="dark-background">Keycloak</a></li>
+          
+            <li><a href="http://modcluster.io/" class="dark-background">Mod Cluster</a></li>
+          
+            <li><a href="http://modeshape.jboss.org/" class="dark-background">ModeShape</a></li>
+          
+            <li><a href="https://www.optaplanner.org/" class="dark-background">OptaPlanner</a></li>
+          
+            <li><a href="https://picketbox.jboss.org/" class="dark-background">Picketbox</a></li>
+          
+            <li><a href="http://resteasy.jboss.org/" class="dark-background">RESTEasy</a></li>
+          
+            <li><a href="https://riftsaw.jboss.org/" class="dark-background">Riftsaw</a></li>
+          
+            <li><a href="http://savara.jboss.org/" class="dark-background">Savara</a></li>
+          
+            <li><a href="http://seamframework.org/" class="dark-background">Seam</a></li>
+          
+            <li><a href="http://arquillian.org/" class="dark-background">Shrinkwrap</a></li>
+          
+            <li><a href="http://snowdrop.jboss.org/" class="dark-background">Snowdrop</a></li>
+          
+            <li><a href="https://switchyard.jboss.org/" class="dark-background">Switchyard</a></li>
+          
+            <li><a href="https://tattletale.jboss.org/" class="dark-background">Tattletale</a></li>
+          
+            <li><a href="http://teiid.jboss.org/" class="dark-background">Teiid</a></li>
+          
+            <li><a href="http://wildfly-swarm.io/" class="dark-background">WildFly Swarm</a></li>
+          
+            <li><a href="http://wise.jboss.org/" class="dark-background">Wise</a></li>
+          
+            <li><a href="https://xnio.jboss.org/" class="dark-background">XNIO</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" class="dark-background" target="_blank">CC by 3.0</a>
+    </span>
+    <span class="redhat">
+      a Red Hat sponsored project   
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/"><img src="/wildflysite/assets/img/RHLogo_white.svg"></a>
+    </span>
+  </div>
+</div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script type="text/javascript" src="/wildflysite/assets/javascript/mobile-nav.js"></script>
 </body>
 
 </html>
