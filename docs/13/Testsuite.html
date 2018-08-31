@@ -37,7 +37,9 @@
           <a href="/wildflysite/contribute/" class="">Contribute</a>
         </li>
         <li>
-          <a href="/wildflysite/docs/" class="">Docs</a>
+          
+            <a href="/wildflysite/docs/13/" class="active">Docs</a>
+          
         </li>
         <li>
           <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
@@ -57,7 +59,7 @@
     <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-08-coming.png">
   </div>
   <div class="grid__item width-12-12"><h1 class="title">WildFly Testsuite</h1></div>
-  <div class="grid__item width-2-12 doc-toc"><ul class="inline_toc">
+  <div class="grid__item width-3-12 doc-toc"><ul class="inline_toc">
   <li><a href="#WildFly_Testsuite_Overview">1. WildFly Testsuite Overview</a>
     <ul>
       <li><a href="#test-suite-organization">1.1. Test Suite Organization</a></li>
@@ -192,126 +194,10 @@
     </ul>
   </li>
 </ul></div>
-  <div class="grid__item width-10-12 doc-content"><div id="preamble">
+  <div class="grid__item width-9-12 doc-content"><div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
 <p>&#169; 2017 The original authors.</p>
-</div>
-<div id="toc" class="toc">
-<div id="toctitle" class="title">WildFly testsuite</div>
-<ul class="sectlevel1">
-<li><a href="#WildFly_Testsuite_Overview">1. WildFly Testsuite Overview</a>
-<ul class="sectlevel2">
-<li><a href="#test-suite-organization">1.1. Test Suite Organization</a></li>
-<li><a href="#profiles">1.2. Profiles</a></li>
-<li><a href="#integration-tests">1.3. Integration tests</a>
-<ul class="sectlevel3">
-<li><a href="#smoke--dts.smoke--dts.nosmoke">1.3.1. Smoke -Dts.smoke, -Dts.noSmoke</a></li>
-<li><a href="#basic--dts.basic">1.3.2. Basic -Dts.basic</a></li>
-<li><a href="#cluster--dts.clust">1.3.3. Cluster -Dts.clust</a></li>
-<li><a href="#iiop--dts.iiop">1.3.4. IIOP -Dts.iiop</a></li>
-</ul>
-</li>
-<li><a href="#xts--dts.xts">1.4. XTS -Dts.XTS</a>
-<ul class="sectlevel3">
-<li><a href="#multinode--dts.multinode">1.4.1. Multinode -Dts.multinode</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#WildFly_Integration_Testsuite_User_Guide">2. WildFly Integration Testsuite User Guide</a>
-<ul class="sectlevel2">
-<li><a href="#running-the-testsuite">2.1. Running the testsuite</a>
-<ul class="sectlevel3">
-<li><a href="#supported-maven-phases">2.1.1. Supported Maven phases</a></li>
-<li><a href="#testsuite-structure">2.1.2. Testsuite structure</a></li>
-<li><a href="#test-groups">2.1.3. Test groups</a></li>
-</ul>
-</li>
-<li><a href="#examples">2.2. Examples</a>
-<ul class="sectlevel3">
-<li><a href="#output-to-console">2.2.1. Output to console</a></li>
-<li><a href="#other-options">2.2.2. Other options</a></li>
-<li><a href="#timeouts">2.2.3. Timeouts</a></li>
-<li><a href="#running-a-single-test-or-specified-tests">2.2.4. Running a single test (or specified tests)</a></li>
-<li><a href="#running-against-existing-as-copy-not-the-one-from-buildtargetjboss-as-">2.2.5. Running against existing AS copy (not the one from</a></li>
-<li><a href="#running-with-a-debugger">2.2.6. Running with a debugger</a></li>
-<li><a href="#running-tests-with-custom-database">2.2.7. Running tests with custom database</a></li>
-<li><a href="#running-tests-with-ipv6">2.2.8. Running tests with IPv6</a></li>
-<li><a href="#running-tests-with-security-manager-custom-security-policy">2.2.9. Running tests with security manager / custom security policy</a></li>
-<li><a href="#creating-test-reports">2.2.10. Creating test reports</a></li>
-<li><a href="#creating-coverage-reports">2.2.11. Creating coverage reports</a></li>
-<li><a href="#cleaning-the-project">2.2.12. Cleaning the project</a></li>
-</ul>
-</li>
-<li><a href="#WildFly_Testsuite_Harness_Developer_Guide">2.3. WildFly Testsuite Harness Developer Guide</a></li>
-<li><a href="#testsuite-requirements">2.4. Testsuite requirements</a></li>
-<li><a href="#adding-a-new-maven-plugin">2.5. Adding a new maven plugin</a></li>
-<li><a href="#shortened-maven-run-overview">2.6. Shortened Maven run overview</a></li>
-<li><a href="#how-the-as-instance-is-built">2.7. How the AS instance is built</a></li>
-<li><a href="#properties-and-their-propagation">2.8. Properties and their propagation</a>
-<ul class="sectlevel3">
-<li><a href="#jboss-as-instance-dir">2.8.1. JBoss AS instance dir</a></li>
-<li><a href="#server-jvm-arguments">2.8.2. Server JVM arguments</a></li>
-<li><a href="#ip-settings">2.8.3. IP settings</a></li>
-<li><a href="#testsuite-directories">2.8.4. Testsuite directories</a></li>
-<li><a href="#clustering-properties">2.8.5. Clustering properties</a></li>
-</ul>
-</li>
-<li><a href="#debug-parameters-propagation">2.9. Debug parameters propagation</a></li>
-<li><a href="#How_the_server_is_built_and_configured_for_testsuite_modules">2.10. How the WildFly is built and configured for testsuite modules.</a></li>
-<li><a href="#arquillian-config-file-location">2.11. Arquillian config file location</a></li>
-</ul>
-</li>
-<li><a href="#Plugin_executions_matrix">3. Plugin executions matrix</a>
-<ul class="sectlevel2">
-<li><a href="#Shortened_Maven_Run_Overview">3.1. Shortened Maven Run Overview</a></li>
-<li><a href="#how-to-get-it">3.2. How to get it</a></li>
-<li><a href="#how-its-done">3.3. How it&#8217;s done</a></li>
-<li><a href="#example-output-with-comments.">3.4. Example output with comments.</a></li>
-<li><a href="#example-output-unchanged">3.5. Example output, unchanged</a></li>
-<li><a href="#WildFly_Testsuite_Test_Developer_Guide">3.6. WildFly Testsuite Test Developer Guide</a></li>
-<li><a href="#pre-requisites">3.7. Pre-requisites</a></li>
-<li><a href="#arquillian-container-configuration">3.8. Arquillian container configuration</a></li>
-<li><a href="#managementclient-and-modelnode-usage-example">3.9. ManagementClient and ModelNode usage example</a></li>
-<li><a href="#arquillian-features-available-in-tests">3.10. Arquillian features available in tests</a></li>
-<li><a href="#properties-available-in-tests">3.11. Properties available in tests</a>
-<ul class="sectlevel3">
-<li><a href="#directories">3.11.1. Directories</a></li>
-<li><a href="#networking">3.11.2. Networking</a></li>
-<li><a href="#time-related-coefficients-ratios">3.11.3. Time-related coefficients (ratios)</a></li>
-</ul>
-</li>
-<li><a href="#negative-tests">3.12. Negative tests</a></li>
-<li><a href="#clustering-tests-wfly-616">3.13. Clustering tests (WFLY-616)</a></li>
-<li><a href="#how-to-get-the-tests-to-master">3.14. How to get the tests to master</a></li>
-<li><a href="#How_to_Add_a_Test_Case">3.15. How to Add a Test Case</a></li>
-<li><a href="#create-a-test-case.">3.16. 1) Create a test case.</a></li>
-<li><a href="#push-your-test-case-to-github-and-create-a-pull-request.">3.17. 2) Push your test case to GitHub and create a pull request.</a></li>
-<li><a href="#wait-for-the-outcome.">3.18. 3) Wait for the outcome.</a></li>
-<li><a href="#Pre-requisites_-_test_quality_standards">3.19. Before you add a test</a></li>
-<li><a href="#verify-the-test-belongs-in-wildfly">3.20. Verify the test belongs in WildFly</a></li>
-<li><a href="#only-add-correct-and-understandable-tests">3.21. Only add CORRECT and UNDERSTANDABLE tests</a></li>
-<li><a href="#do-not-add-duplicate-tests">3.22. Do not add duplicate tests</a></li>
-<li><a href="#dont-name-tests-after-jiras">3.23. Don&#8217;t name tests after JIRAs</a></li>
-<li><a href="#tests-should-contain-javadoc-that-explains-what-is-being-tested">3.24. Tests should contain javadoc that explains what is being tested</a></li>
-<li><a href="#prefer-expanding-an-existing-test-over-a-new-test-class">3.25. Prefer expanding an EXISTING test over a new test class</a></li>
-<li><a href="#organize-tests-by-subsystem">3.26. Organize tests by subsystem</a></li>
-<li><a href="#explain-non-obvious-spec-behavior-in-comments">3.27. Explain non-obvious spec behavior in comments</a></li>
-<li><a href="#put-integration-test-resources-in-the-source-directory-of-the-test">3.28. Put integration test resources in the source directory of the test</a></li>
-<li><a href="#do-not-hard-code-values-likely-to-need-configuration-urls-ports">3.29. Do not hard-code values likely to need configuration (URLs, ports, &#8230;&#8203;)</a></li>
-<li><a href="#follow-best-committing-practices">3.30. Follow best committing practices</a></li>
-<li><a href="#do-not-use-blind-timeouts">3.31. Do not use blind timeouts</a></li>
-<li><a href="#provide-messages-in-assert-and-fail-calls">3.32. Provide messages in assert*() and fail() calls</a></li>
-<li><a href="#provide-configuration-properties-hints-in-exceptions">3.33. Provide configuration properties hints in exceptions</a></li>
-<li><a href="#clean-up">3.34. Clean up</a></li>
-<li><a href="#keep-the-tests-configurable">3.35. Keep the tests configurable</a></li>
-<li><a href="#Shared_Test_Classes_and_Resources">3.36. Shared Test Classes and Resources</a></li>
-<li><a href="#among-testsuite-modules">3.37. Among Testsuite Modules</a></li>
-<li><a href="#between-components-and-testsuite-modules">3.38. Between Components and Testsuite Modules</a></li>
-</ul>
-</li>
-</ul>
 </div>
 </div>
 </div>

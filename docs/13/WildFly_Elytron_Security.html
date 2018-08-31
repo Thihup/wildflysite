@@ -37,7 +37,9 @@
           <a href="/wildflysite/contribute/" class="">Contribute</a>
         </li>
         <li>
-          <a href="/wildflysite/docs/" class="">Docs</a>
+          
+            <a href="/wildflysite/docs/13/" class="active">Docs</a>
+          
         </li>
         <li>
           <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
@@ -57,7 +59,7 @@
     <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-08-coming.png">
   </div>
   <div class="grid__item width-12-12"><h1 class="title">WildFly Elytron Security</h1></div>
-  <div class="grid__item width-2-12 doc-toc"><ul class="inline_toc">
+  <div class="grid__item width-3-12 doc-toc"><ul class="inline_toc">
   <li><a href="#about">1. About</a>
     <ul>
       <li><a href="#elytron-authentication">1.1. Authentication</a></li>
@@ -549,106 +551,7 @@
     </ul>
   </li>
 </ul></div>
-  <div class="grid__item width-10-12 doc-content"><div id="preamble">
-<div class="sectionbody">
-<div id="toc" class="toc">
-<div id="toctitle" class="title">WildFly Elytron Security Guide</div>
-<ul class="sectlevel1">
-<li><a href="#about">1. About</a>
-<ul class="sectlevel2">
-<li><a href="#elytron-authentication">1.1. Authentication</a></li>
-<li><a href="#elytron-authorization">1.2. Authorization</a></li>
-<li><a href="#ssl-tls">1.3. SSL / TLS</a></li>
-<li><a href="#secure-credential-storage">1.4. Secure Credential Storage</a></li>
-</ul>
-</li>
-<li><a href="#General_Elytron_Architecture">2. General Elytron Architecture</a>
-<ul class="sectlevel2">
-<li><a href="#security-domains">2.1. Security Domains</a></li>
-<li><a href="#sasl-authentication">2.2. SASL Authentication</a></li>
-<li><a href="#http-authentication">2.3. HTTP Authentication</a></li>
-<li><a href="#ssl-tls">2.4. SSL / TLS</a></li>
-</ul>
-</li>
-<li><a href="#Elytron_Subsystem">3. Elytron Subsystem</a>
-<ul class="sectlevel2">
-<li><a href="#get-started-using-the-elytron-subsystem">3.1. Get Started using the Elytron Subsystem</a></li>
-<li><a href="#provided-components">3.2. Provided components</a></li>
-<li><a href="#out-of-the-box-configuration">3.3. Out of the Box Configuration</a></li>
-<li><a href="#default-application-authentication-configuration">3.4. Default Application Authentication Configuration</a></li>
-<li><a href="#default-management-authentication-configuration">3.5. Default Management Authentication Configuration</a></li>
-<li><a href="#comparing-legacy-approaches-to-elytron-approaches">3.6. Comparing Legacy Approaches to Elytron Approaches</a></li>
-</ul>
-</li>
-<li><a href="#Using_the_Elytron_Subsystem">4. Using the Elytron Subsystem</a>
-<ul class="sectlevel2">
-<li><a href="#set-up-and-configure-authentication-for-applications">4.1. Set Up and Configure Authentication for Applications</a></li>
-<li><a href="#set-up-and-configure-authentication-for-the-management-interfaces">4.2. Set up and Configure Authentication for the Management Interfaces</a></li>
-<li><a href="#configure-ssltls">4.3. Configure SSL/TLS</a></li>
-<li><a href="#configuring-the-elytron-and-security-subsystems">4.4. Configuring the Elytron and Security Subsystems</a></li>
-<li><a href="#creating-elytron-subsystem-components">4.5. Creating Elytron Subsystem Components</a></li>
-</ul>
-</li>
-<li><a href="#Using_WildFly_Elytron_with_WildFly">5. Using Elytron within WildFly</a>
-<ul class="sectlevel2">
-<li><a href="#using-the-out-of-the-box-elytron-components">5.1. Using the Out of the Box Elytron Components</a></li>
-<li><a href="#undertow-subsystem">5.2. Undertow Subsystem</a></li>
-<li><a href="#ejb-subsystem">5.3. EJB Subsystem</a></li>
-<li><a href="#webservices-subsystem">5.4. WebServices Subsystem</a></li>
-<li><a href="#legacy-security-subsystem">5.5. Legacy Security Subsystem</a></li>
-</ul>
-</li>
-<li><a href="#Client_Authentication_with_Elytron_Client">6. Client Authentication with Elytron Client</a>
-<ul class="sectlevel2">
-<li><a href="#the-configuration-file-approach">6.1. The Configuration File Approach</a></li>
-<li><a href="#the-programmatic-approach">6.2. The Programmatic Approach</a></li>
-<li><a href="#the-default-configuration-approach">6.3. The Default Configuration Approach</a></li>
-<li><a href="#using-elytron-client-with-clients-deployed-to-wildfly">6.4. Using Elytron Client with Clients Deployed to WildFly</a></li>
-<li><a href="#Configuring_other_clients_using_wildfly-config">6.5. Client configuration using wildfly-config.xml</a></li>
-</ul>
-</li>
-<li><a href="#Elytron_and_Java_Authorization_Contract_for_Containers-JACC">7. Elytron and Java Authorization Contract for Containers (JACC)</a>
-<ul class="sectlevel2">
-<li><a href="#disabling-jacc-in-legacy-security-subsystem-picketbox">7.1. Disabling JACC in Legacy Security Subsystem (PicketBox)</a></li>
-<li><a href="#defining-a-jacc-policy-provider">7.2. Defining a JACC Policy Provider</a></li>
-<li><a href="#enabling-jacc-to-a-web-deployment">7.3. Enabling JACC to a Web Deployment</a></li>
-<li><a href="#enabling-jacc-to-a-ejb-deployment">7.4. Enabling JACC to a EJB Deployment</a></li>
-</ul>
-</li>
-<li><a href="#KeyCloak_Integration">8. Using KeyCloak with WildFly Elytron</a></li>
-<li><a href="#OpenSSL">9. OpenSSL</a></li>
-<li><a href="#Web_Single_Sign_On">10. Web Single Sign-On</a>
-<ul class="sectlevel2">
-<li><a href="#create-a-server-configuration-template">10.1. Create a Server Configuration Template</a></li>
-<li><a href="#create-two-server-instances">10.2. Create Two Server Instances</a></li>
-<li><a href="#deploy-an-application">10.3. Deploy an Application</a></li>
-</ul>
-</li>
-<li><a href="#Migrate_Legacy_Security_to_Elytron_Security">11. Migrate Legacy Security to Elytron Security</a>
-<ul class="sectlevel2">
-<li><a href="#authentication-configuration">11.1. Authentication Configuration</a></li>
-<li><a href="#Properties_File_Based_Authentication_Migration">11.2. Properties Based Authentication / Authorization</a></li>
-<li><a href="#LDAP_Based_Authentication_Migration">11.3. LDAP Authentication Migration</a></li>
-<li><a href="#Composite_Stores_Migration">11.4. Composite Stores Migration</a></li>
-<li><a href="#Database_Authentication_Migration">11.5. Database Authentication</a></li>
-<li><a href="#Kerberos_Based_Authentication_Migration">11.6. Kerberos Authentication Migration</a></li>
-<li><a href="#Caching_Migration">11.7. Caching Migration</a></li>
-<li><a href="#clients">11.8. Clients</a></li>
-<li><a href="#Application_Client_Migration">11.9. Application Client Migration</a></li>
-<li><a href="#general-utilities">11.10. General Utilities</a></li>
-<li><a href="#Security_Vault_Migration">11.11. Security Vault Migration</a></li>
-<li><a href="#Security_Property_Migration">11.12. Security Properties</a></li>
-<li><a href="#ssl-migration">11.13. SSL Migration</a></li>
-<li><a href="#Simple_SSL_Migration">11.14. Simple SSL Migration</a></li>
-<li><a href="#SSL_with_Client_Cert_Migration">11.15. SSL with Client Cert Migration</a></li>
-<li><a href="#documentation-still-needed">11.16. Documentation Still Needed</a></li>
-</ul>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect1">
+  <div class="grid__item width-9-12 doc-content"><div class="sect1">
 <h2 id="about">1. About</h2>
 <div class="sectionbody">
 <div class="paragraph">

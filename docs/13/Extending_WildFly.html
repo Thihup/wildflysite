@@ -37,7 +37,9 @@
           <a href="/wildflysite/contribute/" class="">Contribute</a>
         </li>
         <li>
-          <a href="/wildflysite/docs/" class="">Docs</a>
+          
+            <a href="/wildflysite/docs/13/" class="active">Docs</a>
+          
         </li>
         <li>
           <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
@@ -57,7 +59,7 @@
     <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-08-coming.png">
   </div>
   <div class="grid__item width-12-12"><h1 class="title">Extending WildFly</h1></div>
-  <div class="grid__item width-2-12 doc-toc"><ul class="inline_toc">
+  <div class="grid__item width-3-12 doc-toc"><ul class="inline_toc">
   <li><a href="#target-audience">1. Target Audience</a>
     <ul>
       <li><a href="#prerequisites">1.1. Prerequisites</a></li>
@@ -330,7 +332,7 @@
   </li>
   <li><a href="#CLI_extensibility_for_layered_products">7. CLI extensibility for layered products</a></li>
 </ul></div>
-  <div class="grid__item width-10-12 doc-content"><div id="preamble">
+  <div class="grid__item width-9-12 doc-content"><div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
 <p>In this document we provide an example of how to extend the kernel
@@ -353,71 +355,6 @@ focuses on a conceptual overview of the key interfaces and classes
 described in the example. Readers should feel free to start with the
 second section if that better fits their learning style. Jumping back
 and forth between the sections is also a good strategy.</p>
-</div>
-<div id="toc" class="toc">
-<div id="toctitle" class="title">Extending WildFly</div>
-<ul class="sectlevel1">
-<li><a href="#target-audience">1. Target Audience</a>
-<ul class="sectlevel2">
-<li><a href="#prerequisites">1.1. Prerequisites</a></li>
-<li><a href="#examples-in-this">1.2. Examples in this guide</a></li>
-</ul>
-</li>
-<li><a href="#Example_subsystem">2. Example subsystem</a>
-<ul class="sectlevel2">
-<li><a href="#create-the-skeleton-project">2.1. Create the skeleton project</a></li>
-<li><a href="#create-the-schema">2.2. Create the schema</a></li>
-<li><a href="#design-and-define-the-model-structure">2.3. Design and define the model structure</a></li>
-<li><a href="#parsing-and-marshalling-of-the-subsystem-xml">2.4. Parsing and marshalling of the subsystem xml</a></li>
-<li><a href="#add-the-deployers">2.5. Add the deployers</a></li>
-<li><a href="#integrate-with-wildfly">2.6. Integrate with WildFly</a></li>
-<li><a href="#expressions">2.7. Expressions</a></li>
-</ul>
-</li>
-<li><a href="#Working_with_WildFly_Capabilities">3. Working with WildFly Capabilities</a>
-<ul class="sectlevel2">
-<li><a href="#capabilities">3.1. Capabilities</a></li>
-<li><a href="#capability-contract">3.2. Capability Contract</a></li>
-<li><a href="#capability-registry">3.3. Capability Registry</a></li>
-<li><a href="#using-capabilities">3.4. Using Capabilities</a></li>
-</ul>
-</li>
-<li><a href="#Domain_Mode_Subsystem_Transformers">4. Domain Mode Subsystem Transformers</a>
-<ul class="sectlevel2">
-<li><a href="#background">4.1. Background</a></li>
-<li><a href="#versions-and-backward-compatibility">4.2. Versions and backward compatibility</a></li>
-<li><a href="#the-role-of-transformers">4.3. The role of transformers</a></li>
-<li><a href="#how-do-i-know-what-needs-to-be-transformed">4.4. How do I know what needs to be transformed?</a></li>
-<li><a href="#how-do-i-write-a-transformer">4.5. How do I write a transformer?</a></li>
-<li><a href="#evolving-transformers-with-subsystem-modelversions">4.6. Evolving transformers with subsystem ModelVersions</a></li>
-<li><a href="#testing-transformers">4.7. Testing transformers</a></li>
-<li><a href="#common-transformation-use-cases">4.8. Common transformation use-cases</a></li>
-</ul>
-</li>
-<li><a href="#Key_Interfaces_and_Classes_Relevant_to_Extension_Developers">5. Key Interfaces and Classes Relevant to Extension Developers</a>
-<ul class="sectlevel2">
-<li><a href="#extension-interface">5.1. Extension Interface</a></li>
-<li><a href="#wildfly-managed-resources">5.2. WildFly Managed Resources</a></li>
-<li><a href="#managementresourceregistration-interface">5.3. ManagementResourceRegistration Interface</a></li>
-<li><a href="#resourcedefinition-interface">5.4. ResourceDefinition Interface</a></li>
-<li><a href="#attributedefinition-class">5.5. AttributeDefinition Class</a></li>
-<li><a href="#operationdefinition-and-operationstephandler-interfaces">5.6. OperationDefinition and OperationStepHandler Interfaces</a></li>
-<li><a href="#operation-execution-and-the-operationcontext">5.7. Operation Execution and the OperationContext</a></li>
-<li><a href="#resource-interface">5.8. Resource Interface</a></li>
-<li><a href="#deploymentunitprocessor-interface">5.9. DeploymentUnitProcessor Interface</a></li>
-<li><a href="#useful-classes-for-implementing-operationstephandler">5.10. Useful classes for implementing OperationStepHandler</a></li>
-</ul>
-</li>
-<li><a href="#WildFly_JNDI_Implementation">6. WildFly JNDI Implementation</a>
-<ul class="sectlevel2">
-<li><a href="#introduction">6.1. Introduction</a></li>
-<li><a href="#architecture">6.2. Architecture</a></li>
-<li><a href="#binding-apis">6.3. Binding APIs</a></li>
-<li><a href="#resource-ref-processing">6.4. Resource Ref Processing</a></li>
-</ul>
-</li>
-<li><a href="#CLI_extensibility_for_layered_products">7. CLI extensibility for layered products</a></li>
-</ul>
 </div>
 </div>
 </div>

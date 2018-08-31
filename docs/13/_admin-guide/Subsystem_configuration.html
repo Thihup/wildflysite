@@ -39,7 +39,9 @@
           <a href="/wildflysite/contribute/" class="">Contribute</a>
         </li>
         <li>
-          <a href="/wildflysite/docs/" class="">Docs</a>
+          
+            <a href="/wildflysite/docs/13/" class="active">Docs</a>
+          
         </li>
         <li>
           <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
@@ -52,139 +54,6 @@
       <div class="wrapper">
         <div id="preamble">
 <div class="sectionbody">
-<div id="toc" class="toc">
-<div id="toctitle" class="title">Table of Contents</div>
-<ul class="sectlevel1">
-<li><a href="#EE">EE Subsystem Configuration</a>
-<ul class="sectlevel2">
-<li><a href="#EE_Application_Deployment_Configuration">Java EE Application Deployment</a></li>
-<li><a href="#EE_Concurrency_Utilities_Configuration">EE Concurrency Utilities</a></li>
-<li><a href="#EE_Default_Bindings_Configuration">Default EE Bindings</a></li>
-</ul>
-</li>
-<li><a href="#Naming">Naming Subsystem Configuration</a>
-<ul class="sectlevel2">
-<li><a href="#Naming_Global_Bindings_Configuration">Global Bindings Configuration</a></li>
-<li><a href="#Naming_Remote_JNDI_Configuration">Remote JNDI Configuration</a></li>
-</ul>
-</li>
-<li><a href="#DataSource">DataSource configuration</a>
-<ul class="sectlevel2">
-<li><a href="#jdbc-driver-installation">JDBC Driver Installation</a></li>
-<li><a href="#datasource-definitions">Datasource Definitions</a></li>
-<li><a href="#ds-using-security-domains">Using security domains</a></li>
-<li><a href="#ds-component-reference">Component Reference</a></li>
-</ul>
-</li>
-<li><a href="#Logging">Logging Configuration</a>
-<ul class="sectlevel2">
-<li><a href="#logging-attributes">Attributes</a></li>
-<li><a href="#per-deployment-logging">Per-deployment Logging</a></li>
-<li><a href="#logging-profiles">Logging Profiles</a></li>
-<li><a href="#default-log-file-locations">Default Log File Locations</a></li>
-<li><a href="#filter-expressions">Filter Expressions</a></li>
-<li><a href="#list-log-files-and-reading-log-files">List Log Files and Reading Log Files</a></li>
-<li><a href="#faq">FAQ</a></li>
-<li><a href="#logging-formatters">Logging Formatters</a></li>
-<li><a href="#Logging_Handlers">Handlers</a></li>
-<li><a href="#Logging_How_To">How To</a></li>
-<li><a href="#Logging_Loggers">Loggers</a></li>
-</ul>
-</li>
-<li><a href="#EJB3">EJB3 subsystem configuration guide</a>
-<ul class="sectlevel2">
-<li><a href="#session-bean">&lt;session-bean&gt;</a></li>
-<li><a href="#mdb">&lt;mdb&gt;</a></li>
-<li><a href="#entity-bean">&lt;entity-bean&gt;</a></li>
-<li><a href="#pools">&lt;pools&gt;</a></li>
-<li><a href="#caches">&lt;caches&gt;</a></li>
-<li><a href="#passivation-stores">&lt;passivation-stores&gt;</a></li>
-<li><a href="#async">&lt;async&gt;</a></li>
-<li><a href="#timer-service">&lt;timer-service&gt;</a></li>
-<li><a href="#remote">&lt;remote&gt;</a></li>
-<li><a href="#thread-pools">&lt;thread-pools&gt;</a></li>
-<li><a href="#iiop">&lt;iiop&gt;</a></li>
-<li><a href="#in-vm-remote-interface-invocation">&lt;in-vm-remote-interface-invocation&gt;</a></li>
-</ul>
-</li>
-<li><a href="#Undertow">Undertow subsystem configuration</a>
-<ul class="sectlevel2">
-<li><a href="#buffer-cache-configuration">Buffer cache configuration</a></li>
-<li><a href="#server-configuration">Server configuration</a></li>
-<li><a href="#servlet-container-configuration">Servlet container configuration</a></li>
-<li><a href="#Undertow_AJP_listeners">AJP listeners</a></li>
-<li><a href="#Undertow_using_as_a_Load_Balancer">Using Wildfly as a Load Balancer</a></li>
-</ul>
-</li>
-<li><a href="#Messaging">Messaging configuration</a>
-<ul class="sectlevel2">
-<li><a href="#required-extension">Required Extension</a></li>
-<li><a href="#connectors">Connectors</a></li>
-<li><a href="#jms-connection-factories">JMS Connection Factories</a></li>
-<li><a href="#jms-queues-and-topics">JMS Queues and Topics</a></li>
-<li><a href="#dead-letter-redelivery">Dead Letter &amp; Redelivery</a></li>
-<li><a href="#security-settings-for-artemis-addresses-and-jms-destinations">Security Settings for Artemis addresses and JMS destinations</a></li>
-<li><a href="#security-domain-for-users">Security Domain for Users</a></li>
-<li><a href="#using-the-elytron-subsystem">Using the Elytron Subsystem</a></li>
-<li><a href="#cluster-authentication">Cluster Authentication</a></li>
-<li><a href="#deployment-of--jms.xml-files">Deployment of -jms.xml files</a></li>
-<li><a href="#jms-bridge">JMS Bridge</a></li>
-<li><a href="#component-reference">Component Reference</a></li>
-<li><a href="#Messaging_Connect_a_pooled-connection-factory_to_a_Remote_Artemis_Server">Connect a pooled-connection-factory to a Remote Artemis Server</a></li>
-<li><a href="#Mesaging_AIO_-_NIO_for_messaging_journal">AIO - NIO for messaging journal</a></li>
-<li><a href="#Messaging_JDBC_Store_for_Messaging_Journal">JDBC Store for Messaging Journal</a></li>
-<li><a href="#Messaging_Discovery_Configuration">Configuring Broadcast/Discovery</a></li>
-</ul>
-</li>
-<li><a href="#Security">Security subsystem configuration</a>
-<ul class="sectlevel2">
-<li><a href="#structure-of-the-security-subsystem">Structure of the Security Subsystem</a></li>
-<li><a href="#security-subsystem-configuration">Security Subsystem Configuration</a></li>
-<li><a href="#Security_Authentication_Modules">Authentication Modules</a></li>
-</ul>
-</li>
-<li><a href="#Web_services">Web services configuration</a>
-<ul class="sectlevel2">
-<li><a href="#structure-of-the-webservices-subsystem">Structure of the webservices subsystem</a></li>
-<li><a href="#runtime-information">Runtime information</a></li>
-<li><a href="#ws-component-reference">Component Reference</a></li>
-</ul>
-</li>
-<li><a href="#Resource_adapters">Resource adapters</a>
-<ul class="sectlevel2">
-<li><a href="#resource-adapter-definitions">Resource Adapter Definitions</a></li>
-<li><a href="#ra-using-security-domains">Using security domains</a></li>
-<li><a href="#automatic-activation-of-resource-adapter-archives">Automatic activation of resource adapter archives</a></li>
-<li><a href="#ra-component-reference">Component Reference</a></li>
-<li><a href="#default-subsystem-configuration">Default Subsystem Configuration</a></li>
-<li><a href="#security">Security</a></li>
-<li><a href="#deployment-descriptors">Deployment Descriptors</a></li>
-<li><a href="#deployment-resources">Deployment Resources</a></li>
-</ul>
-</li>
-<li><a href="#JSF">JSF Configuration</a>
-<ul class="sectlevel2">
-<li><a href="#installing-a-new-jsf-implementation-manually">Installing a new JSF implementation manually</a></li>
-<li><a href="#changing-the-default-jsf-implementation">Changing the default JSF implementation</a></li>
-<li><a href="#configuring-a-jsf-app-to-use-a-non-default-jsf-implementation">Configuring a JSF app to use a non-default JSF implementation</a></li>
-<li><a href="#disallowing-doctype-declarations">Disallowing DOCTYPE declarations</a></li>
-</ul>
-</li>
-<li><a href="#JMX">JMX subsystem configuration</a>
-<ul class="sectlevel2">
-<li><a href="#audit-logging">Audit logging</a></li>
-</ul>
-</li>
-<li><a href="#Deployment_Scanner">Deployment Scanner configuration</a></li>
-<li><a href="#Core_Management">Core Management Subsystem Configuration</a>
-<ul class="sectlevel2">
-<li><a href="#lifecycle-listener">Lifecycle listener</a></li>
-<li><a href="#configuration-changes">Configuration changes</a></li>
-</ul>
-</li>
-<li><a href="#Simple_configuration_subsystems">Simple configuration subsystems</a></li>
-</ul>
-</div>
 <div class="paragraph">
 <p>The following chapters will focus on the high level management use cases
 that are available through the CLI and the web interface. For a detailed
