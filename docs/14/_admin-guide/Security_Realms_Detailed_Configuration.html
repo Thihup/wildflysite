@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="">
+  <link rel="shortcut icon" type="image/png" href="/wildflysite/favicon.ico" >
+  <link rel="stylesheet" href="/wildflysite/assets/css/main.css" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+
+
+</head>
+
+<body class="Detailed Configuration">
+  <div class="content">
+    <div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          
+            <a href="/wildflysite/docs/14/" class="active">Docs</a>
+          
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+
+    <div class="docs-page grid-wrapper">
+  <div class="grid__item width-12-12 docs-v-icons">
+    <a href="/wildflysite/docs/13/" ><img src="/wildflysite/assets/img/docs/wildfly_icons_docs-13-inactive.png"></a>
+    <a href="https://docs.wildfly.org/12/" target="_blank"><img src="/wildflysite/assets/img/docs/wildfly_icons_docs-12-inactive.png"></a>
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-11-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-10-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-09-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-08-coming.png">
+  </div>
+  <div class="grid__item width-12-12"><h1 class="title">Detailed Configuration</h1></div>
+  <div class="grid__item width-3-12 doc-toc"><ul class="inline_toc">
+  <li><a href="#server-identities">&lt;server-identities /&gt;</a>
+    <ul>
+      <li><a href="#ssl">&lt;ssl /&gt;</a></li>
+      <li><a href="#secret">&lt;secret /&gt;</a></li>
+    </ul>
+  </li>
+  <li><a href="#authentication">&lt;authentication /&gt;</a>
+    <ul>
+      <li><a href="#truststore">&lt;truststore /&gt;</a></li>
+      <li><a href="#local">&lt;local /&gt;</a></li>
+      <li><a href="#jaas">&lt;jaas /&gt;</a></li>
+      <li><a href="#ldap">&lt;ldap /&gt;</a>
+        <ul>
+          <li><a href="#username-filter">&lt;username-filter /&gt;</a></li>
+          <li><a href="#advanced-filter">&lt;advanced-filter /&gt;</a></li>
+        </ul>
+      </li>
+      <li><a href="#security-realms-properties">&lt;properties /&gt;</a></li>
+      <li><a href="#users">&lt;users /&gt;</a></li>
+    </ul>
+  </li>
+  <li><a href="#authorization">&lt;authorization /&gt;</a>
+    <ul>
+      <li><a href="#properties">&lt;properties /&gt;</a></li>
+    </ul>
+  </li>
+  <li><a href="#outbound-connection">&lt;outbound-connection /&gt;</a>
+    <ul>
+      <li><a href="#ldap-2">&lt;ldap /&gt;</a></li>
+    </ul>
+  </li>
+</ul></div>
+  <div class="grid__item width-9-12 doc-content"><div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>This section of the documentation describes the various configuration
+options when defining realms, plug-ins are a slightly special case so
+the configuration options for plug-ins is within it&#8217;s own section.</p>
+</div>
+<div class="paragraph">
+<p>Within a security realm definition there are four optional elements
+<code>&lt;plug-ins /&gt;</code>, <code>&lt;server-identities /&gt;</code>, <code>&lt;authentication /&gt;</code>, and
+<code>&lt;authorization /&gt;</code>, as mentioned above plug-ins is defined within it&#8217;s
+own section below so we will begin by looking at the
+<code>&lt;server-identities /&gt;</code> element.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="server-identities">&lt;server-identities /&gt;</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The server identities section of a realm definition is used to define
+how a server appears to the outside world, currently this element can be
+used to configure a password to be used when establishing a remote
+outbound connection and also how to load a X.509 key which can be used
+for both inbound and outbound SSL connections.</p>
+</div>
+<div class="sect2">
+<h3 id="ssl">&lt;ssl /&gt;</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;server-identities&gt;
+  &lt;ssl protocol="..."&gt;
+    &lt;keystore path="..." relative-to="..." keystore-password="..." alias="..." key-password="..." /&gt;
+  &lt;/ssl&gt;
+&lt;/server-identities&gt;</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>protocol</strong> - By default this is set to TLS and in general does not
+need to be set.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The SSL element then contains the nested <code>&lt;keystore /&gt;</code> element, this is
+used to define how to load the key from the file based (JKS) keystore.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>path</strong> (mandatory) - This is the path to the keystore, this can be an
+absolute path or relative to the next attribute.</p>
+</li>
+<li>
+<p><strong>relative-to</strong> (optional) - The name of a service representing a path
+the keystore is relative to.</p>
+</li>
+<li>
+<p><strong>keystore-password</strong> (mandatory) - The password required to open the
+keystore.</p>
+</li>
+<li>
+<p><strong>alias</strong> (optional) - The alias of the entry to use from the keystore -
+for a keystore with multiple entries in practice the first usable entry
+is used but this should not be relied on and the alias should be set to
+guarantee which entry is used.</p>
+</li>
+<li>
+<p><strong>key-password</strong> (optional) - The password to load the key entry, if
+omitted the keystore-password will be used instead.</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Tip</div>
+</td>
+<td class="content">
+If you see the error <code>UnrecoverableKeyException: Cannot recover key</code> the
+most likely cause that you need to specify a <code>key-password</code> and possible
+even an <code>alias</code> as well to ensure only one key is loaded.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="secret">&lt;secret /&gt;</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;server-identities&gt;
+  &lt;secret value="..." /&gt;
+&lt;/server-identities&gt;</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>value</strong> (mandatory) - The password to use for outbound connections
+encoded as Base64, this field also supports a vault expression should
+stronger protection be required.</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+The username for the outbound connection is specified at the point the
+outbound connection is defined.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="authentication">&lt;authentication /&gt;</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The authentication element is predominantly used to configure the
+authentication that is performed on an inbound connection, however there
+is one exception and that is if a trust store is defined - on
+negotiating an outbound SSL connection the trust store will be used to
+verify the remote server.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;authentication&gt;
+  &lt;truststore /&gt;
+  &lt;local /&gt;
+  &lt;jaas /&gt;
+  &lt;ldap /&gt;
+  &lt;properties /&gt;
+  &lt;users /&gt;
+  &lt;plug-in /&gt;
+&lt;/authentication&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>An authentication definition can have zero or one <code>&lt;truststore /&gt;</code>, it
+can also have zero or one <code>&lt;local /&gt;</code> and it can also have one of
+<code>&lt;jaas /&gt;</code>, <code>&lt;ldap /&gt;</code>, <code>&lt;properties /&gt;</code>, <code>&lt;users /&gt;</code>, and <code>&lt;plug-in /&gt;</code>
+i.e. the local mechanism and a truststore for certificate verification
+can be independent switched on and off and a single username / password
+store can be defined.</p>
+</div>
+<div class="sect2">
+<h3 id="truststore">&lt;truststore /&gt;</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;authentication&gt;
+  &lt;truststore path="..." relative-to="..." keystore-password="..."/&gt;
+&lt;/authentication&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This element is used to define how to load a key store file that can be
+used as the trust store within the SSLContext we create internally, the
+store is then used to verify the certificates of the remote side of the
+connection be that inbound or outbound.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>path</strong> (mandatory) - This is the path to the keystore, this can be an
+absolute path or relative to the next attribute.</p>
+</li>
+<li>
+<p><strong>relative-to</strong> (optional) - The name of a service representing a path
+the keystore is relative to.</p>
+</li>
+<li>
+<p><strong>keystore-password</strong> (mandatory) - The password required to open the
+keystore.</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+Although this is a definition of a trust store the attribute for the
+password is <code>keystore-password</code>, this is because the underlying file
+being opened is still a key store.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="local">&lt;local /&gt;</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;authentication&gt;
+  &lt;local default-user="..." allowed-users="..." /&gt;
+&lt;/authentication&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This element switches on the local authentication mechanism that allows
+clients to the server to verify that they are local to the server, at
+the protocol level it is optional for the remote client to send a user
+name in the authentication response.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>default-user</strong> (optional) - If the client does not pass in a username
+this is the assumed username, this value is also automatically added to
+the list of allowed-users.</p>
+</li>
+<li>
+<p><strong>allowed-users</strong> (optional) - This attribute is used to specify a comma
+separated list of users allowed to authenticate using the local
+mechanism, alternatively ' `*&#8217; can be specified to allow any username
+to be specified.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="jaas">&lt;jaas /&gt;</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;authentication&gt;
+  &lt;jaas name="..." /&gt;
+&lt;/authentication&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The jaas element is used to enable username and password based
+authentication where the supplied username and password are verified by
+making use of a configured jaas domain.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>name</strong> (mandatory) - The name of the jaas domain to use to verify the
+supplied username and password.</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Warning</div>
+</td>
+<td class="content">
+As JAAS authentication works by taking a username and password and
+verifying these the use of this element means that at the transport
+level authentication will be forced to send the password in plain text,
+any interception of the messages exchanged between the client and server
+without SSL enabled will reveal the users password.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="ldap">&lt;ldap /&gt;</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;authentication&gt;
+  &lt;ldap connection="..." base-dn="..." recursive="..." user-dn="..."&gt;
+    &lt;username-filter attribute="..." /&gt;
+    &lt;advanced-filter filter="..." /&gt;
+  &lt;/ldap&gt;
+&lt;/authentication&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The ldap element is used to define how LDAP searches will be used to
+authenticate a user, this works by first connecting to LDAP and
+performing a search using the supplied user name to identity the
+distinguished name of the user and then a subsequent connection is made
+to the server using the password supplied by the user - if this second
+connection is a success then authentication succeeds.</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Warning</div>
+</td>
+<td class="content">
+Due to the verification approach used this configuration causes the
+authentication mechanisms selected for the protocol to cause the
+password to be sent from the client in plain text, the following Jira
+issue is to investigating proxying a Digest authentication with the LDAP
+server so no plain text password is needed
+<a href="https://issues.jboss.org/browse/AS7-4195">AS7-4195</a>.
+</td>
+</tr>
+</table>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>connection</strong> (mandatory) - The name of the connection to use to
+connect to LDAP.</p>
+</li>
+<li>
+<p><strong>base-dn</strong> (mandatory) - The distinguished name of the context to use
+to begin the search from.</p>
+</li>
+<li>
+<p><strong>recursive</strong> (optional) - Should the filter be executed recursively?
+Defaults to false.</p>
+</li>
+<li>
+<p><strong>user-dn</strong> (optional) - After the user has been found specifies which
+attribute to read for the users distinguished name, defaults to ' `dn&#8217;.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Within the ldap element only one of <code>&lt;username-filter /&gt;</code> or
+<code>&lt;advanced-filter /&gt;</code> can be specified.</p>
+</div>
+<div class="sect3">
+<h4 id="username-filter">&lt;username-filter /&gt;</h4>
+<div class="paragraph">
+<p>This element is used for a simple filter to match the username specified
+by the remote user against a single attribute, as an example with Active
+Directory the match is most likely to be against the ' `sAMAccountName&#8217;
+attribute.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>attribute</strong> (mandatory) - The name of the field to match the users
+supplied username against.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="advanced-filter">&lt;advanced-filter /&gt;</h4>
+<div class="paragraph">
+<p>This element is used where a more advanced filter is required, one
+example use of this filter is to exclude certain matches by specifying
+some additional criteria for the filter.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>filter</strong> (mandatory) - The filter to execute to locate the user, this
+filter should contain '\{ <code>0</code>}' as a place holder for the username
+supplied by the user authenticating.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="security-realms-properties">&lt;properties /&gt;</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;authentication&gt;
+  &lt;properties path="..." relative-to="..." plain-text="..." /&gt;
+&lt;/authentication&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The properties element is used to reference a properties file to load to
+read a users password or pre-prepared digest for the authentication
+process.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>path</strong> (mandatory) - The path to the properties file, either absolute
+or relative to the path referenced by the relative-to attribute.</p>
+</li>
+<li>
+<p><strong>relative-to</strong> (optional) - The name of a path service that the defined
+path will be relative to.</p>
+</li>
+<li>
+<p><strong>plain-text</strong> (optional) - Setting to specify if the passwords are
+stored as plain text within the properties file, defaults to false.</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+By default the properties files are expected to store a pre-prepared
+hash of the users password in the form HEX( MD5( username ':' realm ':'
+password))
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="users">&lt;users /&gt;</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;authentication&gt;
+  &lt;users&gt;
+    &lt;user username="..."&gt;
+      &lt;password&gt;...&lt;/password&gt;
+    &lt;/user&gt;
+  &lt;/users&gt;
+&lt;/authentication&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This is a very simple store of a username and password that stores both
+of these within the domain model, this is only really provided for the
+provision of simple examples.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>username</strong> (mandatory) - A users username.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The <code>&lt;password/&gt;</code> element is then used to define the password for the
+user.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="authorization">&lt;authorization /&gt;</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The authorization element is used to define how a users roles can be
+loaded after the authentication process completes, these roles may then
+be used for subsequent authorization decisions based on the service
+being accessed. At the moment only a properties file approach or a
+custom plug-in are supported - support for loading roles from LDAP or
+from a database are planned for a subsequent release.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;authorization&gt;
+  &lt;properties /&gt;
+  &lt;plug-in /&gt;
+&lt;/authorization&gt;</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="properties">&lt;properties /&gt;</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;authorization&gt;
+  &lt;properties path="..." relative-to="..." /&gt;
+&lt;/authorization&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The format of the properties file is <code>username={ROLES</code>} where \{
+<code>ROLES</code>} is a comma separated list of the users roles.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>path</strong> (mandatory) - The path to the properties file, either absolute
+or relative to the path referenced by the relative-to attribute.</p>
+</li>
+<li>
+<p><strong>relative-to</strong> (optional) - The name of a path service that the defined
+path will be relative to.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="outbound-connection">&lt;outbound-connection /&gt;</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Strictly speaking these are not a part of the security realm definition,
+however at the moment they are only used by security realms so the
+definition of outbound connection is described here.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;management&gt;
+  &lt;security-realms /&gt;
+  &lt;outbound-connections&gt;
+    &lt;ldap /&gt;
+  &lt;/outbound-connections&gt;
+&lt;/management&gt;</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="ldap-2">&lt;ldap /&gt;</h3>
+<div class="paragraph">
+<p>We only support outbound connections to ldap servers for the authentication process.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;outbound-connections&gt;
+  &lt;ldap name="..." url="..." search-dn="..." search-credential="..." security-realm="..." initial-context-factory="..."
+        referrals="..." handles-referrals-for="..." always-send-client-cert="..."&gt;
+    &lt;properties&gt;
+      &lt;property name="..." value="..." /&gt;
+    &lt;/properties&gt;
+    &lt;security-credential-reference store="..." alias="..." type="..."  clear-text="..." /&gt;
+  &lt;/ldap&gt;
+&lt;/outbound-connections&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The outbound connections are defined in this section and then referenced
+by name from the configuration that makes use of them.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>name</strong> (mandatory) - The unique name used to reference this
+connection.</p>
+</li>
+<li>
+<p><strong>url</strong> (mandatory) - The URL use to establish the LDAP connection.</p>
+</li>
+<li>
+<p><strong>search-dn</strong> (mandatory) - The distinguished name of the user to
+authenticate as to perform the searches.</p>
+</li>
+<li>
+<p><strong>search-credential</strong> (optional) - The password required to connect to
+LDAP as the search-dn.</p>
+</li>
+<li>
+<p><strong>initial-context-factory</strong> (optional) - Allows overriding the initial
+context factory, defaults to ' `com.sun.jndi.ldap.LdapCtxFactory&#8217;</p>
+</li>
+<li>
+<p><strong>referrals</strong> (optional) - The referral handling mode.</p>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>IGNORE</strong> - Ignore any referrals received.</p>
+</li>
+<li>
+<p><strong>FOLLOW</strong> - Automatically follow any referrals re-using the configuration for this connection.</p>
+</li>
+<li>
+<p><strong>THROW</strong> - Throw an exception is a referral is encountered, this allows an alternative connection to be identified to handle the referral.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>handles-referrals-for</strong> (optional) - A space separated list of URIs this connection can be used for.</p>
+</li>
+<li>
+<p><strong>always-send-client-cert</strong> (optional) - By default the server&#8217;s client certificate is not sent whilst verifying the users credential, if this is set to <code>true</code> it will always be sent.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The optional <code>&lt;properties/&gt;</code> element can be used to specify additional properties to be passed in to the <code>DirContext</code> when it is created.</p>
+</div>
+<div class="paragraph">
+<p>The optional <code>&lt;security-credential-reference /&gt;</code> can be used to reference a credential stored in a credential store as an alternative to
+the <code>search-credential</code> attribute.  This element supports the following attributes: -</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>store</strong> (optional) - Reference to the credential store to obtain the search credential from.</p>
+</li>
+<li>
+<p><strong>alias</strong> (optional) - The alias of the credential in the referenced store.</p>
+</li>
+<li>
+<p><strong>type</strong> (optional) - The fully qualified class name of the credential type to obtain from the credential store.</p>
+</li>
+<li>
+<p><strong>clear-text</strong> (optional) - Instead of referencing a credential store this attribute can be used to specify a clear text password.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div></div>
+</div>
+
+
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">WildFly is open. All dependencies of this project are available under the <a href='https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html' class='dark-background' target='_blank'>LGPL 2.1</a> or compatible license.<br/><br/>This website was built with <a href='https://jekyllrb.com/' class='dark-background' target='_blank'>Jekyll</a> is hosted on <a href='https://pages.github.com/' class='dark-background' target='_blank'>Github Pages</a> and is completely open source. If you want to make it better, <a href='https://github.com/wildfly/wildfly.org/fork' class='dark-background' target='_blank'>fork it</a> and show us what you’ve got.</p>
+
+    
+      <div class="width-1-12 project-links">
+        <strong>Navigation</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="/wildflysite/downloads" class="dark-background">Downloads</a></li>
+          
+            <li><a href="/wildflysitef/docs" class="dark-background">Docs</a></li>
+          
+            <li><a href="https://github.com/wildfly/wildfly" class="dark-background">Github</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <strong>Contribute</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="https://issues.jboss.org/browse/WFLY" class="dark-background">Submit a bug</a></li>
+          
+            <li><a href="https://community.jboss.org/en/wildfly?view=discussion" class="dark-background">Join the forum</a></li>
+          
+            <li><a href="https://github.com/wildfly/wildfly/fork" class="dark-background">Fork WildFly</a></li>
+          
+            <li><a href="https://twitter.com/WildFlyAS" class="dark-background">Follow us</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <strong>Get Help</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="https://community.jboss.org/en/wildfly?view=discussion" class="dark-background">Join the forum</a></li>
+          
+            <li><a href="https://www.hipchat.com/gFOhnVQke" class="dark-background">Join HipChat</a></li>
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-6-12 more-links">
+        <strong>Find more Red Hat Middleware Community Projects</strong>
+        <ul class="footer-links">
+          
+            <li><a href="https://www.apiman.io/" class="dark-background">APIMan</a></li>
+          
+            <li><a href="http://arquillian.org" class="dark-background">Arquillian</a></li>
+          
+            <li><a href="http://byteman.jboss.org/" class="dark-background">Byteman</a></li>
+          
+            <li><a href="http://capedwarf.org/" class="dark-background">CapeDwarf</a></li>
+          
+            <li><a href="https://github.com/alechenninger/chronicler" class="dark-background">Chronicler</a></li>
+          
+            <li><a href="https://github.com/darcy-framework" class="dark-background">Darcy</a></li>
+          
+            <li><a href="http://debezium.io/" class="dark-background">Debezium</a></li>
+          
+            <li><a href="https://www.drools.org/" class="dark-background">Drools</a></li>
+          
+            <li><a href="http://gatein.jboss.org/" class="dark-background">GateIn</a></li>
+          
+            <li><a href="http://www.hawkular.org/" class="dark-background">Hawkular</a></li>
+          
+            <li><a href="http://hawt.io/" class="dark-background">Hawtio</a></li>
+          
+            <li><a href="http://hibernate.org/" class="dark-background">Hibernate</a></li>
+          
+            <li><a href="http://www.infinispan.org/" class="dark-background">Infinispan</a></li>
+          
+            <li><a href="https://devstudio.jboss.com/" class="dark-background">JBoss DevStudio</a></li>
+          
+            <li><a href="http://forge.jboss.org/" class="dark-background">JBoss Forge</a></li>
+          
+            <li><a href="https://github.com/jboss-logging" class="dark-background">JBoss Logging</a></li>
+          
+            <li><a href="http://jbossremoting.jboss.org/" class="dark-background">JBoss Remoting</a></li>
+          
+            <li><a href="https://www.jbpm.org/" class="dark-background">jBPM</a></li>
+          
+            <li><a href="https://jsfunit.jboss.org/" class="dark-background">JSFUnit</a></li>
+          
+            <li><a href="https://www.keycloak.org/" class="dark-background">Keycloak</a></li>
+          
+            <li><a href="http://modcluster.io/" class="dark-background">Mod Cluster</a></li>
+          
+            <li><a href="http://modeshape.jboss.org/" class="dark-background">ModeShape</a></li>
+          
+            <li><a href="https://www.optaplanner.org/" class="dark-background">OptaPlanner</a></li>
+          
+            <li><a href="https://picketbox.jboss.org/" class="dark-background">Picketbox</a></li>
+          
+            <li><a href="http://resteasy.jboss.org/" class="dark-background">RESTEasy</a></li>
+          
+            <li><a href="https://riftsaw.jboss.org/" class="dark-background">Riftsaw</a></li>
+          
+            <li><a href="http://savara.jboss.org/" class="dark-background">Savara</a></li>
+          
+            <li><a href="http://seamframework.org/" class="dark-background">Seam</a></li>
+          
+            <li><a href="http://arquillian.org/" class="dark-background">Shrinkwrap</a></li>
+          
+            <li><a href="http://snowdrop.jboss.org/" class="dark-background">Snowdrop</a></li>
+          
+            <li><a href="https://switchyard.jboss.org/" class="dark-background">Switchyard</a></li>
+          
+            <li><a href="https://tattletale.jboss.org/" class="dark-background">Tattletale</a></li>
+          
+            <li><a href="http://teiid.jboss.org/" class="dark-background">Teiid</a></li>
+          
+            <li><a href="http://wildfly-swarm.io/" class="dark-background">WildFly Swarm</a></li>
+          
+            <li><a href="http://wise.jboss.org/" class="dark-background">Wise</a></li>
+          
+            <li><a href="https://xnio.jboss.org/" class="dark-background">XNIO</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" class="dark-background" target="_blank">CC by 3.0</a>
+    </span>
+    <span class="redhat">
+      a Red Hat sponsored project   
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/"><img src="/wildflysite/assets/img/RHLogo_white.svg"></a>
+    </span>
+  </div>
+</div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script type="text/javascript" src="/wildflysite/assets/javascript/mobile-nav.js"></script>
+</body>
+
+</html>

@@ -1,20 +1,19 @@
 <!DOCTYPE html>
-<html lang="en"><head>
+<html>
+
+<head>
   <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
-<title>Webservices reference guide | Wildfly</title>
-<meta name="generator" content="Jekyll v3.8.3" />
-<meta property="og:title" content="Webservices reference guide" />
-<meta property="og:locale" content="en_US" />
-<link rel="canonical" href="https://jbossorg.github.io/wildflysite/docs/13/_developer-guide/JAX-WS_Reference_guide.html" />
-<meta property="og:url" content="https://jbossorg.github.io/wildflysite/docs/13/_developer-guide/JAX-WS_Reference_guide.html" />
-<meta property="og:site_name" content="Wildfly" />
-<script type="application/ld+json">
-{"@type":"WebPage","url":"https://jbossorg.github.io/wildflysite/docs/13/_developer-guide/JAX-WS_Reference_guide.html","headline":"Webservices reference guide","@context":"http://schema.org"}</script>
-<!-- End Jekyll SEO tag -->
-<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://jbossorg.github.io/wildflysite/feed.xml" title="Wildfly" /></head>
-<body><div class="header navigation">
+  <meta name="description" content="">
+  <link rel="shortcut icon" type="image/png" href="/wildflysite/favicon.ico" >
+  <link rel="stylesheet" href="/wildflysite/assets/css/main.css" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+
+
+</head>
+
+<body class="Webservices reference guide">
+  <div class="content">
+    <div class="header navigation">
   <div class="logo-wrapper">
     <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
   </div>
@@ -39,7 +38,7 @@
         </li>
         <li>
           
-            <a href="/wildflysite/docs/13/" class="active">Docs</a>
+            <a href="/wildflysite/docs/14/" class="active">Docs</a>
           
         </li>
         <li>
@@ -49,9 +48,526 @@
     </nav>
   </div>
 </div>
-<main class="page-content" aria-label="Content">
-      <div class="wrapper">
-        <div id="preamble">
+
+    <div class="docs-page grid-wrapper">
+  <div class="grid__item width-12-12 docs-v-icons">
+    <a href="/wildflysite/docs/13/" ><img src="/wildflysite/assets/img/docs/wildfly_icons_docs-13-inactive.png"></a>
+    <a href="https://docs.wildfly.org/12/" target="_blank"><img src="/wildflysite/assets/img/docs/wildfly_icons_docs-12-inactive.png"></a>
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-11-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-10-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-09-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-08-coming.png">
+  </div>
+  <div class="grid__item width-12-12"><h1 class="title">Webservices reference guide</h1></div>
+  <div class="grid__item width-3-12 doc-toc"><ul class="inline_toc">
+  <li><a href="#JAX-WS_User_Guide">JAX-WS User Guide</a>
+    <ul>
+      <li><a href="#web-service-endpoints">Web Service Endpoints</a>
+        <ul>
+          <li><a href="#plain-old-java-object-pojo">Plain old Java Object (POJO)</a>
+            <ul>
+              <li><a href="#the-endpoint-as-a-web-application">The endpoint as a web application</a></li>
+              <li><a href="#packaging-the-endpoint">Packaging the endpoint</a></li>
+              <li><a href="#accessing-the-generated-wsdl">Accessing the generated WSDL</a></li>
+            </ul>
+          </li>
+          <li><a href="#ejb3-stateless-session-bean-slsb">EJB3 Stateless Session Bean (SLSB)</a>
+            <ul>
+              <li><a href="#packaging-the-endpoint-1">Packaging the endpoint</a></li>
+              <li><a href="#accessing-the-generated-wsdl-1">Accessing the generated WSDL</a></li>
+            </ul>
+          </li>
+          <li><a href="#endpoint-provider">Endpoint Provider</a></li>
+        </ul>
+      </li>
+      <li><a href="#web-service-clients">Web Service Clients</a>
+        <ul>
+          <li><a href="#service">Service</a>
+            <ul>
+              <li><a href="#service-usage">Service Usage</a>
+                <ul>
+                  <li><a href="#static-case">Static case</a></li>
+                  <li><a href="#dynamic-case">Dynamic case</a></li>
+                </ul>
+              </li>
+              <li><a href="#handler-resolver">Handler Resolver</a></li>
+              <li><a href="#executor">Executor</a></li>
+            </ul>
+          </li>
+          <li><a href="#dynamic-proxy">Dynamic Proxy</a></li>
+          <li><a href="#webserviceref">WebServiceRef</a></li>
+          <li><a href="#dispatch">Dispatch</a></li>
+          <li><a href="#asynchronous-invocations">Asynchronous Invocations</a></li>
+          <li><a href="#oneway-invocations">Oneway Invocations</a></li>
+          <li><a href="#timeout-configuration">Timeout Configuration</a></li>
+        </ul>
+      </li>
+      <li><a href="#common-api">Common API</a>
+        <ul>
+          <li><a href="#handler-framework">Handler Framework</a>
+            <ul>
+              <li><a href="#logical-handler">Logical Handler</a></li>
+              <li><a href="#protocol-handler">Protocol Handler</a></li>
+              <li><a href="#service-endpoint-handlers">Service endpoint handlers</a></li>
+              <li><a href="#service-client-handlers">Service client handlers</a></li>
+            </ul>
+          </li>
+          <li><a href="#message-context">Message Context</a>
+            <ul>
+              <li><a href="#logical-message-context">Logical Message Context</a></li>
+              <li><a href="#soap-message-context">SOAP Message Context</a></li>
+            </ul>
+          </li>
+          <li><a href="#fault-handling">Fault Handling</a></li>
+        </ul>
+      </li>
+      <li><a href="#jax-ws-annotations">JAX-WS Annotations</a>
+        <ul>
+          <li><a href="#javax.xml.ws.servicemode">javax.xml.ws.ServiceMode</a></li>
+          <li><a href="#javax.xml.ws.webfault">javax.xml.ws.WebFault</a></li>
+          <li><a href="#javax.xml.ws.requestwrapper">javax.xml.ws.RequestWrapper</a></li>
+          <li><a href="#javax.xml.ws.responsewrapper">javax.xml.ws.ResponseWrapper</a></li>
+          <li><a href="#javax.xml.ws.webserviceclient">javax.xml.ws.WebServiceClient</a></li>
+          <li><a href="#javax.xml.ws.webendpoint">javax.xml.ws.WebEndpoint</a></li>
+          <li><a href="#javax.xml.ws.webserviceprovider">javax.xml.ws.WebServiceProvider</a></li>
+          <li><a href="#javax.xml.ws.bindingtype">javax.xml.ws.BindingType</a></li>
+          <li><a href="#javax.xml.ws.webserviceref">javax.xml.ws.WebServiceRef</a></li>
+          <li><a href="#javax.xml.ws.webservicerefs">javax.xml.ws.WebServiceRefs</a></li>
+          <li><a href="#javax.xml.ws.action">javax.xml.ws.Action</a></li>
+          <li><a href="#javax.xml.ws.faultaction">javax.xml.ws.FaultAction</a></li>
+        </ul>
+      </li>
+      <li><a href="#jsr-181-annotations">JSR-181 Annotations</a>
+        <ul>
+          <li><a href="#javax.jws.webservice">javax.jws.WebService</a></li>
+          <li><a href="#javax.jws.webmethod">javax.jws.WebMethod</a></li>
+          <li><a href="#javax.jws.oneway">javax.jws.OneWay</a></li>
+          <li><a href="#javax.jws.webparam">javax.jws.WebParam</a></li>
+          <li><a href="#javax.jws.webresult">javax.jws.WebResult</a></li>
+          <li><a href="#javax.jws.soapbinding">javax.jws.SOAPBinding</a></li>
+          <li><a href="#javax.jws.handlerchain">javax.jws.HandlerChain</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#JAX-WS_Tools">JAX-WS Tools</a>
+    <ul>
+      <li><a href="#server-side">Server side</a>
+        <ul>
+          <li><a href="#bottom-up-using-wsprovide">Bottom-Up (Using wsprovide)</a></li>
+          <li><a href="#top-down-using-wsconsume">Top-Down (Using wsconsume)</a></li>
+        </ul>
+      </li>
+      <li><a href="#client-side">Client Side</a></li>
+      <li><a href="#wsconsume">wsconsume</a></li>
+      <li><a href="#command-line-tool">Command Line Tool</a>
+        <ul>
+          <li><a href="#examples">Examples</a></li>
+        </ul>
+      </li>
+      <li><a href="#maven-plugin">Maven Plugin</a>
+        <ul>
+          <li><a href="#examples-1">Examples</a></li>
+        </ul>
+      </li>
+      <li><a href="#ant-task">Ant Task</a>
+        <ul>
+          <li><a href="#examples-2">Examples</a></li>
+        </ul>
+      </li>
+      <li><a href="#wsprovide">wsprovide</a></li>
+      <li><a href="#command-line-tool">Command Line Tool</a>
+        <ul>
+          <li><a href="#examples">Examples</a></li>
+        </ul>
+      </li>
+      <li><a href="#maven-plugin">Maven Plugin</a>
+        <ul>
+          <li><a href="#examples-1">Examples</a></li>
+        </ul>
+      </li>
+      <li><a href="#ant-task">Ant Task</a>
+        <ul>
+          <li><a href="#examples-2">Examples</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#JAX_WS_Advanced_User_Guide">Advanced User Guide</a>
+    <ul>
+      <li><a href="#logging">Logging</a>
+        <ul>
+          <li><a href="#jax-ws-handler-approach">JAX-WS Handler approach</a></li>
+          <li><a href="#apache-cxf-approach">Apache CXF approach</a>
+            <ul>
+              <li><a href="#system-property">System property</a></li>
+              <li><a href="#manual-interceptor-addition-and-logging-feature">Manual interceptor addition and logging feature</a></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><a href="#ws--support">WS-* support</a></li>
+      <li><a href="#address-rewrite">Address rewrite</a>
+        <ul>
+          <li><a href="#server-configuration-options">Server configuration options</a></li>
+          <li><a href="#dynamic-rewrite">Dynamic rewrite</a></li>
+        </ul>
+      </li>
+      <li><a href="#configuration-through-deployment-descriptor">Configuration through deployment descriptor</a>
+        <ul>
+          <li><a href="#context-root-element">context-root element</a></li>
+          <li><a href="#config-name-and-config-file-elements">config-name and config-file elements</a></li>
+          <li><a href="#property-element">property element</a></li>
+          <li><a href="#port-component-element">port-component element</a></li>
+          <li><a href="#webservice-description-element">webservice-description element</a></li>
+        </ul>
+      </li>
+      <li><a href="#schema-validation-of-soap-messages">Schema validation of SOAP messages</a></li>
+      <li><a href="#jaxb-introductions">JAXB Introductions</a></li>
+      <li><a href="#wsdl-system-properties-expansion">WSDL system properties expansion</a></li>
+      <li><a href="#Predefined_client_and_endpoint_configurations">Predefined client and endpoint configurations</a>
+        <ul>
+          <li><a href="#assigning-configurations">Assigning configurations</a>
+            <ul>
+              <li><a href="#endpoint-configuration-assignment">Endpoint configuration assignment</a></li>
+              <li><a href="#endpoint-configuration-deployment-descriptor">Endpoint Configuration Deployment Descriptor</a>
+                <ul>
+                  <li><a href="#application-server-configurations">Application server configurations</a></li>
+                  <li><a href="#endpointconfig-annotation">EndpointConfig annotation</a></li>
+                  <li><a href="#jaxws-feature">JAXWS Feature</a></li>
+                  <li><a href="#explicit-setup-through-api">Explicit setup through API</a></li>
+                </ul>
+              </li>
+              <li><a href="#automatic-configuration-from-default-descriptors">Automatic configuration from default descriptors</a></li>
+              <li><a href="#automatic-configuration-assignment-from-container-setup">Automatic configuration assignment from container setup</a></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><a href="#jax-ws-Authentication">Authentication</a>
+        <ul>
+          <li><a href="#jax-ws-authentication">Authentication</a>
+            <ul>
+              <li><a href="#specify-the-security-domain">Specify the security domain</a></li>
+              <li><a href="#use-bindingprovider-to-set-principalcredential">Use BindingProvider to set principal/credential</a></li>
+              <li><a href="#using-http-basic-auth-for-security">Using HTTP Basic Auth for security</a></li>
+            </ul>
+          </li>
+          <li><a href="#jaspi-authentication">JASPI Authentication</a></li>
+        </ul>
+      </li>
+      <li><a href="#Apache_CXF_integration">Apache CXF integration</a>
+        <ul>
+          <li><a href="#jbossws-integration-layer-with-apache-cxf">JBossWS integration layer with Apache CXF</a></li>
+          <li><a href="#building-ws-applications-the-jboss-way">Building WS applications the JBoss way</a>
+            <ul>
+              <li><a href="#portable-applications">Portable applications</a></li>
+              <li><a href="#direct-apache-cxf-api-usage">Direct Apache CXF API usage</a></li>
+            </ul>
+          </li>
+          <li><a href="#bus-usage">Bus usage</a>
+            <ul>
+              <li><a href="#creating-a-bus-instance">Creating a Bus instance</a></li>
+              <li><a href="#using-existing-bus-instances">Using existing Bus instances</a></li>
+              <li><a href="#bus-selection-strategies-for-jaxws-clients">Bus selection strategies for JAXWS clients</a>
+                <ul>
+                  <li><a href="#thread-bus-strategy-thread_bus">Thread bus strategy (THREAD_BUS)</a></li>
+                  <li><a href="#new-bus-strategy-new_bus">New bus strategy (NEW_BUS)</a></li>
+                  <li><a href="#thread-context-classloader-bus-strategy-tccl_bus">Thread context classloader bus strategy (TCCL_BUS)</a></li>
+                  <li><a href="#strategy-configuration">Strategy configuration</a></li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li><a href="#server-side-integration-customization">Server Side Integration Customization</a>
+            <ul>
+              <li><a href="#deployment-descriptor-properties">Deployment descriptor properties</a>
+                <ul>
+                  <li><a href="#workqueue-configuration">WorkQueue configuration</a></li>
+                  <li><a href="#policy-alternative-selector">Policy alternative selector</a></li>
+                  <li><a href="#mbean-management">MBean management</a></li>
+                  <li><a href="#schema-validation">Schema validation</a></li>
+                  <li><a href="#interceptors">Interceptors</a></li>
+                  <li><a href="#features">Features</a></li>
+                  <li><a href="#ws-discovery-enablement">WS-Discovery enablement</a></li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li><a href="#apache-cxf-interceptors">Apache CXF interceptors</a></li>
+          <li><a href="#apache-cxf-features">Apache CXF features</a></li>
+          <li><a href="#properties-driven-bean-creation">Properties driven bean creation</a></li>
+          <li><a href="#httpconduit-configuration">HTTPConduit configuration</a></li>
+        </ul>
+      </li>
+      <li><a href="#WS-Addressing">WS-Addressing</a>
+        <ul>
+          <li><a href="#enabling-ws-addressing">Enabling WS-Addressing</a></li>
+          <li><a href="#ws-addressing-policy">WS-Addressing Policy</a></li>
+          <li><a href="#example">Example</a>
+            <ul>
+              <li><a href="#endpoint">Endpoint</a></li>
+              <li><a href="#client">Client</a></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><a href="#WS-Security">WS-Security</a>
+        <ul>
+          <li><a href="#ws-security-overview">WS-Security overview</a></li>
+          <li><a href="#jboss-ws-security-support">JBoss WS-Security support</a>
+            <ul>
+              <li><a href="#apache-cxf-ws-security-implementation">Apache CXF WS-Security implementation</a>
+                <ul>
+                  <li><a href="#ws-security-policy-support">WS-Security Policy support</a></li>
+                </ul>
+              </li>
+              <li><a href="#jbossws-configuration-additions">JBossWS configuration additions</a></li>
+              <li><a href="#apache-cxf-annotations">Apache CXF annotations</a></li>
+            </ul>
+          </li>
+          <li><a href="#examples">Examples</a>
+            <ul>
+              <li><a href="#signature-and-encryption">Signature and encryption</a>
+                <ul>
+                  <li><a href="#endpoint">Endpoint</a></li>
+                  <li><a href="#client">Client</a></li>
+                  <li><a href="#endpoint-serving-multiple-clients">Endpoint serving multiple clients</a></li>
+                </ul>
+              </li>
+              <li><a href="#authentication-and-authorization">Authentication and authorization</a>
+                <ul>
+                  <li><a href="#endpoint-1">Endpoint</a></li>
+                  <li><a href="#client-1">Client</a></li>
+                </ul>
+              </li>
+              <li><a href="#secure-transport">Secure transport</a></li>
+              <li><a href="#secure-conversation">Secure conversation</a></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><a href="#WS-Trust_and_STS">WS-Trust and STS</a>
+        <ul>
+          <li><a href="#ws-trust-overview">WS-Trust overview</a></li>
+          <li><a href="#security-token-service">Security Token Service</a></li>
+          <li><a href="#apache-cxf-support">Apache CXF support</a></li>
+          <li><a href="#a-basic-ws-trust-scenario">A Basic WS-Trust Scenario</a>
+            <ul>
+              <li><a href="#web-service-provider">Web service provider</a>
+                <ul>
+                  <li><a href="#web-service-provider-wsdl">Web service provider WSDL</a></li>
+                  <li><a href="#web-service-provider-interface">Web service provider Interface</a></li>
+                  <li><a href="#web-service-provider-implementation">Web service provider Implementation</a></li>
+                  <li><a href="#servercallbackhandler">ServerCallbackHandler</a></li>
+                  <li><a href="#crypto-properties-and-keystore-files">Crypto properties and keystore files</a></li>
+                  <li><a href="#manifest.mf">MANIFEST.MF</a></li>
+                </ul>
+              </li>
+              <li><a href="#security-token-service-sts">Security Token Service (STS)</a>
+                <ul>
+                  <li><a href="#sts-wsdl">STS WSDL</a></li>
+                  <li><a href="#sts-implementation">STS Implementation</a></li>
+                  <li><a href="#stscallbackhandler">STSCallbackHandler</a></li>
+                  <li><a href="#crypto-properties-and-keystore-files-1">Crypto properties and keystore files</a></li>
+                  <li><a href="#manifest.mf-1">MANIFEST.MF</a></li>
+                  <li><a href="#security-domain">Security Domain</a></li>
+                </ul>
+              </li>
+              <li><a href="#web-service-requester">Web service requester</a>
+                <ul>
+                  <li><a href="#web-service-requester-implementation">Web service requester Implementation</a></li>
+                  <li><a href="#clientcallbackhandler">ClientCallbackHandler</a></li>
+                  <li><a href="#requester-crypto-properties-and-keystore-files">Requester Crypto properties and keystore files</a></li>
+                </ul>
+              </li>
+              <li><a href="#picketlink-sts">PicketLink STS</a></li>
+            </ul>
+          </li>
+          <li><a href="#ActAs_WS-Trust_Scenario">ActAs WS-Trust Scenario</a>
+            <ul>
+              <li><a href="#web-service-provider-2">Web service provider</a>
+                <ul>
+                  <li><a href="#web-service-provider-wsdl-2">Web service provider WSDL</a></li>
+                  <li><a href="#web-service-interface">Web Service Interface</a></li>
+                  <li><a href="#web-service-implementation">Web Service Implementation</a></li>
+                  <li><a href="#actascallbackhandler">ActAsCallbackHandler</a></li>
+                  <li><a href="#usernametokencallbackhandler">UsernameTokenCallbackHandler</a></li>
+                  <li><a href="#crypto-properties-and-keystore-files">Crypto properties and keystore files</a></li>
+                  <li><a href="#manifest.mf">MANIFEST.MF</a></li>
+                </ul>
+              </li>
+              <li><a href="#security-token-service">Security Token Service</a>
+                <ul>
+                  <li><a href="#sts-implementation-class">STS Implementation class</a></li>
+                  <li><a href="#stscallbackhandler">STSCallbackHandler</a></li>
+                </ul>
+              </li>
+              <li><a href="#web-service-requester">Web service requester</a>
+                <ul>
+                  <li><a href="#web-service-requester-implementation">Web service requester Implementation</a></li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li><a href="#OnBehalfOf_WS-Trust_Scenario">OnBehalfOf WS-Trust Scenario</a>
+            <ul>
+              <li><a href="#web-service-provider-3">Web service provider</a>
+                <ul>
+                  <li><a href="#web-service-provider-wsdl-3">Web service provider WSDL</a></li>
+                  <li><a href="#web-service-interface">Web Service Interface</a></li>
+                  <li><a href="#web-service-implementation">Web Service Implementation</a></li>
+                  <li><a href="#onbehalfofcallbackhandler">OnBehalfOfCallbackHandler</a></li>
+                </ul>
+              </li>
+              <li><a href="#web-service-requester">Web service requester</a>
+                <ul>
+                  <li><a href="#web-service-requester-implementation">Web service requester Implementation</a></li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li><a href="#SAML_Bearer_Assertion_Scenario">SAML Bearer Assertion Scenario</a>
+            <ul>
+              <li><a href="#web-service-provider-4">Web service Provider</a>
+                <ul>
+                  <li><a href="#web-service-provider-wsdl-4">Web service provider WSDL</a></li>
+                  <li><a href="#ssl-configuration">SSL configuration</a></li>
+                  <li><a href="#web-service-interface">Web service Interface</a></li>
+                  <li><a href="#web-service-implementation">Web service Implementation</a></li>
+                  <li><a href="#crypto-properties-and-keystore-files">Crypto properties and keystore files</a></li>
+                  <li><a href="#manifest.mf">MANIFEST.MF</a></li>
+                </ul>
+              </li>
+              <li><a href="#bearer-security-token-service">Bearer Security Token Service</a>
+                <ul>
+                  <li><a href="#security-domain">Security Domain</a></li>
+                  <li><a href="#stss-wsdl">STS’s WSDL</a></li>
+                  <li><a href="#stss-implementation-class">STS’s implementation class</a></li>
+                  <li><a href="#stsbearercallbackhandler">STSBearerCallbackHandler</a></li>
+                  <li><a href="#crypto-properties-and-keystore-files-1">Crypto properties and keystore files</a></li>
+                  <li><a href="#manifest.mf-1">MANIFEST.MF</a></li>
+                </ul>
+              </li>
+              <li><a href="#web-service-requester">Web service requester</a>
+                <ul>
+                  <li><a href="#web-service-requester-implementation">Web service requester Implementation</a></li>
+                  <li><a href="#clientcallbackhandler">ClientCallbackHandler</a></li>
+                  <li><a href="#crypto-properties-and-keystore-files-2">Crypto properties and keystore files</a></li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li><a href="#SAML_Holder-Of-Key_Assertion_Scenario">SAML Holder-Of-Key Assertion Scenario</a>
+            <ul>
+              <li><a href="#web-service-provider-5">Web service Provider</a>
+                <ul>
+                  <li><a href="#web-service-provider-wsdl-5">Web service provider WSDL</a></li>
+                  <li><a href="#ssl-configuration">SSL configuration</a></li>
+                  <li><a href="#web-service-interface">Web service Interface</a></li>
+                  <li><a href="#web-service-implementation">Web service Implementation</a></li>
+                  <li><a href="#crypto-properties-and-keystore-files">Crypto properties and keystore files</a></li>
+                  <li><a href="#manifest.mf">MANIFEST.MF</a></li>
+                </ul>
+              </li>
+              <li><a href="#security-token-service">Security Token Service</a>
+                <ul>
+                  <li><a href="#security-domain">Security Domain</a></li>
+                  <li><a href="#stss-wsdl">STS’s WSDL</a></li>
+                  <li><a href="#stss-implementation-class">STS’s implementation class</a></li>
+                  <li><a href="#holderofkeycallbackhandler">HolderOfKeyCallbackHandler</a></li>
+                  <li><a href="#crypto-properties-and-keystore-files-1">Crypto properties and keystore files</a></li>
+                  <li><a href="#manifest.mf-1">MANIFEST.MF</a></li>
+                </ul>
+              </li>
+              <li><a href="#web-service-requester">Web service requester</a>
+                <ul>
+                  <li><a href="#web-service-requester-implementation">Web service requester Implementation</a></li>
+                  <li><a href="#clientcallbackhandler">ClientCallbackHandler</a></li>
+                  <li><a href="#crypto-properties-and-keystore-files-2">Crypto properties and keystore files</a></li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><a href="#WS-Reliable_Messaging">WS-Reliable Messaging</a>
+        <ul>
+          <li><a href="#enabling-ws-reliable-messaging">Enabling WS-Reliable Messaging</a></li>
+          <li><a href="#example">Example</a>
+            <ul>
+              <li><a href="#endpoint">Endpoint</a></li>
+              <li><a href="#client">Client</a></li>
+              <li><a href="#additional-configuration">Additional configuration</a></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><a href="#SOAP_over_JMS">SOAP over JMS</a>
+        <ul>
+          <li><a href="#configuring-soap-over-jms">Configuring SOAP over JMS</a></li>
+          <li><a href="#examples">Examples</a>
+            <ul>
+              <li><a href="#jms-endpoint-only-deployment">JMS endpoint only deployment</a></li>
+              <li><a href="#jms-and-http-endpoints-deployment">JMS and HTTP endpoints deployment</a></li>
+              <li><a href="#use-of-endpoint.publish-api">Use of Endpoint.publish() API</a></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><a href="#HTTP_Proxy">HTTP Proxy</a>
+        <ul>
+          <li><a href="#configuration">Configuration</a></li>
+        </ul>
+      </li>
+      <li><a href="#WS-Discovery">WS-Discovery</a>
+        <ul>
+          <li><a href="#enabling-ws-discovery">Enabling WS-Discovery</a></li>
+          <li><a href="#probing-services">Probing services</a></li>
+        </ul>
+      </li>
+      <li><a href="#WS-Policy">WS-Policy</a>
+        <ul>
+          <li><a href="#apache-cxf-ws-policy-support">Apache CXF WS-Policy support</a>
+            <ul>
+              <li><a href="#contract-first-approach">Contract-first approach</a></li>
+              <li><a href="#code-first-approach">Code-first approach</a></li>
+            </ul>
+          </li>
+          <li><a href="#jbossws-additions">JBossWS additions</a>
+            <ul>
+              <li><a href="#policy-sets">Policy sets</a></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><a href="#Published_WSDL_customization">Published WSDL customization</a>
+        <ul>
+          <li><a href="#endpoint-address-rewrite">Endpoint address rewrite</a></li>
+          <li><a href="#system-property-references">System property references</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#JAX_WS_JBoss_Modules_and_WS_applications">JBoss Modules and WS applications</a>
+    <ul>
+      <li><a href="#setting-module-dependencies">Setting module dependencies</a>
+        <ul>
+          <li><a href="#using-manifest.mf">Using MANIFEST.MF</a>
+            <ul>
+              <li><a href="#using-jaxb">Using JAXB</a></li>
+              <li><a href="#using-apache-cxf">Using Apache CXF</a></li>
+              <li><a href="#client-side-ws-aggregation-module">Client side WS aggregation module</a></li>
+              <li><a href="#annotation-scanning">Annotation scanning</a></li>
+            </ul>
+          </li>
+          <li><a href="#using-jboss-deployment-descriptor.xml">Using jboss-deployment-descriptor.xml</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul></div>
+  <div class="grid__item width-9-12 doc-content"><div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
 <p>The Web Services functionalities of WildFly are provided by the JBossWS
@@ -13441,32 +13957,160 @@ their deployment and set module dependencies in it.</p>
 </div>
 </div>
 </div>
-</div>
-      </div>
-    </main><footer class="site-footer h-card">
-  <data class="u-url" href="/wildflysite/"></data>
-
-  <div class="wrapper">
-
-    <h2 class="footer-heading">Wildfly</h2>
-
-    <div class="footer-col-wrapper">
-      <div class="footer-col footer-col-1">
-        <ul class="contact-list">
-          <li class="p-name">Wildfly</li></ul>
-      </div>
-
-      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div></div>
 </div>
 
-      <div class="footer-col footer-col-3">
-        <p></p>
-      </div>
-    </div>
+
 
   </div>
 
-</footer>
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">WildFly is open. All dependencies of this project are available under the <a href='https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html' class='dark-background' target='_blank'>LGPL 2.1</a> or compatible license.<br/><br/>This website was built with <a href='https://jekyllrb.com/' class='dark-background' target='_blank'>Jekyll</a> is hosted on <a href='https://pages.github.com/' class='dark-background' target='_blank'>Github Pages</a> and is completely open source. If you want to make it better, <a href='https://github.com/wildfly/wildfly.org/fork' class='dark-background' target='_blank'>fork it</a> and show us what you’ve got.</p>
+
+    
+      <div class="width-1-12 project-links">
+        <strong>Navigation</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="/wildflysite/downloads" class="dark-background">Downloads</a></li>
+          
+            <li><a href="/wildflysitef/docs" class="dark-background">Docs</a></li>
+          
+            <li><a href="https://github.com/wildfly/wildfly" class="dark-background">Github</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <strong>Contribute</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="https://issues.jboss.org/browse/WFLY" class="dark-background">Submit a bug</a></li>
+          
+            <li><a href="https://community.jboss.org/en/wildfly?view=discussion" class="dark-background">Join the forum</a></li>
+          
+            <li><a href="https://github.com/wildfly/wildfly/fork" class="dark-background">Fork WildFly</a></li>
+          
+            <li><a href="https://twitter.com/WildFlyAS" class="dark-background">Follow us</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <strong>Get Help</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="https://community.jboss.org/en/wildfly?view=discussion" class="dark-background">Join the forum</a></li>
+          
+            <li><a href="https://www.hipchat.com/gFOhnVQke" class="dark-background">Join HipChat</a></li>
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-6-12 more-links">
+        <strong>Find more Red Hat Middleware Community Projects</strong>
+        <ul class="footer-links">
+          
+            <li><a href="https://www.apiman.io/" class="dark-background">APIMan</a></li>
+          
+            <li><a href="http://arquillian.org" class="dark-background">Arquillian</a></li>
+          
+            <li><a href="http://byteman.jboss.org/" class="dark-background">Byteman</a></li>
+          
+            <li><a href="http://capedwarf.org/" class="dark-background">CapeDwarf</a></li>
+          
+            <li><a href="https://github.com/alechenninger/chronicler" class="dark-background">Chronicler</a></li>
+          
+            <li><a href="https://github.com/darcy-framework" class="dark-background">Darcy</a></li>
+          
+            <li><a href="http://debezium.io/" class="dark-background">Debezium</a></li>
+          
+            <li><a href="https://www.drools.org/" class="dark-background">Drools</a></li>
+          
+            <li><a href="http://gatein.jboss.org/" class="dark-background">GateIn</a></li>
+          
+            <li><a href="http://www.hawkular.org/" class="dark-background">Hawkular</a></li>
+          
+            <li><a href="http://hawt.io/" class="dark-background">Hawtio</a></li>
+          
+            <li><a href="http://hibernate.org/" class="dark-background">Hibernate</a></li>
+          
+            <li><a href="http://www.infinispan.org/" class="dark-background">Infinispan</a></li>
+          
+            <li><a href="https://devstudio.jboss.com/" class="dark-background">JBoss DevStudio</a></li>
+          
+            <li><a href="http://forge.jboss.org/" class="dark-background">JBoss Forge</a></li>
+          
+            <li><a href="https://github.com/jboss-logging" class="dark-background">JBoss Logging</a></li>
+          
+            <li><a href="http://jbossremoting.jboss.org/" class="dark-background">JBoss Remoting</a></li>
+          
+            <li><a href="https://www.jbpm.org/" class="dark-background">jBPM</a></li>
+          
+            <li><a href="https://jsfunit.jboss.org/" class="dark-background">JSFUnit</a></li>
+          
+            <li><a href="https://www.keycloak.org/" class="dark-background">Keycloak</a></li>
+          
+            <li><a href="http://modcluster.io/" class="dark-background">Mod Cluster</a></li>
+          
+            <li><a href="http://modeshape.jboss.org/" class="dark-background">ModeShape</a></li>
+          
+            <li><a href="https://www.optaplanner.org/" class="dark-background">OptaPlanner</a></li>
+          
+            <li><a href="https://picketbox.jboss.org/" class="dark-background">Picketbox</a></li>
+          
+            <li><a href="http://resteasy.jboss.org/" class="dark-background">RESTEasy</a></li>
+          
+            <li><a href="https://riftsaw.jboss.org/" class="dark-background">Riftsaw</a></li>
+          
+            <li><a href="http://savara.jboss.org/" class="dark-background">Savara</a></li>
+          
+            <li><a href="http://seamframework.org/" class="dark-background">Seam</a></li>
+          
+            <li><a href="http://arquillian.org/" class="dark-background">Shrinkwrap</a></li>
+          
+            <li><a href="http://snowdrop.jboss.org/" class="dark-background">Snowdrop</a></li>
+          
+            <li><a href="https://switchyard.jboss.org/" class="dark-background">Switchyard</a></li>
+          
+            <li><a href="https://tattletale.jboss.org/" class="dark-background">Tattletale</a></li>
+          
+            <li><a href="http://teiid.jboss.org/" class="dark-background">Teiid</a></li>
+          
+            <li><a href="http://wildfly-swarm.io/" class="dark-background">WildFly Swarm</a></li>
+          
+            <li><a href="http://wise.jboss.org/" class="dark-background">Wise</a></li>
+          
+            <li><a href="https://xnio.jboss.org/" class="dark-background">XNIO</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" class="dark-background" target="_blank">CC by 3.0</a>
+    </span>
+    <span class="redhat">
+      a Red Hat sponsored project   
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/"><img src="/wildflysite/assets/img/RHLogo_white.svg"></a>
+    </span>
+  </div>
+</div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script type="text/javascript" src="/wildflysite/assets/javascript/mobile-nav.js"></script>
 </body>
 
 </html>

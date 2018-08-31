@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="">
+  <link rel="shortcut icon" type="image/png" href="/wildflysite/favicon.ico" >
+  <link rel="stylesheet" href="/wildflysite/assets/css/main.css" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+
+
+</head>
+
+<body class="Bearer Token Authorization">
+  <div class="content">
+    <div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          
+            <a href="/wildflysite/docs/14/" class="active">Docs</a>
+          
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+
+    <div class="docs-page grid-wrapper">
+  <div class="grid__item width-12-12 docs-v-icons">
+    <a href="/wildflysite/docs/13/" ><img src="/wildflysite/assets/img/docs/wildfly_icons_docs-13-inactive.png"></a>
+    <a href="https://docs.wildfly.org/12/" target="_blank"><img src="/wildflysite/assets/img/docs/wildfly_icons_docs-12-inactive.png"></a>
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-11-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-10-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-09-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-08-coming.png">
+  </div>
+  <div class="grid__item width-12-12"><h1 class="title">Bearer Token Authorization</h1></div>
+  <div class="grid__item width-3-12 doc-toc"><ul class="inline_toc">
+  <li><a href="#how-it-works">How it Works</a></li>
+  <li><a href="#validating-jwt-tokens">Validating JWT Tokens</a></li>
+  <li><a href="#validating-oauth2-bearer-tokens">Validating OAuth2 Bearer Tokens</a></li>
+  <li><a href="#quickstarts">Quickstarts</a></li>
+  <li><a href="#cli-examples-on-how-to-create-a-token-realm">CLI Examples on How to Create a Token Realm</a></li>
+</ul></div>
+  <div class="grid__item width-9-12 doc-content"><div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Bearer Token Authorization is the process of authorizing HTTP requests based on the existence and validity of a bearer
+token representing a subject and his access context, where the token provides valuable information to determine the subject of the call as well whether or not a HTTP resource
+can be accessed.</p>
+</div>
+<div class="paragraph">
+<p>Elytron supports bearer token authorization by providing a <code>BEARER_TOKEN</code> HTTP authentication mechanism based on <a href="https://tools.ietf.org/html/rfc6750">RFC-6750</a> and
+an specific <code>realm</code> implementation, the <code>token-realm</code>, to validate tokens using the JWT format (for instance, OpenID Connect ID Tokens) or opaque tokens issued by any OAuth2 compliant
+authorization server.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="how-it-works">How it Works</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>When a HTTP request arrives to your application, the <code>BEARER_TOKEN</code> mechanism will check if a bearer token was provided by checking the existence of an <code>Authorization</code> HTTP header with the following format:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">GET /resource HTTP/1.1
+Host: server.example.com
+Authorization: Bearer mF_9.B5f-4.1JqM</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If no bearer token was provided, the mechanism will respond with a <code>401</code> HTTP status code as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">HTTP/1.1 401 Unauthorized
+WWW-Authenticate: Bearer realm="example"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>When a bearer token is provided, the mechanism will extract the token from the request (in the example above, the token is represented by the string <code>mF_9.B5f-4.1JqM</code>) and pass it over
+to the <code>token-realm</code> in order to check if the token is valid and can be used to build a security context based on its information. Note that the <code>BEARER_TOKEN</code> mechanism is only responsible to
+check and extract bearer tokens from an HTTP request, whereas the <code>token-realm</code> is the one responsible for validating the token.</p>
+</div>
+<div class="paragraph">
+<p>If validation succeeds, a security context will be created based on the information represented by the token and the application can use the newly created
+security context to obtain information about the subject making the request as well decide whether or not the request should be full filled. In case the validation fails,
+the mechanism will respond with a <code>403</code> HTTP status code as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">HTTP/1.1 403 Forbidden</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="validating-jwt-tokens">Validating JWT Tokens</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Elytron provides built-in support for JWT tokens, which can be enabled by defining a <code>realm</code> in the Elytron subsystem as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml"> &lt;token-realm name="JwtRealm" principal-claim="sub"&gt;
+    &lt;jwt issuer="as.example.com"
+         audience="api.example.com"
+         public-key="-----BEGIN PUBLIC KEY-----MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCqGKukO1De7zhZj6+H0qtjTkVxwTCpvKe4eCZ0FPqri0cb2JZfXJ/DgYSF6vUpwmJG8wVQZKjeGcjDOL5UlsuusFncCzWBQ7RKNUSesmQRMSGkVb1/3j+skZ6UtW+5u09lHNsj6tQ51s1SPrCBkedbNf0Tp0GbMJDyR4e9T04ZZwIDAQAB-----END PUBLIC KEY-----"/&gt;
+ &lt;/token-realm&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In the example above, the <code>token-realm</code> is defined with a <code>principal-claim</code> attribute. This attribute specifies which claim
+within the token should be used to identity the principal. If you have a token as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-json" data-lang="json"> {
+   "iss": "as.example.com",
+   "sub": "24400320",
+   "aud": "s6BhdRkqt3",
+   "exp": 1311281970,
+   "nbf": 1311280970,
+  }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Elytron will use the value associated with the <code>sub</code> claim as the identifier of the subject represented by the token.</p>
+</div>
+<div class="paragraph">
+<p>The <code>jwt</code> element within the <code>token-realm</code> specifies that tokens should be validated as JWT and provides different configuration options on how they
+should be validated:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>issuer</strong></p>
+<div class="paragraph">
+<p>A list of strings representing the issuers supported by this configuration. During validation JWT tokens must have an "iss" claim that contains one of the values defined here</p>
+</div>
+</li>
+<li>
+<p><strong>audience</strong></p>
+<div class="paragraph">
+<p>A list of strings representing the audiences supported by this configuration. During validation JWT tokens must have an "aud" claim that contains one of the values defined here</p>
+</div>
+</li>
+<li>
+<p><strong>public-key</strong></p>
+<div class="paragraph">
+<p>A public key in PEM Format. During validation, if a public key is provided, signature will be verified based on the key you provided here. Alternatively,
+you can define a <code>key-store</code> and <code>certificate</code> attributes to configure the public key.</p>
+</div>
+</li>
+<li>
+<p><strong>key-store</strong></p>
+<div class="paragraph">
+<p>As an alternative to <code>public-key</code>, you can also define a key store from where the certificate with a public key should be loaded from</p>
+</div>
+</li>
+<li>
+<p><strong>certificate</strong></p>
+<div class="paragraph">
+<p>The name of the certificate with a public key to load from the key store in case you defined the <code>key-store</code> attribute</p>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The <code>jwt</code> validator performs different checks in order to determine the validity of a JWT:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Expiration checks based on the values of the <code>exp</code> and <code>nbf</code> claims</p>
+</li>
+<li>
+<p>Signature checks based on the public key provided via <code>public-key</code> or <code>certificate</code> attributes</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>It is strongly recommended that you use signed JWTs in order to guarantee authenticity of tokens and make sure they were not tampered.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="validating-oauth2-bearer-tokens">Validating OAuth2 Bearer Tokens</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Elytron provides built-in support for tokens issued by an OAuth2 compliant authorization server, where these tokens are validated
+using a token introspection endpoint as defined by OAuth2 specification.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;token-realm name="OAuth2Realm" principal-claim="sub"&gt;
+    &lt;oauth2-introspection client-id="my-client-id"
+                          client-secret="keep_it_secret"
+                          introspection-url="https://as.example.com/token/introspect"
+                          client-ssl-context="user-defined-ssl-context"
+                          host-name-verification-policy="ANY" /&gt;
+&lt;/token-realm&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>auth2-introspection</code> element within the <code>token-realm</code> specifies that tokens should be validated using an OAuth2 Token Introspection Endpoint and provides different configuration options on how they
+should be validated:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>client-id</strong></p>
+<div class="paragraph">
+<p>The identifier of the client on the OAuth2 Authorization Server</p>
+</div>
+</li>
+<li>
+<p><strong>client-secret</strong></p>
+<div class="paragraph">
+<p>The secret of the client</p>
+</div>
+</li>
+<li>
+<p><strong>introspection-url</strong></p>
+<div class="paragraph">
+<p>The URL of token introspection endpoint</p>
+</div>
+</li>
+<li>
+<p><strong>client-ssl-context</strong></p>
+<div class="paragraph">
+<p>The SSL context to be used if the introspection endpoint is using HTTPS.</p>
+</div>
+</li>
+<li>
+<p><strong>host-name-verification-policy</strong></p>
+<div class="paragraph">
+<p>A policy that defines how host names should be verified when using HTTPS. Allowed values: "ANY".</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="quickstarts">Quickstarts</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/wildfly/quickstart/tree/master/jaxrs-jwt">JAX-RS secured using JSON Web Tokens</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="cli-examples-on-how-to-create-a-token-realm">CLI Examples on How to Create a Token Realm</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="title">Create a Token Realm to validate JWT tokens using a key store to retrieve the public key</div>
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash"># Create a Key Store
+/subsystem=elytron/key-store=my-keystore:add(path=/path/to/keystore.jks,credential-reference={clear-text=secret},type=JKS)
+
+# Create the realm
+/subsystem=elytron/token-realm=jwt-realm:add(principal-claim=sub, jwt={issuer=["as.example.com"], audience=["api.example.com"], key-store=my-keystore, certificate=as.example.com})</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Create a Token Realm to validate OAuth2 tokens</div>
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash"># Create a Client SSLContext
+/subsystem=elytron/key-store=default-trust-store:add(path=/path/to/keystore.jks,credential-reference={clear-text=secret},type=JKS)
+/subsystem=elytron/trust-manager=default-trust-manager:add(algorithm=PKIX, key-store=default-trust-store)
+/subsystem=elytron/client-ssl-context=default-client-ssl-context:add(trust-manager=default-trust-manager)
+
+# Create the realm
+/subsystem=elytron/token-realm=oauth2-realm:add(principal-claim=preferred_username, oauth2-introspection={client-id=my-client-id, client-secret=keep_it_secret, client-ssl-context=default-client-ssl-context, introspection-url=https://as.example.com/token/introspect})</code></pre>
+</div>
+</div>
+</div>
+</div></div>
+</div>
+
+
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">WildFly is open. All dependencies of this project are available under the <a href='https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html' class='dark-background' target='_blank'>LGPL 2.1</a> or compatible license.<br/><br/>This website was built with <a href='https://jekyllrb.com/' class='dark-background' target='_blank'>Jekyll</a> is hosted on <a href='https://pages.github.com/' class='dark-background' target='_blank'>Github Pages</a> and is completely open source. If you want to make it better, <a href='https://github.com/wildfly/wildfly.org/fork' class='dark-background' target='_blank'>fork it</a> and show us what you’ve got.</p>
+
+    
+      <div class="width-1-12 project-links">
+        <strong>Navigation</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="/wildflysite/downloads" class="dark-background">Downloads</a></li>
+          
+            <li><a href="/wildflysitef/docs" class="dark-background">Docs</a></li>
+          
+            <li><a href="https://github.com/wildfly/wildfly" class="dark-background">Github</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <strong>Contribute</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="https://issues.jboss.org/browse/WFLY" class="dark-background">Submit a bug</a></li>
+          
+            <li><a href="https://community.jboss.org/en/wildfly?view=discussion" class="dark-background">Join the forum</a></li>
+          
+            <li><a href="https://github.com/wildfly/wildfly/fork" class="dark-background">Fork WildFly</a></li>
+          
+            <li><a href="https://twitter.com/WildFlyAS" class="dark-background">Follow us</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <strong>Get Help</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="https://community.jboss.org/en/wildfly?view=discussion" class="dark-background">Join the forum</a></li>
+          
+            <li><a href="https://www.hipchat.com/gFOhnVQke" class="dark-background">Join HipChat</a></li>
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-6-12 more-links">
+        <strong>Find more Red Hat Middleware Community Projects</strong>
+        <ul class="footer-links">
+          
+            <li><a href="https://www.apiman.io/" class="dark-background">APIMan</a></li>
+          
+            <li><a href="http://arquillian.org" class="dark-background">Arquillian</a></li>
+          
+            <li><a href="http://byteman.jboss.org/" class="dark-background">Byteman</a></li>
+          
+            <li><a href="http://capedwarf.org/" class="dark-background">CapeDwarf</a></li>
+          
+            <li><a href="https://github.com/alechenninger/chronicler" class="dark-background">Chronicler</a></li>
+          
+            <li><a href="https://github.com/darcy-framework" class="dark-background">Darcy</a></li>
+          
+            <li><a href="http://debezium.io/" class="dark-background">Debezium</a></li>
+          
+            <li><a href="https://www.drools.org/" class="dark-background">Drools</a></li>
+          
+            <li><a href="http://gatein.jboss.org/" class="dark-background">GateIn</a></li>
+          
+            <li><a href="http://www.hawkular.org/" class="dark-background">Hawkular</a></li>
+          
+            <li><a href="http://hawt.io/" class="dark-background">Hawtio</a></li>
+          
+            <li><a href="http://hibernate.org/" class="dark-background">Hibernate</a></li>
+          
+            <li><a href="http://www.infinispan.org/" class="dark-background">Infinispan</a></li>
+          
+            <li><a href="https://devstudio.jboss.com/" class="dark-background">JBoss DevStudio</a></li>
+          
+            <li><a href="http://forge.jboss.org/" class="dark-background">JBoss Forge</a></li>
+          
+            <li><a href="https://github.com/jboss-logging" class="dark-background">JBoss Logging</a></li>
+          
+            <li><a href="http://jbossremoting.jboss.org/" class="dark-background">JBoss Remoting</a></li>
+          
+            <li><a href="https://www.jbpm.org/" class="dark-background">jBPM</a></li>
+          
+            <li><a href="https://jsfunit.jboss.org/" class="dark-background">JSFUnit</a></li>
+          
+            <li><a href="https://www.keycloak.org/" class="dark-background">Keycloak</a></li>
+          
+            <li><a href="http://modcluster.io/" class="dark-background">Mod Cluster</a></li>
+          
+            <li><a href="http://modeshape.jboss.org/" class="dark-background">ModeShape</a></li>
+          
+            <li><a href="https://www.optaplanner.org/" class="dark-background">OptaPlanner</a></li>
+          
+            <li><a href="https://picketbox.jboss.org/" class="dark-background">Picketbox</a></li>
+          
+            <li><a href="http://resteasy.jboss.org/" class="dark-background">RESTEasy</a></li>
+          
+            <li><a href="https://riftsaw.jboss.org/" class="dark-background">Riftsaw</a></li>
+          
+            <li><a href="http://savara.jboss.org/" class="dark-background">Savara</a></li>
+          
+            <li><a href="http://seamframework.org/" class="dark-background">Seam</a></li>
+          
+            <li><a href="http://arquillian.org/" class="dark-background">Shrinkwrap</a></li>
+          
+            <li><a href="http://snowdrop.jboss.org/" class="dark-background">Snowdrop</a></li>
+          
+            <li><a href="https://switchyard.jboss.org/" class="dark-background">Switchyard</a></li>
+          
+            <li><a href="https://tattletale.jboss.org/" class="dark-background">Tattletale</a></li>
+          
+            <li><a href="http://teiid.jboss.org/" class="dark-background">Teiid</a></li>
+          
+            <li><a href="http://wildfly-swarm.io/" class="dark-background">WildFly Swarm</a></li>
+          
+            <li><a href="http://wise.jboss.org/" class="dark-background">Wise</a></li>
+          
+            <li><a href="https://xnio.jboss.org/" class="dark-background">XNIO</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" class="dark-background" target="_blank">CC by 3.0</a>
+    </span>
+    <span class="redhat">
+      a Red Hat sponsored project   
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/"><img src="/wildflysite/assets/img/RHLogo_white.svg"></a>
+    </span>
+  </div>
+</div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script type="text/javascript" src="/wildflysite/assets/javascript/mobile-nav.js"></script>
+</body>
+
+</html>

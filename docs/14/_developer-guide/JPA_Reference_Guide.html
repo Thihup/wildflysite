@@ -1,0 +1,1604 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="">
+  <link rel="shortcut icon" type="image/png" href="/wildflysite/favicon.ico" >
+  <link rel="stylesheet" href="/wildflysite/assets/css/main.css" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+
+
+</head>
+
+<body class="JPA Reference Guide">
+  <div class="content">
+    <div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          
+            <a href="/wildflysite/docs/14/" class="active">Docs</a>
+          
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+
+    <div class="docs-page grid-wrapper">
+  <div class="grid__item width-12-12 docs-v-icons">
+    <a href="/wildflysite/docs/13/" ><img src="/wildflysite/assets/img/docs/wildfly_icons_docs-13-inactive.png"></a>
+    <a href="https://docs.wildfly.org/12/" target="_blank"><img src="/wildflysite/assets/img/docs/wildfly_icons_docs-12-inactive.png"></a>
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-11-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-10-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-09-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-08-coming.png">
+  </div>
+  <div class="grid__item width-12-12"><h1 class="title">JPA Reference Guide</h1></div>
+  <div class="grid__item width-3-12 doc-toc"><ul class="inline_toc">
+  <li><a href="#introduction">Introduction</a></li>
+  <li><a href="#update-your-persistence.xml-for-hibernate">Update your Persistence.xml for Hibernate</a></li>
+  <li><a href="#entity-manager">Entity manager</a></li>
+  <li><a href="#container-managed-entity-manager">Container-managed entity manager</a></li>
+  <li><a href="#application-managed-entity-manager">Application-managed entity manager</a></li>
+  <li><a href="#persistence-context">Persistence Context</a></li>
+  <li><a href="#transaction-scoped-persistence-context">Transaction-scoped Persistence Context</a></li>
+  <li><a href="#extended-persistence-context">Extended Persistence Context</a>
+    <ul>
+      <li><a href="#extended-persistence-context-inheritance">Extended Persistence Context Inheritance</a></li>
+    </ul>
+  </li>
+  <li><a href="#entities">Entities</a></li>
+  <li><a href="#deployment">Deployment</a></li>
+  <li><a href="#troubleshooting">Troubleshooting</a></li>
+  <li><a href="#using-the-infinispan-second-level-cache">Using the Infinispan second level cache</a></li>
+  <li><a href="#using-hibernate-search">Using Hibernate Search</a></li>
+  <li><a href="#packaging-the-hibernate-jpa-persistence-provider-with-your-application">Packaging the Hibernate JPA persistence provider with your application</a></li>
+  <li><a href="#migrating-from-openjpa">Migrating from OpenJPA</a></li>
+  <li><a href="#migrating-from-eclipselink">Migrating from EclipseLink</a></li>
+  <li><a href="#native-hibernate-use">Native Hibernate use</a></li>
+  <li><a href="#injection-of-hibernate-session-and-sessionfactoryinjection-of-hibernate-session-and-sessionfactory">Injection of Hibernate Session and SessionFactory</a></li>
+  <li><a href="#hibernate-transformer">Hibernate ORM 5.1 native API bytecode transformer</a></li>
+  <li><a href="#hibernate-properties">Hibernate properties</a></li>
+  <li><a href="#persistence-unit-properties">Persistence unit properties</a></li>
+  <li><a href="#determine-the-persistence-provider-module">Determine the persistence provider module</a></li>
+  <li><a href="#binding-entitymanagerfactoryentitymanager-to-jndi">Binding EntityManagerFactory/EntityManager to JNDI</a></li>
+  <li><a href="#tips-for-using-the-latest-hibernate-orm">Tips for using the latest Hibernate ORM</a></li>
+</ul></div>
+  <div class="grid__item width-9-12 doc-content"><div class="sect1">
+<h2 id="introduction">Introduction</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The WildFly JPA subsystem implements the JPA 2.2 container-managed
+requirements. Deploys the persistence unit definitions, the persistence
+unit/context annotations and persistence unit/context references in the
+deployment descriptor. JPA Applications use the Hibernate (version 5.3)
+persistence provider, which is included with WildFly. The JPA subsystem
+uses the standard SPI (javax.persistence.spi.PersistenceProvider) to
+access the Hibernate persistence provider and some additional extensions
+as well.</p>
+</div>
+<div class="paragraph">
+<p>During application deployment, JPA use is detected (e.g. persistence.xml
+or @PersistenceContext/Unit annotations) and injects Hibernate
+dependencies into the application deployment. This makes it easy to
+deploy JPA applications.</p>
+</div>
+<div class="paragraph">
+<p>In the remainder of this documentation, "entity manager" refers to an
+instance of the <em>javax.persistence.EntityManager</em> class.
+<a href="https://javaee.github.io/javaee-spec/javadocs/overview-summary.html">Javadoc
+for the JPA interfaces</a>and <a href="https://jcp.org/en/jsr/detail?id=338">JPA 2.2
+specification</a>.</p>
+</div>
+<div class="paragraph">
+<p>The index of the Hibernate documentation is at
+<a href="http://hibernate.org/orm/documentation/5.3/" class="bare">http://hibernate.org/orm/documentation/5.3/</a></p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="update-your-persistence.xml-for-hibernate">Update your Persistence.xml for Hibernate</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The persistence provider class name in Hibernate is
+<strong>org.hibernate.jpa.HibernatePersistenceProvider</strong>.</p>
+</div>
+<div class="paragraph">
+<p>Your persistence.xml can specify:</p>
+</div>
+<div class="paragraph">
+<p><strong>&lt;provider&gt;org.hibernate.jpa.HibernatePersistenceProvider&lt;/provider&gt;</strong></p>
+</div>
+<div class="paragraph">
+<p>Or remove the persistence provider class name from your persistence.xml
+(so the default provider will be used).</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="entity-manager">Entity manager</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The entity manager (javax.persistence.EntityManager class) is similar to
+the Hibernate Session class; applications use it to
+create/read/update/delete data (and related operations). Applications
+can use application-managed or container-managed entity managers. Keep
+in mind that the entity manager is not thread safe, don&#8217;t share the same
+entity manager instance with multiple threads.</p>
+</div>
+<div class="paragraph">
+<p>Internally, the entity manager, has a persistence context for managing
+entities. You can think of the persistence context as being closely
+associated with the entity manager.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="container-managed-entity-manager">Container-managed entity manager</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>When you inject a container-managed entity managers into an application
+variable, it is treated like an (EE container controlled) Java proxy
+object, that will be associated with an underlying EntityManager
+instance, for each started JTA transaction and is flushed/closed when
+the JTA transaction commits. Such that when your application code
+invokes EntityManager.anyMethod(), the current JTA transaction is
+searched (using persistence unit name as key) for the underlying
+EntityManager instance, if not found, a new EntityManager instance is
+created and associated with the current JTA transaction, to be reused
+for the next EntityManager invocation. Use the @PersistenceContext
+annotation, to inject a container-managed entity manager into a
+javax.persistence.EntityManager variable.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="application-managed-entity-manager">Application-managed entity manager</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>An application-managed entity manager is kept around until the
+application closes it. The scope of the application-managed entity
+manager is from when the application creates it and lasts until the
+application closes it. Use the <em>@PersistenceUnit</em> annotation, to inject
+a persistence unit into a <em>javax.persistence.EntityManagerFactory
+variable</em>. The EntityManagerFactory can return an application-managed
+entity manager.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="persistence-context">Persistence Context</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The JPA persistence context contains the entities managed by the entity
+manager (via the JPA persistence provider). The underlying entity
+manager maintains the persistence context. The persistence context acts
+like a first level (transactional) cache for interacting with the
+datasource. Loaded entities are placed into the persistence context
+before being returned to the application. Entities changes are also
+placed into the persistence context (to be saved in the database when
+the transaction commits).</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="transaction-scoped-persistence-context">Transaction-scoped Persistence Context</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The transaction-scoped persistence context coordinates with the (active)
+JTA transaction. When the transaction commits, the persistence context
+is flushed to the datasource (entity objects are detached but may still
+be referenced by application code). All entity changes that are expected
+to be saved to the datasource, must be made during a transaction.
+Entities read outside of a transaction will be detached when the entity
+manager invocation completes. Example transaction-scoped persistence
+context is below.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@Stateful  // will use container managed transactions
+public class CustomerManager {
+  @PersistenceContext(unitName = "customerPU") // default type is PersistenceContextType.TRANSACTION
+  EntityManager em;
+  public customer createCustomer(String name, String address) {
+    Customer customer = new Customer(name, address);
+    em.persist(customer);  // persist new Customer when JTA transaction completes (when method ends).
+                           // internally:
+                           //    1. Look for existing "customerPU" persistence context in active JTA transaction and use if found.
+                           //    2. Else create new "customerPU" persistence context (e.g. instance of org.hibernate.ejb.HibernatePersistence)
+                           //       and put in current active JTA transaction.
+    return customer;       // return Customer entity (will be detached from the persistence context when caller gets control)
+  }  // Transaction.commit will be called, Customer entity will be persisted to the database and "customerPU" persistence context closed</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="extended-persistence-context">Extended Persistence Context</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The (ee container managed) extended persistence context can span
+multiple transactions and allows data modifications to be queued up
+(without an active JTA transaction), to be applied
+during completion of next JTA transaction. The Container-managed extended persistence
+context can only be injected into a stateful session bean.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@PersistenceContext(type = PersistenceContextType.EXTENDED, unitName = "inventoryPU")
+EntityManager em;</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="extended-persistence-context-inheritance">Extended Persistence Context Inheritance</h3>
+<div class="listingblock">
+<div class="content">
+<pre>JPA 2.2 specification section 7.6.3.1
+ 
+If a stateful session bean instantiates a stateful session bean (executing in the same EJB container instance) which also has such an extended persistence context with the same synchronization type, the extended persistence context of the first stateful session bean is inherited by the second stateful session bean and bound to it, and this rule recursively applies independently of whether transactions are active or not at the point of the creation of the stateful session beans. If the stateful session beans differ in declared synchronization type, the EJBException is thrown by the container.  If the persistence context has been inherited by any stateful session beans, the container does not close the persistence context until all such stateful session beans have been removed or otherwise destroyed.</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>By default, the current stateful session bean being created, will (
+<strong>deeply</strong>) inherit the extended persistence context from any stateful
+session bean executing in the current Java thread. The <strong>deep</strong>
+inheritance of extended persistence context includes walking multiple
+levels up the stateful bean call stack (inheriting from parent beans).
+The <strong>deep</strong> inheritance of extended persistence context includes sibling
+beans. For example, parentA references child beans beanBwithXPC &amp;
+beanCwithXPC. Even though parentA doesn&#8217;t have an extended persistence
+context, beanBwithXPC &amp; beanCwithXPC will share the same extended
+persistence context.</p>
+</div>
+<div class="paragraph">
+<p>Some other EE application servers, use <strong>shallow</strong> inheritance, where
+stateful session bean only inherit from the parent stateful session bean
+(if there is a parent bean). Sibling beans do not share the same
+extended persistence context unless their (common) parent bean also has
+the same extended persistence context.</p>
+</div>
+<div class="paragraph">
+<p>Applications can include a (top-level) <strong>jboss-all.xml</strong> deployment
+descriptor that specifies either the (default) <strong>DEEP</strong> extended
+persistence context inheritance or <strong>SHALLOW</strong>.</p>
+</div>
+<div class="paragraph">
+<p>The WF/docs/schema/jboss-jpa_1_0.xsd describes the <strong>jboss-jpa</strong>
+deployment descriptor that may be included in the <strong>jboss-all.xml</strong>. Below
+is an example of using <strong>SHALLOW</strong> extended persistence context
+inheritance:</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>&lt;jboss&gt;<br>
+&lt;jboss-jpa xmlns="http://www.jboss.com/xml/ns/javaee"&gt;<br>
+&lt;extended-persistence inheritance="SHALLOW"/&gt;<br>
+&lt;/jboss-jpa&gt;<br>
+&lt;/jboss&gt;</p>
+</div>
+</blockquote>
+</div>
+<div class="paragraph">
+<p>Below is an example of using <strong>DEEP</strong> extended persistence inheritance:</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>&lt;jboss&gt;<br>
+&lt;jboss-jpa xmlns="http://www.jboss.com/xml/ns/javaee"&gt;<br>
+&lt;extended-persistence inheritance="DEEP"/&gt;<br>
+&lt;/jboss-jpa&gt;<br>
+&lt;/jboss&gt;</p>
+</div>
+</blockquote>
+</div>
+<div class="paragraph">
+<p>The AS console/cli can change the <strong>default</strong> extended persistence context
+setting (DEEP or SHALLOW). The following cli commands will read the
+current JPA settings and enable SHALLOW extended persistence context
+inheritance for applications that do not include the <strong>jboss-jpa</strong>
+deployment descriptor:</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<div class="title">/jboss-cli.sh<br></div>
+<p>cd subsystem=jpa<br>
+:read-resource<br>
+:write-attribute(name=default-extended-persistence-inheritance,value="SHALLOW")</p>
+</div>
+</blockquote>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="entities">Entities</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>JPA allows use of your (pojo) plain old Java class to represent a
+database table row.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@PersistenceContext EntityManager em;
+Integer bomPk = getIndexKeyValue();
+BillOfMaterials bom = em.find(BillOfMaterials.class, bomPk); // read existing table row into BillOfMaterials class
+ 
+BillOfMaterials createdBom = new BillOfMaterials("...");     // create new entity
+em.persist(createdBom);  // createdBom is now managed and will be saved to database when the current JTA transaction completes</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The entity lifecycle is managed by the underlying persistence provider.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>New (transient): an entity is new if it has just been instantiated
+using the new operator, and it is not associated with a persistence
+context. It has no persistent representation in the database and no
+identifier value has been assigned.</p>
+</li>
+<li>
+<p>Managed (persistent): a managed entity instance is an instance with a
+persistent identity that is currently associated with a persistence
+context.</p>
+</li>
+<li>
+<p>Detached: the entity instance is an instance with a persistent
+identity that is no longer associated with a persistence context,
+usually because the persistence context was closed or the instance was
+evicted from the context.</p>
+</li>
+<li>
+<p>Removed: a removed entity instance is an instance with a persistent
+identity, associated with a persistence context, but scheduled for
+removal from the database.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="deployment">Deployment</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The persistence.xml contains the persistence unit configuration (e.g.
+datasource name) and as described in the JPA 2.0 spec (section 8.2), the
+jar file or directory whose META-INF directory contains the
+persistence.xml file is termed the root of the persistence unit. In Java
+EE environments, the root of a persistence unit must be one of the
+following (quoted directly from the JPA 2.0 specification):</p>
+</div>
+<div class="paragraph">
+<p>"</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>an EJB-JAR file</p>
+</li>
+<li>
+<p>the WEB-INF/classes directory of a WAR file</p>
+</li>
+<li>
+<p>a jar file in the WEB-INF/lib directory of a WAR file</p>
+</li>
+<li>
+<p>a jar file in the EAR library directory</p>
+</li>
+<li>
+<p>an application client jar file</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The persistence.xml can specify either a JTA datasource or a non-JTA
+datasource. The JTA datasource is expected to be used within the EE
+environment (even when reading data without an active transaction). If a
+datasource is not specified, the default-datasource will instead be used
+(must be configured).</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+Java Persistence 1.0 supported use of a jar file in the root of
+the EAR as the root of a persistence unit. This use is no longer
+supported. Portable applications should use the EAR library directory
+for this case instead.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>"</p>
+</div>
+<div class="paragraph">
+<p>Question: Can you have a EAR/META-INF/persistence.xml?</p>
+</div>
+<div class="paragraph">
+<p>Answer: No, the above may deploy but it could include other archives
+also in the EAR, so you may have deployment issues for other reasons.
+Better to put the persistence.xml in an EAR/lib/somePuJar.jar.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="troubleshooting">Troubleshooting</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The <strong>org.jboss.as.jpa</strong> logging can be enabled to get the following
+information:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>INFO - when persistence.xml has been parsed, starting of persistence
+unit service (per deployed persistence.xml), stopping of persistence
+unit service</p>
+</li>
+<li>
+<p>DEBUG - informs about entity managers being injected, creating/reusing
+transaction scoped entity manager for active transaction</p>
+</li>
+<li>
+<p>TRACE - shows how long each entity manager operation took in
+milliseconds, application searches for a persistence unit, parsing of
+persistence.xml</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>To enable TRACE, open the as/standalone/configuration/standalone.xml (or
+as/domain/configuration/domain.xml) file. Search for <strong>&lt;subsystem
+xmlns="urn:jboss:domain:logging:1.0"&gt;</strong> and add the <strong>org.jboss.as.jpa</strong>
+category. You need to change the console-handler level from <strong>INFO</strong> to
+<strong>TRACE</strong>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">&lt;subsystem xmlns="urn:jboss:domain:logging:1.0"&gt;
+     &lt;console-handler name="CONSOLE"&gt;
+      &lt;level name="TRACE" /&gt;
+      ...
+     &lt;/console-handler&gt;
+ 
+     &lt;/periodic-rotating-file-handler&gt;
+     &lt;logger category="com.arjuna"&gt;
+        &lt;level name="WARN" /&gt;
+     &lt;/logger&gt;
+ 
+     &lt;logger category="org.jboss.as.jpa"&gt;
+        &lt;level name="TRACE" /&gt;
+     &lt;/logger&gt;
+ 
+     &lt;logger category="org.apache.tomcat.util.modeler"&gt;
+        &lt;level name="WARN" /&gt;
+     &lt;/logger&gt;
+     ...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To see what is going on at the JDBC level, enable <strong>jboss.jdbc.spy</strong> TRACE
+and add spy="true" to the datasource.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">&lt;datasource jndi-name="java:jboss/datasources/..." pool-name="..." enabled="true" spy="true"&gt;
+&lt;logger category="jboss.jdbc.spy"&gt;
+  &lt;level name="TRACE"/&gt;
+&lt;/logger&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To troubleshoot issues with the Hibernate second level cache, try
+enabling trace for <strong>org.hibernate.SQL + org.hibernate.cache.infinispan<br>
+org.infinispan:</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">&lt;subsystem xmlns="urn:jboss:domain:logging:1.0"&gt;
+     &lt;console-handler name="CONSOLE"&gt;
+      &lt;level name="TRACE" /&gt;
+      ...
+     &lt;/console-handler&gt;
+ 
+     &lt;/periodic-rotating-file-handler&gt;
+     &lt;logger category="com.arjuna"&gt;
+        &lt;level name="WARN" /&gt;
+     &lt;/logger&gt;
+ 
+     &lt;logger category="org.hibernate.SQL"&gt;
+        &lt;level name="TRACE" /&gt;
+     &lt;/logger&gt;
+ 
+     &lt;logger category="org.hibernate"&gt;
+        &lt;level name="TRACE" /&gt;
+     &lt;/logger&gt;
+      &lt;logger category="org.infinispan"&gt;
+        &lt;level name="TRACE" /&gt;
+     &lt;/logger&gt;
+ 
+     &lt;logger category="org.apache.tomcat.util.modeler"&gt;
+        &lt;level name="WARN" /&gt;
+     &lt;/logger&gt;
+     ...</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="using-the-infinispan-second-level-cache">Using the Infinispan second level cache</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To enable the second level cache with Hibernate, just set the
+<strong>hibernate.cache.use_second_level_cache</strong> property to true or
+set <strong>shared-cache-mode</strong> to one of the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>ENABLE_SELECTIVE</p>
+</li>
+<li>
+<p>DISABLE_SELECTIVE</p>
+</li>
+<li>
+<p>ALL</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Infinispan is the cache provider for <strong>JPA applications</strong>, so you don&#8217;t need to specify
+anything in addition. The Infinispan version that is included in
+WildFly is expected to work with the Hibernate version that is included
+with WildFly. Example persistence.xml settings:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;persistence xmlns="http://java.sun.com/xml/ns/persistence" version="1.0"&gt;
+&lt;persistence-unit name="2lc_example_pu"&gt;
+   &lt;description&gt;example of enabling the second level cache.&lt;/description&gt;
+   &lt;jta-data-source&gt;java:jboss/datasources/mydatasource&lt;/jta-data-source&gt;
+   &lt;shared-cache-mode&gt;ENABLE_SELECTIVE&lt;/shared-cache-mode&gt;
+&lt;/persistence-unit&gt;
+&lt;/persistence&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Here is an example of enabling the second level cache for a Hibernate
+native API hibernate.cfg.xml file:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;property name="hibernate.cache.region.factory_class" value="org.infinispan.hibernate.cache.v53.InfinispanRegionFactory"/&gt;
+&lt;property name="hibernate.cache.infinispan.shared" value="false"/&gt;
+&lt;property name="hibernate.cache.use_second_level_cache" value="true"/&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The Hibernate native API application will also need a MANIFEST.MF:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>Dependencies: org.infinispan,org.hibernate</pre>
+</div>
+</div>
+<div class="paragraph">
+<p><a href="http://infinispan.org/docs/9.3.x/user_guide/user_guide.html#jpa_hibernate_2l_cache">Infinispan
+Hibernate/JPA second level cache provider documentation</a> contains
+advanced configuration information but you should bear in mind that when
+Hibernate runs within WildFly {wildflyVersion}, some of those configuration options,
+such as region factory, are not needed. Moreover, the application server
+providers you with option of selecting a different cache container for
+Infinispan via <strong>hibernate.cache.infinispan.container</strong> persistence
+property. To reiterate, this property is not mandatory and a default
+container is already deployed for by the application server to host the
+second level cache.</p>
+</div>
+<div class="paragraph">
+<p>Here is an example of what the Hibernate cache settings may currently be
+in your standalone.xml:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml"> &lt;cache-container name="hibernate" module="org.infinispan.hibernate-cache"&gt;
+     &lt;local-cache name="entity"&gt;
+         &lt;transaction mode="NON_XA"/&gt;
+         &lt;object-memory size="10000"/&gt;
+         &lt;expiration max-idle="100000"/&gt;
+     &lt;/local-cache&gt;
+     &lt;local-cache name="local-query"&gt;
+         &lt;object-memory size="10000"/&gt;
+         &lt;expiration max-idle="100000"/&gt;
+     &lt;/local-cache&gt;
+     &lt;local-cache name="timestamps"/&gt;
+ &lt;/cache-container&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Below is an example of customizing the "entity", "immutable-entity",
+"local-query", "pending-puts", "timestamps" cache configuration may look
+like:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml"> &lt;cache-container name="hibernate" module="org.infinispan.hibernate-cache" default-cache="immutable-entity"&gt;
+    &lt;local-cache name="entity"&gt;
+        &lt;transaction mode="NONE"/&gt;
+        &lt;eviction max-entries="-1"/&gt;
+        &lt;expiration max-idle="120000"/&gt;
+    &lt;/local-cache&gt;
+    &lt;local-cache name="immutable-entity"&gt;
+        &lt;transaction mode="NONE"/&gt;
+        &lt;eviction max-entries="-1"/&gt;
+        &lt;expiration max-idle="120000"/&gt;
+    &lt;/local-cache&gt;
+    &lt;local-cache name="local-query"&gt;
+        &lt;eviction max-entries="-1"/&gt;
+        &lt;expiration max-idle="300000"/&gt;
+    &lt;/local-cache&gt;
+    &lt;local-cache name="pending-puts"&gt;
+        &lt;transaction mode="NONE"/&gt;
+        &lt;eviction strategy="NONE"/&gt;
+        &lt;expiration max-idle="60000"/&gt;
+    &lt;/local-cache&gt;
+    &lt;local-cache name="timestamps"&gt;
+        &lt;transaction mode="NONE"/&gt;
+        &lt;eviction strategy="NONE"/&gt;
+    &lt;/local-cache&gt;
+&lt;/cache-container&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Persistence.xml to use the above custom settings:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;properties&gt;
+    &lt;property name="hibernate.cache.use_second_level_cache" value="true"/&gt;
+    &lt;property name="hibernate.cache.use_query_cache" value="true"/&gt;
+    &lt;property name="hibernate.cache.infinispan.immutable-entity.cfg" value="immutable-entity"/&gt;
+    &lt;property name="hibernate.cache.infinispan.timestamps.cfg" value="timestamps"/&gt;
+    &lt;property name="hibernate.cache.infinispan.pending-puts.cfg" value="pending-puts"/&gt;
+&lt;/properties&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="using-hibernate-search">Using Hibernate Search</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>WildFly includes Hibernate Search. If you want to use the bundled version of Hibernate Search, which requires to use the default Hibernate ORM persistence provider, this will be automatically enabled.  Having this enabled means that, provided your application includes any entity which is annotated with <strong>org.hibernate.search.annotations.Indexed</strong>, the module <strong>org.hibernate.search.orm:main</strong> will be made available to your deployment; this will also include the required version of Apache Lucene.</p>
+</div>
+<div class="paragraph">
+<p>If you do not want this module to be exposed to your deployment, set the persistence property <strong>wildfly.jpa.hibernate.search.module</strong> to either <strong>none</strong> to not automatically inject any Hibernate Search module, or to any other module identifier to inject a different module. For example you could set <strong>wildfly.jpa.hibernate.search.module=org.hibernate.search.orm:5.11.0.Alpha1</strong> to use the experimental version 5.11.0.Alpha1 instead of the provided module; in this case you&#8217;ll have to download and add the custom modules to the application server as other versions are not included.  When setting <strong>wildfly.jpa.hibernate.search.module=none</strong> you might also opt to include Hibernate Search and its dependencies within your application but we highly recommend the modules approach.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="packaging-the-hibernate-jpa-persistence-provider-with-your-application">Packaging the Hibernate JPA persistence provider with your application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>WildFly allows the packaging of Hibernate persistence provider jars with
+the application. The JPA deployer will detect the presence of a
+persistence provider in the application and
+<strong>jboss.as.jpa.providerModule</strong> needs to be set to <strong>application</strong>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt; +
+&lt;persistence xmlns="http://java.sun.com/xml/ns/persistence"
+version="1.0"&gt; +
+&lt;persistence-unit name="myOwnORMVersion_pu"&gt; +
+&lt;description&gt;Hibernate Persistence Unit.&lt;/description&gt; +
+&lt;jta-data-source&gt;java:jboss/datasources/PlannerDS&lt;/jta-data-source&gt; +
+&lt;properties&gt; +
+&lt;property name="jboss.as.jpa.providerModule" value="application" /&gt; +
+&lt;/properties&gt; +
+&lt;/persistence-unit&gt; +
+&lt;/persistence&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="migrating-from-openjpa">Migrating from OpenJPA</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>You need to copy the OpenJPA jars (e.g. openjpa-all.jar serp.jar) into
+the WildFly modules/org/apache/openjpa/main folder and update
+modules/org/apache/openjpa/main/module.xml to include the same jar file
+names that you copied in. This will help you get your application that
+depends on OpenJPA, to deploy on WildFly.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java"> &lt;module xmlns="urn:jboss:module:1.1" name="org.apache.openjpa"&gt;
+    &lt;resources&gt;
+        &lt;resource-root path="jipijapa-openjpa-1.0.1.Final.jar"/&gt;
+        &lt;resource-root path="openjpa-all.jar"&gt;
+           &lt;filter&gt;
+              &lt;exclude path="javax/**" /&gt;
+           &lt;/filter&gt;
+        &lt;/resource-root&gt;
+        &lt;resource-root path="serp.jar"/&gt;
+    &lt;/resources&gt;
+ 
+    &lt;dependencies&gt;
+        &lt;module name="javax.api"/&gt;
+        &lt;module name="javax.annotation.api"/&gt;
+        &lt;module name="javax.enterprise.api"/&gt;
+        &lt;module name="javax.persistence.api"/&gt;
+        &lt;module name="javax.transaction.api"/&gt;
+        &lt;module name="javax.validation.api"/&gt;
+        &lt;module name="javax.xml.bind.api"/&gt;
+        &lt;module name="org.apache.commons.collections"/&gt;
+        &lt;module name="org.apache.commons.lang"/&gt;
+        &lt;module name="org.jboss.as.jpa.spi"/&gt;
+        &lt;module name="org.jboss.logging"/&gt;
+        &lt;module name="org.jboss.vfs"/&gt;
+        &lt;module name="org.jboss.jandex"/&gt;
+    &lt;/dependencies&gt;
+&lt;/module&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="migrating-from-eclipselink">Migrating from EclipseLink</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>You need to copy the EclipseLink jar (e.g. eclipselink-2.6.0.jar or
+eclipselink.jar as in the example below) into the WildFly
+modules/org/eclipse/persistence/main folder and update
+modules/org/eclipse/persistence/main/module.xml to include the
+EclipseLink jar (take care to use the jar name that you copied in). If
+you happen to leave the EclipseLink version number in the jar name, the
+module.xml should reflect that. This will help you get your application
+that depends on EclipseLink, to deploy on WildFly.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml"> &lt;module xmlns="urn:jboss:module:1.1" name="org.eclipse.persistence"&gt;
+    &lt;resources&gt;
+        &lt;resource-root path="jipijapa-eclipselink-10.0.0.Final.jar"/&gt;
+        &lt;resource-root path="eclipselink.jar"&gt;           &lt;filter&gt;
+              &lt;exclude path="javax/**" /&gt;
+           &lt;/filter&gt;
+        &lt;/resource-root&gt;
+    &lt;/resources&gt;
+ 
+    &lt;dependencies&gt;
+        &lt;module name="asm.asm"/&gt;
+        &lt;module name="javax.api"/&gt;
+        &lt;module name="javax.annotation.api"/&gt;
+        &lt;module name="javax.enterprise.api"/&gt;
+        &lt;module name="javax.persistence.api"/&gt;
+        &lt;module name="javax.transaction.api"/&gt;
+        &lt;module name="javax.validation.api"/&gt;
+        &lt;module name="javax.xml.bind.api"/&gt;
+        &lt;module name="org.antlr"/&gt;
+        &lt;module name="org.apache.commons.collections"/&gt;
+        &lt;module name="org.dom4j"/&gt;
+        &lt;module name="org.jboss.as.jpa.spi"/&gt;
+        &lt;module name="org.jboss.logging"/&gt;
+        &lt;module name="org.jboss.vfs"/&gt;
+    &lt;/dependencies&gt;
+&lt;/module&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You should then be able to deploy applications with persistence.xml that
+include;</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;provider&gt;org.eclipse.persistence.jpa.PersistenceProvider&lt;/provider&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Also refer to page
+<a href="https://community.jboss.org/wiki/HowToUseEclipseLinkWithAS7">how to use
+EclipseLink with WildFly guide here</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="native-hibernate-use">Native Hibernate use</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Applications that use the Hibernate API directly, can be referred to
+as native Hibernate applications. Native Hibernate applications, can
+choose to use the Hibernate jars included with WildFly or they can
+package their own copy of the Hibernate jars. Applications that utilize
+JPA will automatically have the Hibernate classes injected onto the
+application deployment classpath. Meaning that JPA applications, should
+expect to use the Hibernate jars included in WildFly.</p>
+</div>
+<div class="paragraph">
+<p>Example MANIFEST.MF entry to add dependency for Hibernate native
+applications:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>Manifest-Version: 1.0
+...
+Dependencies: org.hibernate</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="injection-of-hibernate-session-and-sessionfactoryinjection-of-hibernate-session-and-sessionfactory">Injection of Hibernate Session and SessionFactory</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>You can inject a org.hibernate.Session and org.hibernate.SessionFactory
+directly, just as you can do with EntityManagers and
+EntityManagerFactorys.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+@Stateful public class MyStatefulBean ... {
+   @PersistenceContext(unitName="crm") Session session1;
+   @PersistenceContext(unitName="crm2", type=EXTENDED) Session extendedpc;
+   @PersistenceUnit(unitName="crm") SessionFactory factory;
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="hibernate-transformer">Hibernate ORM 5.1 native API bytecode transformer</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The <strong>Hibernate ORM 5.1 native API bytecode transformer</strong>, can rewrite application bytecode,
+to handle APIs that have changed between Hibernate ORM 5.1.x + 5.3.x.  For applications that use the Hibernate ORM 5.1
+native APIs, you may either rewrite them for Hibernate ORM 5.3 or use the transformer, to rewrite your application byte-code
+during application deployment (only the in-memory copy of your application is rewritten).  If your application is only using the
+JPA specification APIs, you do not need to transform your application.</p>
+</div>
+<div class="paragraph">
+<p>For details on the Hibernate 5.3 native API changes, review the <a href="https://github.com/hibernate/hibernate-orm/blob/5.2/migration-guide.adoc">ORM 5.2</a>
++ <a href="https://github.com/hibernate/hibernate-orm/blob/5.3/migration-guide.adoc">ORM 5.3</a> migration guides.</p>
+</div>
+<div class="paragraph">
+<p>The Hibernate ORM 5.1 transformer is already deprecated, meaning it could be removed in the next release.
+For this reason, we made it easy to enable the transformer via either a system property or jboss-deployment-structure change.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;jboss-deployment-structure&gt;
+    &lt;deployment&gt;
+        &lt;transformers&gt;
+            &lt;transformer class="org.jboss.as.hibernate.Hibernate51CompatibilityTransformer"/&gt;
+        &lt;/transformers&gt;
+        &lt;dependencies&gt;
+            &lt;module name="org.hibernate" export="true" /&gt;
+        &lt;/dependencies&gt;
+    &lt;/deployment&gt;
+    &lt;sub-deployment name="main.war"&gt;
+        &lt;transformers&gt;
+            &lt;transformer class="org.jboss.as.hibernate.Hibernate51CompatibilityTransformer"/&gt;
+        &lt;/transformers&gt;
+    &lt;/sub-deployment&gt;
+&lt;/jboss-deployment-structure&gt;</code></pre>
+</div>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">If enabled, the following transformations will be made to application classes compiled with Hibernate 5.1: </dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>In user type classes, change methods with parameter type org.hibernate.engine.spi.SessionImplementor to instead use type org.hibernate.engine.spi.SharedSessionContractImplementor, this is done for implementations of:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>org.hibernate.usertype.UserType.</p>
+</li>
+<li>
+<p>org.hibernate.usertype.CompositeUserType.</p>
+</li>
+<li>
+<p>org.hibernate.usertype.UserCollectionType.</p>
+</li>
+<li>
+<p>org.hibernate.usertype.UserVersionType.</p>
+</li>
+<li>
+<p>org.hibernate.type.Type.</p>
+</li>
+<li>
+<p>org.hibernate.type.SingleColumnType.</p>
+</li>
+<li>
+<p>org.hibernate.type.AbstractStandardBasicType.</p>
+</li>
+<li>
+<p>org.hibernate.type.ProcedureParameterExtractionAware.</p>
+</li>
+<li>
+<p>org.hibernate.type.ProcedureParameterNamedBinder.</p>
+</li>
+<li>
+<p>org.hibernate.type.VersionType.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>In user type classes, when calling org.hibernate.* class methods, cast SessionImplementor to SharedSessionContractImplementor.</p>
+</li>
+<li>
+<p>Change calls to org.hibernate.BasicQueryContract.getFlushMode(), <a href="https://github.com/hibernate/hibernate-orm/blob/5.2/migration-guide.adoc#misc">to instead call BasicQueryContract.getHibernateFlushMode()</a>.</p>
+</li>
+<li>
+<p>Change calls to org.hibernate.Session.getFlushMode(), <a href="https://github.com/hibernate/hibernate-orm/blob/5.2/migration-guide.adoc#misc">to instead call Session.getHibernateFlushMode()</a>.</p>
+</li>
+<li>
+<p>Change calls to org.hibernate.Query.getFirstResult(), to instead call Query.getHibernateFirstResult(), so null can be returned when the value is uninitialized (note that 0 is now returned instead of negative values).</p>
+</li>
+<li>
+<p>Change calls to org.hibernate.Query.getMaxResults(), <a href="https://github.com/hibernate/hibernate-orm/blob/5.3/migration-guide.adoc#native-non-jpa-pagination-changes">to instead call Query.getHibernateMaxResults(), so that null will be returned when the value is uninitialized or org.hibernate.Query#setMaxResults() was called with a value &#8656; 0</a>.</p>
+</li>
+<li>
+<p>Change calls to org.hibernate.Query.setFirstResult(), <a href="https://github.com/hibernate/hibernate-orm/blob/5.3/migration-guide.adoc#native-non-jpa-pagination-changes">to instead call Query.setHibernateFirstResult(), so that calls to set a value &lt; 0 results in pagination starting with the 0th row as was done in Hibernate ORM 5.1</a>.</p>
+</li>
+<li>
+<p>Change calls to org.hibernate.Query.setMaxResults(), <a href="https://github.com/hibernate/hibernate-orm/blob/5.3/migration-guide.adoc#native-non-jpa-pagination-changes">to instead call Query.setHibernateMaxResults(), so that passed values &#8656; 0 are treated the same as uninitialized</a>.</p>
+</li>
+<li>
+<p>Change references to NEVER field in enum org.hibernate.FlushMode, to instead reference FlushMode.MANUAL.</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="paragraph">
+<p>TRACE + DEBUG level logging can be enabled via the "org.jboss.as.hibernate.transformer" logger category.
+Example output:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-text" data-lang="text">Hibernate51CompatibilityTransformer transformed application classes in 'deployment.org.jboss.as.test.compat.jpa.hibernate.transformer.VerifyHibernate51CompatibilityPropertyAndJDSEnabledTransformerTestCase.ear', class 'org/jboss/as/test/compat/jpa/hibernate/transformer/BitSetType' is calling method org/hibernate/type/AbstractSingleColumnStandardBasicType.replace, which must be changed to use SharedSessionContractImplementor as parameter.</code></pre>
+</div>
+</div>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">System Property</th>
+<th class="tableblock halign-left valign-top">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Hibernate51CompatibilityTransformer</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">if true, the transformer will transform ORM 5.1.x native calls to, ORM 5.3 native calls, in every application deployment</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Hibernate51CompatibilityTransformer.disableAmbiguousChanges</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">disable transformation of org.hibernate.Query.setFirstResult(int) + org.hibernate.Query.setMaxResults(int), since these methods are in both Hibernate ORM 5.1.x + 5.3.x</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Hibernate51CompatibilityTransformer.showTransformedClassFolder</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">specifies the folder name to create bytecode level description of applications run through the transformer.  If the transformer actually makes a change to your application, a (boolean) class variable will be added "$<em>org_jboss_as_hibernate_Hibernate51CompatibilityTransformer_transformed</em>$", that ensures that the application is only transformed once</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">disabled</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="hibernate-properties">Hibernate properties</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>WildFly automatically sets the following Hibernate properties (if
+not already set in persistence unit definition):</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Property</th>
+<th class="tableblock halign-left valign-top">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">hibernate.id.new_generator_mappings =true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">New applications should let
+this default to true, older applications with existing data might need
+to set to false (see note below). It really depends on whether your
+application uses the @GeneratedValue(AUTO) which will generates new key
+values for newly created entities. The application can override this
+value (in the persistence.xml).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">hibernate.transaction.jta.platform= instance of
+org.hibernate.service.jta.platform.spi.JtaPlatform interface</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The
+transaction manager, user transaction and transaction synchronization
+registry is passed into Hibernate via this class.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">hibernate.ejb.resource_scanner = instance of
+org.hibernate.ejb.packaging.Scanner interface</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Instance of entity
+scanning class is passed in that knows how to use the AS annotation
+indexer (for faster deployment).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">hibernate.transaction.manager_lookup_class</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This property is removed if
+found in the persistence.xml (could conflict with JtaPlatform)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">hibernate.session_factory_name = qualified persistence unit name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Is
+set to the application name + persistence unit name (application can
+specify a different value but it needs to be unique across all
+application deployments on the AS instance).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">hibernate.session_factory_name_is_jndi = false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">only set if the
+application didn&#8217;t specify a value for hibernate.session_factory_name.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">hibernate.ejb.entitymanager_factory_name = qualified persistence unit
+name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Is set to the application name + persistence unit name
+(application can specify a different value but it needs to be unique
+across all application deployments on the AS instance).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">hibernate.query.jpaql_strict_compliance=true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">hibernate.auto_quote_keyword=false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">hibernate.implicit_naming_strategy=org.hibernate.boot.model.naming.ImplicitNamingStrategyJpaCompliantImpl</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">hibernate.model.generator_name_as_sequence_name=true</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">hibernate.jpa.compliance.transaction=true</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">hibernate.jpa.compliance.closed=true</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">hibernate.jpa.compliance.query=true</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">hibernate.jpa.compliance.list=true</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">hibernate.jpa.compliance.caching=true</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">hibernate.jpa.compliance.proxy=true</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">hibernate.enable_lazy_load_no_trans=false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">hibernate.jpa.compliance.global_id_generators=true</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">hibernate.search.index_uninverting_allowed=true</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"> </p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>if <strong>hibernate.id.new_generator_mappings</strong> is <strong>true</strong>:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>@GeneratedValue(AUTO) maps to
+org.hibernate.id.enhanced.SequenceStyleGenerator</p>
+</li>
+<li>
+<p>@GeneratedValue(TABLE) maps to
+org.hibernate.id.enhanced.TableGenerator</p>
+</li>
+<li>
+<p>@GeneratedValue(SEQUENCE) maps to
+org.hibernate.id.enhanced.SequenceStyleGenerator</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>if <strong>hibernate.id.new_generator_mappings</strong> is <strong>false</strong>:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>@GeneratedValue(AUTO) maps to Hibernate "native"</p>
+</li>
+<li>
+<p>@GeneratedValue(TABLE) maps to
+org.hibernate.id.MultipleHiLoPerTableGenerator</p>
+</li>
+<li>
+<p>@GeneratedValue(SEQUENCE) to Hibernate "seqhilo"</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="persistence-unit-properties">Persistence unit properties</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The following properties are supported in the persistence unit
+definition (in the persistence.xml file):</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Property</th>
+<th class="tableblock halign-left valign-top">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">jboss.as.jpa.providerModule</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">name of the persistence provider module
+(default is org.hibernate). Should be application, if a persistence
+provider is packaged with the application. See note below about some
+module names that are built in (based on the provider).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">jboss.as.jpa.adapterModule</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">name of the integration classes that help
+WildFly to work with the persistence provider.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">jboss.as.jpa.adapterClass</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">class name of the integration adapter.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">jboss.as.jpa.managed</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">set to false to disable container managed JPA
+access to the persistence unit. The default is true, which enables
+container managed JPA access to the persistence unit. This is typically
+set to false for Spring applications.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">jboss.as.jpa.classtransformer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">set to false to disable class
+transformers for the persistence unit. Set to true, to allow entity
+class enhancing/rewriting.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">wildfly.jpa.default-unit</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">set to true to choose the default persistence
+unit in an application. This is useful if you inject a persistence
+context without specifying the unitName (@PersistenceContext
+EntityManager em) but have multiple persistence units specified in your
+persistence.xml.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">wildfly.jpa.twophasebootstrap</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">persistence providers (like Hibernate
+ORM 4.3+ via EntityManagerFactoryBuilder), allow a two phase persistence
+unit bootstrap, which improves JPA integration with CDI. Setting the
+wildfly.jpa.twophasebootstrap hint to false, disables the two phase
+bootstrap (for the persistence unit that contains the hint).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">wildfly.jpa.allowdefaultdatasourceuse</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">set to false to prevent
+persistence unit from using the default data source. Defaults to true.
+This is only important for persistence units that do not specify a
+datasource.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">jboss.as.jpa.deferdetach</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Controls whether transaction scoped
+persistence context used in non-JTA transaction thread, will detach
+loaded entities after each EntityManager invocation or when the
+persistence context is closed (e.g. business method ends). Defaults to
+false (entities are cleared after EntityManager invocation) and if set
+to true, the detach is deferred until the context is closed.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">wildfly.jpa.hibernate.search.module</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Controls which version of
+Hibernate Search to include on classpath. Only makes sense when using
+Hibernate as JPA implementation. The default is auto; other valid values
+are none or a full module identifier to use an alternative version.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">jboss.as.jpa.scopedname</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specify the qualified (application scoped)
+persistence unit name to be used. By default, this is internally set to
+the application name + persistence unit name. The
+hibernate.cache.region_prefix will default to whatever you set
+jboss.as.jpa.scopedname to. Make sure you set the
+jboss.as.jpa.scopedname value to a value not already in use by other
+applications deployed on the same application server instance.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">wildfly.jpa.allowjoinedunsync</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If set to true, allows an
+SynchronizationType.UNSYNCHRONIZED persistence context that has been
+joined to the active JTA transaction, to be propagated into a
+SynchronizationType.SYNCHRONIZED persistence context. Otherwise, an
+IllegalStateException exception would of been thrown that complains that
+an unsychronized persistence context cannot be propagated into a
+synchronized persistence context. Defaults to false.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">wildfly.jpa.skipmixedsynctypechecking</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Set to true to disable the
+throwing of an IllegalStateException exception when propagating an
+SynchronizationType.UNSYNCHRONIZED persistence context into a
+SynchronizationType.SYNCHRONIZED persistence context. This is a
+workaround intended to allow applications that used to incorrectly not
+get IllegalStateException exception with extended persistence contexts,
+to avoid the IllegalStateException, so they don&#8217;t have to change their
+application right away (for compatibility purposes). This hint may be
+deprecated in a future release. See WFLY-7108 for more details. Defaults
+to false.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="determine-the-persistence-provider-module">Determine the persistence provider module</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>As mentioned above, if the <strong>jboss.as.jpa.providerModule</strong> property is not
+specified, the provider module name is determined by the <strong>provider</strong> name
+specified in the persistence.xml. The mapping is:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Provider Name</th>
+<th class="tableblock halign-left valign-top">Module name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">blank</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">org.hibernate</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">org.hibernate.jpa.HibernatePersistenceProvider</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">org.hibernate</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">org.hibernate.ogm.jpa.HibernateOgmPersistence</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">org.hibernate.ogm</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">oracle.toplink.essentials.PersistenceProvider</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">oracle.toplink</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">oracle.toplink.essentials.ejb.cmp3.EntityManagerFactoryProvider</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">oracle.toplink</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">org.eclipse.persistence.jpa.PersistenceProvider</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">org.eclipse.persistence</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">org.datanucleus.api.jpa.PersistenceProviderImpl</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">org.datanucleus</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">org.datanucleus.store.appengine.jpa.DatastorePersistenceProvider</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">org.datanucleus:appengine</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">org.apache.openjpa.persistence.PersistenceProviderImpl</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">org.apache.openjpa</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="binding-entitymanagerfactoryentitymanager-to-jndi">Binding EntityManagerFactory/EntityManager to JNDI</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>By default WildFly does <strong>not</strong> bind the entity manager factory to JNDI.
+However, you can explicitly configure this in the persistence.xml of
+your application by setting the <code>jboss.entity.manager.factory.jndi.name</code>
+<code>hint. The value of that property should be the JNDI name to which the entity manager factory should be bound.</code></p>
+</div>
+<div class="paragraph">
+<p><code>You can also bind a container managed (transaction scoped) entity manager to JNDI as well, }}via hint</code>
+<code>jboss.entity.manager.jndi.name</code>\{
+<code>}{{. As a reminder, a transaction scoped entity manager (persistence context), acts as a proxy that always gets an unique underlying entity manager (at the persistence provider level).</code></p>
+</div>
+<div class="paragraph">
+<p><code>Here&#8217;s an example:</code></p>
+</div>
+<div class="paragraph">
+<p>persistence.xml</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;persistence version="2.0"
+   xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="
+        http://java.sun.com/xml/ns/persistence
+        http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"&gt;
+   &lt;persistence-unit name="myPU"&gt;
+      &lt;!-- If you are running in a production environment, add a managed
+         data source, the example data source is just for proofs of concept! --&gt;
+      &lt;jta-data-source&gt;java:jboss/datasources/ExampleDS&lt;/jta-data-source&gt;
+      &lt;properties&gt;
+         &lt;!-- Bind entity manager factory to JNDI at java:jboss/myEntityManagerFactory --&gt;
+         &lt;property name="jboss.entity.manager.factory.jndi.name" value="java:jboss/myEntityManagerFactory" /&gt;
+         &lt;property name="jboss.entity.manager.jndi.name" value="java:/myEntityManager"/&gt;
+       &lt;/properties&gt;
+   &lt;/persistence-unit&gt;
+&lt;/persistence&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@Stateful
+public class ExampleSFSB {
+  public void createSomeEntityWithTransactionScopedEM(String name) {
+    Context context = new InitialContext();
+    javax.persistence.EntityManager entityManager = (javax.persistence.EntityManager) context.lookup("java:/myEntityManager");
+    SomeEntity someEntity = new SomeEntity();
+    someEntity.setName(name);    entityManager.persist(name);
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="tips-for-using-the-latest-hibernate-orm">Tips for using the latest Hibernate ORM</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="http://docs.jboss.org/hibernate/stable/orm/topical/html_single/wildfly/Wildfly.html">Read about using Hibernate ORM feature packs on WildFly</a>.</p>
+</div>
+</div>
+</div></div>
+</div>
+
+
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">WildFly is open. All dependencies of this project are available under the <a href='https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html' class='dark-background' target='_blank'>LGPL 2.1</a> or compatible license.<br/><br/>This website was built with <a href='https://jekyllrb.com/' class='dark-background' target='_blank'>Jekyll</a> is hosted on <a href='https://pages.github.com/' class='dark-background' target='_blank'>Github Pages</a> and is completely open source. If you want to make it better, <a href='https://github.com/wildfly/wildfly.org/fork' class='dark-background' target='_blank'>fork it</a> and show us what you’ve got.</p>
+
+    
+      <div class="width-1-12 project-links">
+        <strong>Navigation</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="/wildflysite/downloads" class="dark-background">Downloads</a></li>
+          
+            <li><a href="/wildflysitef/docs" class="dark-background">Docs</a></li>
+          
+            <li><a href="https://github.com/wildfly/wildfly" class="dark-background">Github</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <strong>Contribute</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="https://issues.jboss.org/browse/WFLY" class="dark-background">Submit a bug</a></li>
+          
+            <li><a href="https://community.jboss.org/en/wildfly?view=discussion" class="dark-background">Join the forum</a></li>
+          
+            <li><a href="https://github.com/wildfly/wildfly/fork" class="dark-background">Fork WildFly</a></li>
+          
+            <li><a href="https://twitter.com/WildFlyAS" class="dark-background">Follow us</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <strong>Get Help</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="https://community.jboss.org/en/wildfly?view=discussion" class="dark-background">Join the forum</a></li>
+          
+            <li><a href="https://www.hipchat.com/gFOhnVQke" class="dark-background">Join HipChat</a></li>
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-6-12 more-links">
+        <strong>Find more Red Hat Middleware Community Projects</strong>
+        <ul class="footer-links">
+          
+            <li><a href="https://www.apiman.io/" class="dark-background">APIMan</a></li>
+          
+            <li><a href="http://arquillian.org" class="dark-background">Arquillian</a></li>
+          
+            <li><a href="http://byteman.jboss.org/" class="dark-background">Byteman</a></li>
+          
+            <li><a href="http://capedwarf.org/" class="dark-background">CapeDwarf</a></li>
+          
+            <li><a href="https://github.com/alechenninger/chronicler" class="dark-background">Chronicler</a></li>
+          
+            <li><a href="https://github.com/darcy-framework" class="dark-background">Darcy</a></li>
+          
+            <li><a href="http://debezium.io/" class="dark-background">Debezium</a></li>
+          
+            <li><a href="https://www.drools.org/" class="dark-background">Drools</a></li>
+          
+            <li><a href="http://gatein.jboss.org/" class="dark-background">GateIn</a></li>
+          
+            <li><a href="http://www.hawkular.org/" class="dark-background">Hawkular</a></li>
+          
+            <li><a href="http://hawt.io/" class="dark-background">Hawtio</a></li>
+          
+            <li><a href="http://hibernate.org/" class="dark-background">Hibernate</a></li>
+          
+            <li><a href="http://www.infinispan.org/" class="dark-background">Infinispan</a></li>
+          
+            <li><a href="https://devstudio.jboss.com/" class="dark-background">JBoss DevStudio</a></li>
+          
+            <li><a href="http://forge.jboss.org/" class="dark-background">JBoss Forge</a></li>
+          
+            <li><a href="https://github.com/jboss-logging" class="dark-background">JBoss Logging</a></li>
+          
+            <li><a href="http://jbossremoting.jboss.org/" class="dark-background">JBoss Remoting</a></li>
+          
+            <li><a href="https://www.jbpm.org/" class="dark-background">jBPM</a></li>
+          
+            <li><a href="https://jsfunit.jboss.org/" class="dark-background">JSFUnit</a></li>
+          
+            <li><a href="https://www.keycloak.org/" class="dark-background">Keycloak</a></li>
+          
+            <li><a href="http://modcluster.io/" class="dark-background">Mod Cluster</a></li>
+          
+            <li><a href="http://modeshape.jboss.org/" class="dark-background">ModeShape</a></li>
+          
+            <li><a href="https://www.optaplanner.org/" class="dark-background">OptaPlanner</a></li>
+          
+            <li><a href="https://picketbox.jboss.org/" class="dark-background">Picketbox</a></li>
+          
+            <li><a href="http://resteasy.jboss.org/" class="dark-background">RESTEasy</a></li>
+          
+            <li><a href="https://riftsaw.jboss.org/" class="dark-background">Riftsaw</a></li>
+          
+            <li><a href="http://savara.jboss.org/" class="dark-background">Savara</a></li>
+          
+            <li><a href="http://seamframework.org/" class="dark-background">Seam</a></li>
+          
+            <li><a href="http://arquillian.org/" class="dark-background">Shrinkwrap</a></li>
+          
+            <li><a href="http://snowdrop.jboss.org/" class="dark-background">Snowdrop</a></li>
+          
+            <li><a href="https://switchyard.jboss.org/" class="dark-background">Switchyard</a></li>
+          
+            <li><a href="https://tattletale.jboss.org/" class="dark-background">Tattletale</a></li>
+          
+            <li><a href="http://teiid.jboss.org/" class="dark-background">Teiid</a></li>
+          
+            <li><a href="http://wildfly-swarm.io/" class="dark-background">WildFly Swarm</a></li>
+          
+            <li><a href="http://wise.jboss.org/" class="dark-background">Wise</a></li>
+          
+            <li><a href="https://xnio.jboss.org/" class="dark-background">XNIO</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" class="dark-background" target="_blank">CC by 3.0</a>
+    </span>
+    <span class="redhat">
+      a Red Hat sponsored project   
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/"><img src="/wildflysite/assets/img/RHLogo_white.svg"></a>
+    </span>
+  </div>
+</div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script type="text/javascript" src="/wildflysite/assets/javascript/mobile-nav.js"></script>
+</body>
+
+</html>

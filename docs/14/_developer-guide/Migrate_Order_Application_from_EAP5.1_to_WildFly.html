@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="">
+  <link rel="shortcut icon" type="image/png" href="/wildflysite/favicon.ico" >
+  <link rel="stylesheet" href="/wildflysite/assets/css/main.css" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+
+
+</head>
+
+<body class="Porting the Order Application from EAP 5.1 to WildFly {wildflyVersion}">
+  <div class="content">
+    <div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          
+            <a href="/wildflysite/docs/14/" class="active">Docs</a>
+          
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+
+    <div class="docs-page grid-wrapper">
+  <div class="grid__item width-12-12 docs-v-icons">
+    <a href="/wildflysite/docs/13/" ><img src="/wildflysite/assets/img/docs/wildfly_icons_docs-13-inactive.png"></a>
+    <a href="https://docs.wildfly.org/12/" target="_blank"><img src="/wildflysite/assets/img/docs/wildfly_icons_docs-12-inactive.png"></a>
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-11-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-10-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-09-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-08-coming.png">
+  </div>
+  <div class="grid__item width-12-12"><h1 class="title">Porting the Order Application from EAP 5.1 to WildFly {wildflyVersion}</h1></div>
+  <div class="grid__item width-3-12 doc-toc"><ul class="inline_toc">
+  <li><a href="#overview-of-the-application">Overview of the application</a></li>
+  <li><a href="#summary-of-changes">Summary of changes</a>
+    <ul>
+      <li><a href="#code-changes">Code Changes</a>
+        <ul>
+          <li><a href="#modify-jndi-lookup-code">Modify JNDI lookup code</a></li>
+        </ul>
+      </li>
+      <li><a href="#modify-logging-code">Modify logging code</a></li>
+      <li><a href="#modify-the-code-to-use-infinispan-for-2nd-level-cache">Modify the code to use Infinispan for 2nd level cache</a></li>
+      <li><a href="#ear-packaging-changes">EAR Packaging Changes</a></li>
+      <li><a href="#summary">Summary</a></li>
+    </ul>
+  </li>
+</ul></div>
+  <div class="grid__item width-9-12 doc-content"><div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Andy Miller ported an example Order application that was used for
+performance testing from EAP 5.1 to WildFly {wildflyVersion}. These are the notes he
+made during the migration process.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="overview-of-the-application">Overview of the application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The application is relatively simple. it contains three servlets, some
+stateless session beans, a stateful session bean, and some entities.</p>
+</div>
+<div class="paragraph">
+<p>In addition to application code changes, modifications were made to the
+way the EAR was packaged. This is because WildFly removed support of
+some proprietary features that were available in EAP 5.1.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="summary-of-changes">Summary of changes</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="code-changes">Code Changes</h3>
+<div class="sect3">
+<h4 id="modify-jndi-lookup-code">Modify JNDI lookup code</h4>
+<div class="paragraph">
+<p>Since this application was first written for EAP 4.2/4.3, which did not
+support EJB reference injection, the servlets were using pre-EE 5
+methods for looking up stateless and stateful session bean interfaces.
+While migrating to WildFly, it seemed a good time to change the code to
+use the @EJB annotation, although this was not a required change.</p>
+</div>
+<div class="paragraph">
+<p>The real difference is in the lookup name. WildFly only supports the new
+EE 6 portable JNDI names rather than the old EAR structure based names.
+The JNDI lookup code changed as follows:</p>
+</div>
+<div class="paragraph">
+<p>Example of code in the EAP 5.1 version:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">try {
+    context = new InitialContext();
+    distributionCenterManager = (DistributionCenterManager) context.lookup("OrderManagerApp/DistributionCenterManagerBean/local");
+} catch(Exception lookupError) {
+    throw new ServletException("Couldn't find DistributionCenterManager bean", lookupError);
+}
+try {
+    customerManager = (CustomerManager) context.lookup("OrderManagerApp/CustomerManagerBean/local");
+} catch(Exception lookupError) {
+    throw new ServletException("Couldn't find CustomerManager bean", lookupError);
+}
+ 
+try {
+    productManager = (ProductManager) context.lookup("OrderManagerApp/ProductManagerBean/local");
+} catch(Exception lookupError) {
+    throw new ServletException("Couldn't find the ProductManager bean", lookupError);
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Example of how this is now coded in WildFly:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@EJB(lookup="java:app/OrderManagerEJB/DistributionCenterManagerBean!services.ejb.DistributionCenterManager")
+private DistributionCenterManager distributionCenterManager;
+ 
+@EJB(lookup="java:app/OrderManagerEJB/CustomerManagerBean!services.ejb.CustomerManager")
+private CustomerManager customerManager;
+ 
+@EJB(lookup="java:app/OrderManagerEJB/ProductManagerBean!services.ejb.ProductManager")
+private ProductManager productManager;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In addition to the change to injection, which was supported in EAP
+5.1.0, the lookup name changed from:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">OrderManagerApp/DistributionCenterManagerBean/local</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>to:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">java:app/OrderManagerEJB/DistributionCenterManagerBean!services.ejb.DistributionCenterManager</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>All the other beans were changed in a similar manner. They are now based
+on the portable JNDI names described in EE 6.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="modify-logging-code">Modify logging code</h3>
+<div class="paragraph">
+<p>The next major change was to logging within the application. The old
+version was using the commons logging infrastructure and Log4J that is
+bundled in the application server. Rather than bundling third-party
+logging, the application was modified to use the new WildFly Logging
+infrastructure.</p>
+</div>
+<div class="paragraph">
+<p>The code changes themselves are rather trivial, as this example
+illustrates:</p>
+</div>
+<div class="paragraph">
+<p>Old JBoss Commons Logging/Log4J:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">private static Log log = LogFactory.getLog(CustomerManagerBean.class);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>New WildFly Logging</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">private static Logger logger = Logger.getLogger(CustomerManagerBean.class.toString());</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Old JBoss Commons Logging/Log4J:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">if(log.isTraceEnabled()) {
+    log.trace("Just flushed " + batchSize + " rows to the database.");
+    log.trace("Total rows flushed is " + (i+1));
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>New WildFly Logging:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">if(logger.isLoggable(Level.TRACE)) {
+    logger.log(Level.TRACE, "Just flushed " + batchSize + " rows to the database.");
+    logger.log(Level.TRACE, "Total rows flushed is " + (i+1));
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In addition to the code changes made to use the new AS7 JBoss log
+manager module, you must add this dependency to the <code>MANIFEST.MF</code> file
+as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">Manifest-Version: 1.0
+Dependencies: org.jboss.logmanager</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="modify-the-code-to-use-infinispan-for-2nd-level-cache">Modify the code to use Infinispan for 2nd level cache</h3>
+<div class="paragraph">
+<p>Jboss Cache has been replaced by Infinispan for 2nd level cache. This
+requires modification of the <code>persistence.xml</code> file.</p>
+</div>
+<div class="paragraph">
+<p>This is what the file looked like in EAP 5.1:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">&lt;properties&gt;
+&lt;property name="hibernate.cache.region.factory_class" value="org.hibernate.cache.jbc2.JndiMultiplexedJBossCacheRegionFactory"/&gt;
+&lt;property name="hibernate.cache.region.jbc2.cachefactory" value="java:CacheManager"/&gt;
+&lt;property name="hibernate.cache.use_second_level_cache" value="true"/&gt;
+&lt;property name="hibernate.cache.use_query_cache" value="false"/&gt;
+&lt;property name="hibernate.cache.use_minimal_puts" value="true"/&gt;
+&lt;property name="hibernate.cache.region.jbc2.cfg.entity" value="mvcc-entity"/&gt;
+&lt;property name="hibernate.cache.region_prefix" value="services"/&gt;
+&lt;/properties&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This is how it was modified to use Infinispan for the same
+configuration:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">&lt;properties&gt;
+&lt;property name="hibernate.cache.use_second_level_cache" value="true"/&gt;
+&lt;property name="hibernate.cache.use_minimal_puts" value="true"/&gt;
+&lt;/properties&gt;
+&lt;shared-cache-mode&gt;ENABLE_SELECTIVE&lt;/shared-cache-mode&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Most of the properties are removed since they will default to the
+correct values for the second level cache. See
+<a href="https://docs.jboss.org/author/display/AS71/JPA+Reference+Guide#JPAReferenceGuide-UsingtheInfinispansecondlevelcache">"Using
+the Infinispan second level cache"</a> for more details.</p>
+</div>
+<div class="paragraph">
+<p>That was the extent of the code changes required to migrate the
+application to AS7.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="ear-packaging-changes">EAR Packaging Changes</h3>
+<div class="paragraph">
+<p>Due to modular class loading changes, the structure of the existing EAR
+failed to deploy successfully in WildFly.</p>
+</div>
+<div class="paragraph">
+<p>The old structure of the EAR was as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">$ jar tf OrderManagerApp.ear
+META-INF/MANIFEST.MF
+META-INF/application.xml
+OrderManagerWeb.war
+OrderManagerEntities.jar
+OrderManagerEJB.jar
+META-INF/</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In this structure, the entities and the <code>persistence.xml</code> were in one
+jar file, <code>OrderManagerEntities.jar</code>, and the stateless and stateful
+session beans were in another jar file, <code>OrderManagerEJB.jar</code>. This did
+not work due to modular class loading changes in WildFly. There are a
+couple of ways to resolve this issue:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Modify the class path in the <code>MANIFEST.MF</code></p>
+</li>
+<li>
+<p>Flatten the code and put all the beans in one JAR file.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>The second approach was selected because it simplified the EAR
+structure:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">$ jar tf OrderManagerApp.ear
+META-INF/application.xml
+OrderManagerWeb.war
+OrderManagerEJB.jar
+META-INF/</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Since there is no longer an <code>OrderManagerEntities.jar</code> file, the
+<code>applcation.xml</code> file was modified to remove the entry.</p>
+</div>
+<div class="paragraph">
+<p>An entry was added to the <code>MANIFEST.MF</code> file in the
+<code>OrderManagerWeb.war</code> to resolve another class loading issue resulting
+from the modification to use EJB reference injection in the servlets.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">Manifest-Version: 1.0
+Dependencies: org.jboss.logmanager
+Class-Path: OrderManagerEJB.jar</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>Class-Path</code> entry tells the application to look in the
+<code>OrderManagerEJB.jar</code> file for the injected beans.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="summary">Summary</h3>
+<div class="paragraph">
+<p>Although the existing EAR structure could have worked with additional
+modifications to the <code>MANIFEST.MF</code> file, this approach seemed more
+appealing because it simplified the structure while maintaining the web
+tier in its own WAR.</p>
+</div>
+<div class="paragraph">
+<p>The source files for both versions is attached so you can view the
+changes that were made to the application.</p>
+</div>
+</div>
+</div>
+</div></div>
+</div>
+
+
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">WildFly is open. All dependencies of this project are available under the <a href='https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html' class='dark-background' target='_blank'>LGPL 2.1</a> or compatible license.<br/><br/>This website was built with <a href='https://jekyllrb.com/' class='dark-background' target='_blank'>Jekyll</a> is hosted on <a href='https://pages.github.com/' class='dark-background' target='_blank'>Github Pages</a> and is completely open source. If you want to make it better, <a href='https://github.com/wildfly/wildfly.org/fork' class='dark-background' target='_blank'>fork it</a> and show us what you’ve got.</p>
+
+    
+      <div class="width-1-12 project-links">
+        <strong>Navigation</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="/wildflysite/downloads" class="dark-background">Downloads</a></li>
+          
+            <li><a href="/wildflysitef/docs" class="dark-background">Docs</a></li>
+          
+            <li><a href="https://github.com/wildfly/wildfly" class="dark-background">Github</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <strong>Contribute</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="https://issues.jboss.org/browse/WFLY" class="dark-background">Submit a bug</a></li>
+          
+            <li><a href="https://community.jboss.org/en/wildfly?view=discussion" class="dark-background">Join the forum</a></li>
+          
+            <li><a href="https://github.com/wildfly/wildfly/fork" class="dark-background">Fork WildFly</a></li>
+          
+            <li><a href="https://twitter.com/WildFlyAS" class="dark-background">Follow us</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <strong>Get Help</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="https://community.jboss.org/en/wildfly?view=discussion" class="dark-background">Join the forum</a></li>
+          
+            <li><a href="https://www.hipchat.com/gFOhnVQke" class="dark-background">Join HipChat</a></li>
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-6-12 more-links">
+        <strong>Find more Red Hat Middleware Community Projects</strong>
+        <ul class="footer-links">
+          
+            <li><a href="https://www.apiman.io/" class="dark-background">APIMan</a></li>
+          
+            <li><a href="http://arquillian.org" class="dark-background">Arquillian</a></li>
+          
+            <li><a href="http://byteman.jboss.org/" class="dark-background">Byteman</a></li>
+          
+            <li><a href="http://capedwarf.org/" class="dark-background">CapeDwarf</a></li>
+          
+            <li><a href="https://github.com/alechenninger/chronicler" class="dark-background">Chronicler</a></li>
+          
+            <li><a href="https://github.com/darcy-framework" class="dark-background">Darcy</a></li>
+          
+            <li><a href="http://debezium.io/" class="dark-background">Debezium</a></li>
+          
+            <li><a href="https://www.drools.org/" class="dark-background">Drools</a></li>
+          
+            <li><a href="http://gatein.jboss.org/" class="dark-background">GateIn</a></li>
+          
+            <li><a href="http://www.hawkular.org/" class="dark-background">Hawkular</a></li>
+          
+            <li><a href="http://hawt.io/" class="dark-background">Hawtio</a></li>
+          
+            <li><a href="http://hibernate.org/" class="dark-background">Hibernate</a></li>
+          
+            <li><a href="http://www.infinispan.org/" class="dark-background">Infinispan</a></li>
+          
+            <li><a href="https://devstudio.jboss.com/" class="dark-background">JBoss DevStudio</a></li>
+          
+            <li><a href="http://forge.jboss.org/" class="dark-background">JBoss Forge</a></li>
+          
+            <li><a href="https://github.com/jboss-logging" class="dark-background">JBoss Logging</a></li>
+          
+            <li><a href="http://jbossremoting.jboss.org/" class="dark-background">JBoss Remoting</a></li>
+          
+            <li><a href="https://www.jbpm.org/" class="dark-background">jBPM</a></li>
+          
+            <li><a href="https://jsfunit.jboss.org/" class="dark-background">JSFUnit</a></li>
+          
+            <li><a href="https://www.keycloak.org/" class="dark-background">Keycloak</a></li>
+          
+            <li><a href="http://modcluster.io/" class="dark-background">Mod Cluster</a></li>
+          
+            <li><a href="http://modeshape.jboss.org/" class="dark-background">ModeShape</a></li>
+          
+            <li><a href="https://www.optaplanner.org/" class="dark-background">OptaPlanner</a></li>
+          
+            <li><a href="https://picketbox.jboss.org/" class="dark-background">Picketbox</a></li>
+          
+            <li><a href="http://resteasy.jboss.org/" class="dark-background">RESTEasy</a></li>
+          
+            <li><a href="https://riftsaw.jboss.org/" class="dark-background">Riftsaw</a></li>
+          
+            <li><a href="http://savara.jboss.org/" class="dark-background">Savara</a></li>
+          
+            <li><a href="http://seamframework.org/" class="dark-background">Seam</a></li>
+          
+            <li><a href="http://arquillian.org/" class="dark-background">Shrinkwrap</a></li>
+          
+            <li><a href="http://snowdrop.jboss.org/" class="dark-background">Snowdrop</a></li>
+          
+            <li><a href="https://switchyard.jboss.org/" class="dark-background">Switchyard</a></li>
+          
+            <li><a href="https://tattletale.jboss.org/" class="dark-background">Tattletale</a></li>
+          
+            <li><a href="http://teiid.jboss.org/" class="dark-background">Teiid</a></li>
+          
+            <li><a href="http://wildfly-swarm.io/" class="dark-background">WildFly Swarm</a></li>
+          
+            <li><a href="http://wise.jboss.org/" class="dark-background">Wise</a></li>
+          
+            <li><a href="https://xnio.jboss.org/" class="dark-background">XNIO</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" class="dark-background" target="_blank">CC by 3.0</a>
+    </span>
+    <span class="redhat">
+      a Red Hat sponsored project   
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/"><img src="/wildflysite/assets/img/RHLogo_white.svg"></a>
+    </span>
+  </div>
+</div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script type="text/javascript" src="/wildflysite/assets/javascript/mobile-nav.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="">
+  <link rel="shortcut icon" type="image/png" href="/wildflysite/favicon.ico" >
+  <link rel="stylesheet" href="/wildflysite/assets/css/main.css" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+
+
+</head>
+
+<body class="Seam 2 Booking Application - Migration of Binaries from EAP5.1 to">
+  <div class="content">
+    <div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          
+            <a href="/wildflysite/docs/14/" class="active">Docs</a>
+          
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+
+    <div class="docs-page grid-wrapper">
+  <div class="grid__item width-12-12 docs-v-icons">
+    <a href="/wildflysite/docs/13/" ><img src="/wildflysite/assets/img/docs/wildfly_icons_docs-13-inactive.png"></a>
+    <a href="https://docs.wildfly.org/12/" target="_blank"><img src="/wildflysite/assets/img/docs/wildfly_icons_docs-12-inactive.png"></a>
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-11-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-10-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-09-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-08-coming.png">
+  </div>
+  <div class="grid__item width-12-12"><h1 class="title">Seam 2 Booking Application - Migration of Binaries from EAP5.1 to</h1></div>
+  <div class="grid__item width-3-12 doc-toc"><ul class="inline_toc">
+  <li><a href="#step-1-build-and-deploy-the-eap5.1-version-of-the-seam-booking-application">Step 1: Build and deploy the EAP5.1 version of the Seam Booking</a>
+    <ul>
+      <li><a href="#first-issue-java.lang.classnotfoundexception-javax.faces.facesexception">First Issue: java.lang.ClassNotFoundException:</a>
+        <ul>
+          <li><a href="#what-it-means">What it means:</a></li>
+          <li><a href="#how-to-resolve-it">How to resolve it:</a></li>
+        </ul>
+      </li>
+      <li><a href="#next-issue-java.lang.classnotfoundexception-org.apache.commons.logging.log">Next Issue: java.lang.ClassNotFoundException:</a>
+        <ul>
+          <li><a href="#what-it-means-1">What it means:</a></li>
+          <li><a href="#how-to-resolve-it-1">How to resolve it:</a></li>
+        </ul>
+      </li>
+      <li><a href="#next-issue-java.lang.classnotfoundexception-org.dom4j.documentexception">Next Issue: java.lang.ClassNotFoundException:</a>
+        <ul>
+          <li><a href="#what-it-means-2">What it means:</a></li>
+          <li><a href="#how-to-resolve-it-2">How to resolve it:</a></li>
+        </ul>
+      </li>
+      <li><a href="#next-issue-java.lang.classnotfoundexception-org.hibernate.validator.invalidvalue">Next Issue: java.lang.ClassNotFoundException:</a>
+        <ul>
+          <li><a href="#what-it-means-3">What it means:</a></li>
+          <li><a href="#how-to-resolve-it-3">How to resolve it:</a></li>
+        </ul>
+      </li>
+      <li><a href="#next-issue-java.lang.instantiationexception-org.jboss.seam.jsf.seamapplicationfactory">Next Issue: java.lang.InstantiationException:</a>
+        <ul>
+          <li><a href="#what-it-means-4">What it means:</a></li>
+          <li><a href="#how-to-resolve-it-4">How to resolve it:</a></li>
+        </ul>
+      </li>
+      <li><a href="#next-issue-java.lang.classnotfoundexception-org.apache.commons.collections.arraystack">Next Issue: java.lang.ClassNotFoundException:</a>
+        <ul>
+          <li><a href="#what-it-means-5">What it means:</a></li>
+          <li><a href="#how-to-resolve-it-5">How to resolve it:</a></li>
+        </ul>
+      </li>
+      <li><a href="#next-issue-services-with-missingunavailable-dependencies">Next Issue: Services with missing/unavailable dependencies</a>
+        <ul>
+          <li><a href="#what-it-means-6">What it means:</a></li>
+          <li><a href="#how-to-resolve-it-6">How to resolve it:</a></li>
+        </ul>
+      </li>
+      <li><a href="#next-issue-java.lang.classnotfoundexception-org.hibernate.cache.hashtablecacheprovider">Next Issue: java.lang.ClassNotFoundException:</a>
+        <ul>
+          <li><a href="#what-it-means-7">What it means:</a></li>
+          <li><a href="#how-to-resolve-it-7">How to resolve it:</a></li>
+        </ul>
+      </li>
+      <li><a href="#next-issue-java.lang.classcastexception-org.hibernate.cache.hashtablecacheprovider">Next Issue: java.lang.ClassCastException:</a>
+        <ul>
+          <li><a href="#what-it-means-8">What it means:</a></li>
+          <li><a href="#how-to-resolve-it-8">How to resolve it:</a></li>
+        </ul>
+      </li>
+      <li><a href="#no-more-issues-deployment-errors-should-be-resolved">No more issues: Deployment errors should be resolved</a></li>
+    </ul>
+  </li>
+  <li><a href="#step-3-debug-and-resolve-runtime-errors-and-exceptions">Step 3: Debug and resolve runtime errors and exceptions</a>
+    <ul>
+      <li><a href="#first-issue-javax.naming.namenotfoundexception-name-jboss-seam-booking-not-found-in-context">First Issue: javax.naming.NameNotFoundException: Name</a>
+        <ul>
+          <li><a href="#what-it-means-9">What it means:</a></li>
+          <li><a href="#how-to-resolve-it-9">How to resolve it:</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#step-4-access-the-application">Step 4: Access the application</a></li>
+  <li><a href="#summary-of-changes">Summary of Changes</a></li>
+</ul></div>
+  <div class="grid__item width-9-12 doc-content"><div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>This is a step-by-step how-to guide on porting the Seam Booking
+application binaries from EAP5.1 to WildFly {wildflyVersion}. Although there are better
+approaches for migrating applications, the purpose of this document is
+to show the types of issues you might encounter when migrating an
+application and how to debug and resolve those issues.</p>
+</div>
+<div class="paragraph">
+<p>For this example, the application EAR is deployed to the
+JBOSS_HOME/standalone/deployments directory with no changes other than
+extracting the archives so we can modify the XML files contained within
+them.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="step-1-build-and-deploy-the-eap5.1-version-of-the-seam-booking-application">Step 1: Build and deploy the EAP5.1 version of the Seam Booking</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>application</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Build the EAR</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">    cd /EAP5_HOME/jboss-eap5.1/seam/examples/booking
+    ~/tools/apache-ant-1.8.2/bin/ant explode</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Copy the EAR to the JBOSS_HOME deployments directory:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">    cp -r EAP5_HOME/jboss-eap-5.1/seam/examples/booking/exploded-archives/jboss-seam-booking.ear AS7_HOME/standalone/deployments/
+    cp -r EAP5_HOME/jboss-eap-5.1/seam/examples/booking/exploded-archives/jboss-seam-booking.war AS7_HOME/standalone/deployments/jboss-seam.ear
+    cp -r EAP5_HOME/jboss-eap-5.1/seam/examples/booking/exploded-archives/jboss-seam-booking.jar AS7_HOME/standalone/deployments/jboss-seam.ear</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Start the WildFly server and check the log. You will see:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">    INFO [org.jboss.as.deployment] (DeploymentScanner-threads - 1) Found jboss-seam-booking.ear in deployment directory. To trigger deployment create a file called jboss-seam-booking.ear.dodeploy</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Create an empty file with the name <code>jboss-seam-booking.ear.dodeploy</code>
+and copy it into the deployments directory. In the log, you will now see
+the following, indicating that it is deploying:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">    INFO [org.jboss.as.server.deployment] (MSC service thread 1-1) Starting deployment of "jboss-seam-booking.ear"
+    INFO [org.jboss.as.server.deployment] (MSC service thread 1-3) Starting deployment of "jboss-seam-booking.jar"
+    INFO [org.jboss.as.server.deployment] (MSC service thread 1-6) Starting deployment of "jboss-seam.jar"
+    INFO [org.jboss.as.server.deployment] (MSC service thread 1-2) Starting deployment of "jboss-seam-booking.war"</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>At this point, you will first encounter your first deployment error.
+In the next section, we will step through each issue and how to debug
+and resolve it.</p>
+<div id="step-2-debug-and-resolve-deployment-errors-and-exceptions" class="paragraph">
+<p>== Step 2: Debug and resolve deployment errors and exceptions</p>
+</div>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+<div class="sect2">
+<h3 id="first-issue-java.lang.classnotfoundexception-javax.faces.facesexception">First Issue: java.lang.ClassNotFoundException:</h3>
+<div class="paragraph">
+<p>javax.faces.FacesException</p>
+</div>
+<div class="paragraph">
+<p>When you deploy the application, the log contains the following error:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">ERROR \[org.jboss.msc.service.fail\] (MSC service thread 1-1) MSC00001: Failed to start service jboss.deployment.subunit."jboss-seam-booking.ear"."jboss-seam-booking.war".POST_MODULE:
+org.jboss.msc.service.StartException in service jboss.deployment.subunit."jboss-seam-booking.ear"."jboss-seam-booking.war".POST_MODULE:
+Failed to process phase POST_MODULE of subdeployment "jboss-seam-booking.war" of deployment "jboss-seam-booking.ear"
+    (.. additional logs removed ...)
+Caused by: java.lang.ClassNotFoundException: javax.faces.FacesException from \[Module "deployment.jboss-seam-booking.ear:main" from Service Module Loader\]
+    at org.jboss.modules.ModuleClassLoader.findClass(ModuleClassLoader.java:191)</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="what-it-means">What it means:</h4>
+<div class="paragraph">
+<p>The ClassNotFoundException indicates a missing dependency. In this case,
+it can not find the class <code>javax.faces.FacesException</code> and you need to
+explicitly add the dependency.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="how-to-resolve-it">How to resolve it:</h4>
+<div class="paragraph">
+<p>Find the module name for that class in the <code>AS7_HOME/modules</code> directory
+by looking for a path that matches the missing class. In this case, you
+will find 2 modules that match:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">    javax/faces/api/main
+    javax/faces/api/1.2</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Both modules have the same module name: "javax.faces.api" but one in the
+main directory is for JSF 2.0 and the one located in the 1.2 directory
+is for JSF 1.2. If there was only one module available, we could simply
+create a <code>MANIFEST.MF</code> file and added the module dependency. But in this
+case, we want to use the JSF 1.2 version and not the 2.0 version in
+main, so we need to be able to specify one and exclude the other. To do
+this, we create a <code>jboss-deployment-structure.xml</code> file in the EAR
+<code>META-INF/</code> directory that contains the following data:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">&lt;jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.0"&gt;
+  &lt;deployment&gt;
+     &lt;dependencies&gt;
+       &lt;module name="javax.faces.api" slot="1.2" export="true"/&gt;
+     &lt;/dependencies&gt;
+  &lt;/deployment&gt;
+  &lt;sub-deployment name="jboss-seam-booking.war"&gt;
+   &lt;exclusions&gt;
+       &lt;module name="javax.faces.api" slot="main"/&gt;
+     &lt;/exclusions&gt;
+     &lt;dependencies&gt;
+       &lt;module name="javax.faces.api" slot="1.2"/&gt;
+     &lt;/dependencies&gt;
+  &lt;/sub-deployment&gt;
+&lt;/jboss-deployment-structure&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>+
+In the "deployment" section, we add the dependency for the
+<code>javax.faces.api</code> for the JSF 1.2 module. We also add the dependency for
+the JSF 1.2 module in the sub-deployment section for the WAR and exclude
+the module for JSF 2.0.</p>
+</div>
+<div class="paragraph">
+<p>+
+Redeploy the application by deleting the
+<code>standalone/deployments/jboss-seam-booking.ear.failed</code> file and creating
+a blank <code>jboss-seam-booking.ear.dodeploy</code> file in the same directory.</p>
+</div>
+<div class="paragraph">
+<p>+</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="next-issue-java.lang.classnotfoundexception-org.apache.commons.logging.log">Next Issue: java.lang.ClassNotFoundException:</h3>
+<div class="paragraph">
+<p>org.apache.commons.logging.Log</p>
+</div>
+<div class="paragraph">
+<p>When you deploy the application, the log contains the following error:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">ERROR [org.jboss.msc.service.fail] (MSC service thread 1-8) MSC00001: Failed to start service jboss.deployment.unit."jboss-seam-booking.ear".INSTALL:
+org.jboss.msc.service.StartException in service jboss.deployment.unit."jboss-seam-booking.ear".INSTALL:
+Failed to process phase INSTALL of deployment "jboss-seam-booking.ear"
+    (.. additional logs removed ...)
+Caused by: java.lang.ClassNotFoundException: org.apache.commons.logging.Log from [Module "deployment.jboss-seam-booking.ear.jboss-seam-booking.war:main" from Service Module Loader]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>+</p>
+</div>
+<div class="sect3">
+<h4 id="what-it-means-1">What it means:</h4>
+<div class="paragraph">
+<p>The ClassNotFoundException indicates a missing dependency. In this case,
+it can not find the class <code>org.apache.commons.logging.Log</code> and you need
+to explicitly add the dependency.</p>
+</div>
+<div class="paragraph">
+<p>+</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="how-to-resolve-it-1">How to resolve it:</h4>
+<div class="paragraph">
+<p>Find the module name for that class in the <code>JBOSS_HOME/modules/</code>
+directory by looking for a path that matches the missing class. In this
+case, you will find one module that matches the path
+<code>org/apache/commons/logging/</code>. The module name is
+"org.apache.commons.logging".</p>
+</div>
+<div class="paragraph">
+<p>Modify the <code>jboss-deployment-structure.xml</code> to add the module dependency
+to the deployment section of the file.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">&lt;module name="org.apache.commons.logging" export="true"/&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>+
+The <code>jboss-deployment-structure.xml</code> should now look like this:</p>
+</div>
+<div class="paragraph">
+<p>+</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">&lt;jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.0"&gt;
+  &lt;deployment&gt;
+     &lt;dependencies&gt;
+       &lt;module name="javax.faces.api" slot="1.2" export="true"/&gt;
+       &lt;module name="org.apache.commons.logging" export="true"/&gt;
+     &lt;/dependencies&gt;
+  &lt;/deployment&gt;
+  &lt;sub-deployment name="jboss-seam-booking.war"&gt;
+   &lt;exclusions&gt;
+       &lt;module name="javax.faces.api" slot="main"/&gt;
+     &lt;/exclusions&gt;
+     &lt;dependencies&gt;
+       &lt;module name="javax.faces.api" slot="1.2"/&gt;
+     &lt;/dependencies&gt;
+  &lt;/sub-deployment&gt;
+&lt;/jboss-deployment-structure&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>+
+Redeploy the application by deleting the
+<code>standalone/deployments/jboss-seam-booking.ear.failed</code> file and creating
+a blank <code>jboss-seam-booking.ear.dodeploy file</code> in the same directory.</p>
+</div>
+<div class="paragraph">
+<p>+</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="next-issue-java.lang.classnotfoundexception-org.dom4j.documentexception">Next Issue: java.lang.ClassNotFoundException:</h3>
+<div class="paragraph">
+<p>org.dom4j.DocumentException</p>
+</div>
+<div class="paragraph">
+<p>When you deploy the application, the log contains the following error:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">ERROR [org.apache.catalina.core.ContainerBase.[jboss.web].[default-host].[/seam-booking]] (MSC service thread 1-3) Exception sending context initialized event to listener instance of class org.jboss.seam.servlet.SeamListener: java.lang.NoClassDefFoundError: org/dom4j/DocumentException
+    (... additional logs removed ...)
+Caused by: java.lang.ClassNotFoundException: org.dom4j.DocumentException from [Module "deployment.jboss-seam-booking.ear.jboss-seam.jar:main" from Service Module Loader]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>+</p>
+</div>
+<div class="sect3">
+<h4 id="what-it-means-2">What it means:</h4>
+<div class="paragraph">
+<p>Again, the ClassNotFoundException indicates a missing dependency. In
+this case, it can not find the class <code>org.dom4j.DocumentException</code>.</p>
+</div>
+<div class="paragraph">
+<p>+</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="how-to-resolve-it-2">How to resolve it:</h4>
+<div class="paragraph">
+<p>Find the module name in the <code>JBOSS_HOME/modules/</code> directory by looking
+for the <code>org/dom4j/DocumentException</code>. The module name is "org.dom4j".</p>
+</div>
+<div class="paragraph">
+<p>Modify the <code>jboss-deployment-structure.xml</code> to add the module dependency
+to the deployment section of the file.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">&lt;module name="org.dom4j" export="true"/&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>+
+The <code>jboss-deployment-structure.xml</code> file should now look like this:</p>
+</div>
+<div class="paragraph">
+<p>+</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">&lt;jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.0"&gt;
+  &lt;deployment&gt;
+     &lt;dependencies&gt;
+       &lt;module name="javax.faces.api" slot="1.2" export="true"/&gt;
+       &lt;module name="org.apache.commons.logging" export="true"/&gt;
+           &lt;module name="org.dom4j" export="true"/&gt;
+          &lt;/dependencies&gt;
+  &lt;/deployment&gt;
+  &lt;sub-deployment name="jboss-seam-booking.war"&gt;
+   &lt;exclusions&gt;
+       &lt;module name="javax.faces.api" slot="main"/&gt;
+     &lt;/exclusions&gt;
+     &lt;dependencies&gt;
+       &lt;module name="javax.faces.api" slot="1.2"/&gt;
+     &lt;/dependencies&gt;
+  &lt;/sub-deployment&gt;
+&lt;/jboss-deployment-structure&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>+
+Redeploy the application by deleting the
+<code>standalone/deployments/jboss-seam-booking.ear.failed</code> file and creating
+a blank <code>jboss-seam-booking.ear.dodeploy file</code> in the same directory.</p>
+</div>
+<div class="paragraph">
+<p>+</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="next-issue-java.lang.classnotfoundexception-org.hibernate.validator.invalidvalue">Next Issue: java.lang.ClassNotFoundException:</h3>
+<div class="paragraph">
+<p>org.hibernate.validator.InvalidValue</p>
+</div>
+<div class="paragraph">
+<p>When you deploy the application, the log contains the following error:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">ERROR [org.apache.catalina.core.ContainerBase.[jboss.web].[default-host].[/seam-booking]] (MSC service thread 1-6) Exception sending context initialized event to listener instance of class org.jboss.seam.servlet.SeamListener: java.lang.RuntimeException: Could not create Component: org.jboss.seam.international.statusMessages
+    (... additional logs removed ...)
+Caused by: java.lang.ClassNotFoundException: org.hibernate.validator.InvalidValue from [Module "deployment.jboss-seam-booking.ear.jboss-seam.jar:main" from Service Module Loader]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>+</p>
+</div>
+<div class="sect3">
+<h4 id="what-it-means-3">What it means:</h4>
+<div class="paragraph">
+<p>Again, the ClassNotFoundException indicates a missing dependency. In
+this case, it can not find the class
+<code>org.hibernate.validator.InvalidValue</code>.</p>
+</div>
+<div class="paragraph">
+<p>+</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="how-to-resolve-it-3">How to resolve it:</h4>
+<div class="paragraph">
+<p>There is a module "org.hibernate.validator", but the JAR does not
+contain the <code>org.hibernate.validator.InvalidValue</code> class, so adding the
+module dependency will not resolve this issue.</p>
+</div>
+<div class="paragraph">
+<p>In this case, the JAR containing the class was part of the EAP 5.1
+deployment. We will look for the JAR that contains the missing class in
+the <code>EAP5_HOME/jboss-eap-5.1/seam/lib/</code> directory. To do this, open a
+console and type the following:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">cd EAP5_HOME/jboss-eap-5.1/seam/lib
+grep 'org.hibernate.validator.InvalidValue' `find . -name '*.jar'`</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>+
+The result shows:</p>
+</div>
+<div class="paragraph">
+<p>+</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">Binary file ./hibernate-validator.jar matches
+Binary file ./test/hibernate-all.jar matches</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>+
+In this case, we need to copy the <code>hibernate-validator.jar</code> to the
+<code>jboss-seam-booking.ear/lib/</code> directory:</p>
+</div>
+<div class="paragraph">
+<p>+</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">cp EAP5_HOME/jboss-eap-5.1/seam/lib/hibernate-validator.jar jboss-seam-booking.ear/lib</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>+
+Redeploy the application by deleting the
+<code>standalone/deployments/jboss-seam-booking.ear.failed</code> file and creating
+a blank <code>jboss-seam-booking.ear.dodeploy file</code> in the same directory.</p>
+</div>
+<div class="paragraph">
+<p>+</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="next-issue-java.lang.instantiationexception-org.jboss.seam.jsf.seamapplicationfactory">Next Issue: java.lang.InstantiationException:</h3>
+<div class="paragraph">
+<p>org.jboss.seam.jsf.SeamApplicationFactory</p>
+</div>
+<div class="paragraph">
+<p>When you deploy the application, the log contains the following error:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">INFO  [javax.enterprise.resource.webcontainer.jsf.config] (MSC service thread 1-7) Unsanitized stacktrace from failed start...: com.sun.faces.config.ConfigurationException: Factory 'javax.faces.application.ApplicationFactory' was not configured properly.
+ at com.sun.faces.config.processor.FactoryConfigProcessor.verifyFactoriesExist(FactoryConfigProcessor.java:296) [jsf-impl-2.0.4-b09-jbossorg-4.jar:2.0.4-b09-jbossorg-4]
+ (... additional logs removed ...)
+Caused by: javax.faces.FacesException: org.jboss.seam.jsf.SeamApplicationFactory
+ at javax.faces.FactoryFinder.getImplGivenPreviousImpl(FactoryFinder.java:606) [jsf-api-1.2_13.jar:1.2_13-b01-FCS]
+ (... additional logs removed ...)
+ at com.sun.faces.config.processor.FactoryConfigProcessor.verifyFactoriesExist(FactoryConfigProcessor.java:294) [jsf-impl-2.0.4-b09-jbossorg-4.jar:2.0.4-b09-jbossorg-4]
+ ... 11 more
+Caused by: java.lang.InstantiationException: org.jboss.seam.jsf.SeamApplicationFactory
+ at java.lang.Class.newInstance0(Class.java:340) [:1.6.0_25]
+ at java.lang.Class.newInstance(Class.java:308) [:1.6.0_25]
+ at javax.faces.FactoryFinder.getImplGivenPreviousImpl(FactoryFinder.java:604) [jsf-api-1.2_13.jar:1.2_13-b01-FCS]
+ ... 16 more</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>+</p>
+</div>
+<div class="sect3">
+<h4 id="what-it-means-4">What it means:</h4>
+<div class="paragraph">
+<p>The com.sun.faces.config.ConfigurationException and
+java.lang.InstantiationException indicate a dependency issue. In this
+case, it is not as obvious.</p>
+</div>
+<div class="paragraph">
+<p>+</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="how-to-resolve-it-4">How to resolve it:</h4>
+<div class="paragraph">
+<p>We need to find the module that contains the com.sun.faces classes.
+While there is no com.sun.faces module, there are are two
+com.sun.jsf-impl modules. A quick check of the jsf-impl-1.2_13.jar in
+the 1.2 directory shows it contains the com.sun.faces classes.</p>
+</div>
+<div class="paragraph">
+<p>As we did with the javax.faces.FacesException ClassNotFoundException, we
+want to use the JSF 1.2 version and not the JSF 2.0 version in main, so
+we need to be able to specify one and exclude the other. We need to
+modify the jboss-deployment-structure.xml to add the module dependency
+to the deployment section of the file. We also need to add it to the WAR
+subdeployment and exclude the JSF 2.0 module. The file should now look
+like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">&lt;jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.0"&gt;
+  &lt;deployment&gt;
+     &lt;dependencies&gt;
+       &lt;module name="javax.faces.api" slot="1.2" export="true"/&gt;
+              &lt;module name="com.sun.jsf-impl" slot="1.2" export="true"/&gt;
+       &lt;module name="org.apache.commons.logging" export="true"/&gt;
+       &lt;module name="org.dom4j" export="true"/&gt;
+     &lt;/dependencies&gt;
+  &lt;/deployment&gt;
+  &lt;sub-deployment name="jboss-seam-booking.war"&gt;
+   &lt;exclusions&gt;
+       &lt;module name="javax.faces.api" slot="main"/&gt;
+       &lt;module name="com.sun.jsf-impl" slot="main"/&gt;
+     &lt;/exclusions&gt;
+     &lt;dependencies&gt;
+       &lt;module name="javax.faces.api" slot="1.2"/&gt;
+              &lt;module name="com.sun.jsf-impl" slot="1.2"/&gt;
+     &lt;/dependencies&gt;
+  &lt;/sub-deployment&gt;
+&lt;/jboss-deployment-structure&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>+
+Redeploy the application by deleting the
+<code>standalone/deployments/jboss-seam-booking.ear.failed</code> file and creating
+a blank <code>jboss-seam-booking.ear.dodeploy file</code> in the same directory.</p>
+</div>
+<div class="paragraph">
+<p>+</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="next-issue-java.lang.classnotfoundexception-org.apache.commons.collections.arraystack">Next Issue: java.lang.ClassNotFoundException:</h3>
+<div class="paragraph">
+<p>org.apache.commons.collections.ArrayStack</p>
+</div>
+<div class="paragraph">
+<p>When you deploy the application, the log contains the following error:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">ERROR [org.apache.catalina.core.ContainerBase.[jboss.web].[default-host].[/seam-booking]] (MSC service thread 1-1) Exception sending context initialized event to listener instance of class com.sun.faces.config.ConfigureListener: java.lang.RuntimeException: com.sun.faces.config.ConfigurationException: CONFIGURATION FAILED! org.apache.commons.collections.ArrayStack from [Module "deployment.jboss-seam-booking.ear:main" from Service Module Loader]
+    (... additional logs removed ...)
+Caused by: java.lang.ClassNotFoundException: org.apache.commons.collections.ArrayStack from [Module "deployment.jboss-seam-booking.ear:main" from Service Module Loader]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>+</p>
+</div>
+<div class="sect3">
+<h4 id="what-it-means-5">What it means:</h4>
+<div class="paragraph">
+<p>Again, the ClassNotFoundException indicates a missing dependency. In
+this case, it can not find the class
+<code>org.apache.commons.collections.ArrayStack</code>.</p>
+</div>
+<div class="paragraph">
+<p>+</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="how-to-resolve-it-5">How to resolve it:</h4>
+<div class="paragraph">
+<p>Find the module name in the <code>JBOSS_HOME/modules/</code> directory by looking
+for the <code>org/apache/commons/collections</code> path. The module name is
+"org.apache.commons.collections".</p>
+</div>
+<div class="paragraph">
+<p>Modify the <code>jboss-deployment-structure.xml</code> to add the module dependency
+to the deployment section of the file.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">&lt;module name="org.apache.commons.collections" export="true"/&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>+
+The <code>jboss-deployment-structure.xml</code> file should now look like this:</p>
+</div>
+<div class="paragraph">
+<p>+</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">&lt;jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.0"&gt;
+  &lt;deployment&gt;
+     &lt;dependencies&gt;
+       &lt;module name="javax.faces.api" slot="1.2" export="true"/&gt;
+              &lt;module name="com.sun.jsf-impl" slot="1.2" export="true"/&gt;
+       &lt;module name="org.apache.commons.logging" export="true"/&gt;
+       &lt;module name="org.dom4j" export="true"/&gt;
+       &lt;module name="org.apache.commons.collections" export="true"/&gt;
+   &lt;/dependencies&gt;
+  &lt;/deployment&gt;
+  &lt;sub-deployment name="jboss-seam-booking.war"&gt;
+   &lt;exclusions&gt;
+       &lt;module name="javax.faces.api" slot="main"/&gt;
+       &lt;module name="com.sun.jsf-impl" slot="main"/&gt;
+     &lt;/exclusions&gt;
+     &lt;dependencies&gt;
+       &lt;module name="javax.faces.api" slot="1.2"/&gt;
+              &lt;module name="com.sun.jsf-impl" slot="1.2"/&gt;
+     &lt;/dependencies&gt;
+  &lt;/sub-deployment&gt;
+&lt;/jboss-deployment-structure&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>+
+Redeploy the application by deleting the
+<code>standalone/deployments/jboss-seam-booking.ear.failed</code> file and creating
+a blank <code>jboss-seam-booking.ear.dodeploy file</code> in the same directory.</p>
+</div>
+<div class="paragraph">
+<p>+</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="next-issue-services-with-missingunavailable-dependencies">Next Issue: Services with missing/unavailable dependencies</h3>
+<div class="paragraph">
+<p>When you deploy the application, the log contains the following error:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">ERROR [org.jboss.as.deployment] (DeploymentScanner-threads - 2) {"Composite operation failed and was rolled back. Steps that failed:" =&gt; {"Operation step-2" =&gt; {"Services with missing/unavailable dependencies" =&gt; ["jboss.deployment.subunit.\"jboss-seam-booking.ear\".\"jboss-seam-booking.jar\".component.AuthenticatorAction.START missing [ jboss.naming.context.java.comp.jboss-seam-booking.\"jboss-seam-booking.jar\".AuthenticatorAction.\"env/org.jboss.seam.example.booking.AuthenticatorAction/em\" ]","jboss.deployment.subunit.\"jboss-seam-booking.ear\".\"jboss-seam-booking.jar\".component.HotelSearchingAction.START missing [ jboss.naming.context.java.comp.jboss-seam-booking.\"jboss-seam-booking.jar\".HotelSearchingAction.\"env/org.jboss.seam.example.booking.HotelSearchingAction/em\" ]","
+&lt;... additional logs removed ...&gt;
+"jboss.deployment.subunit.\"jboss-seam-booking.ear\".\"jboss-seam-booking.jar\".component.BookingListAction.START missing [ jboss.naming.context.java.comp.jboss-seam-booking.\"jboss-seam-booking.jar\".BookingListAction.\"env/org.jboss.seam.example.booking.BookingListAction/em\" ]","jboss.persistenceunit.\"jboss-seam-booking.ear/jboss-seam-booking.jar#bookingDatabase\" missing [ jboss.naming.context.java.bookingDatasource ]"]}}}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>+</p>
+</div>
+<div class="sect3">
+<h4 id="what-it-means-6">What it means:</h4>
+<div class="paragraph">
+<p>When you get a "Services with missing/unavailable dependencies" error,
+look that the text within the brackets after "missing".</p>
+</div>
+<div class="paragraph">
+<p>In this case you see:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">missing [ jboss.naming.context.java.comp.jboss-seam-booking.\"jboss-seam-booking.jar\".AuthenticatorAction.\"env/org.jboss.seam.example.booking.AuthenticatorAction/em\" ]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>+
+The "/em" indicates an Entity Manager and datasource issue.</p>
+</div>
+<div class="paragraph">
+<p>+</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="how-to-resolve-it-6">How to resolve it:</h4>
+<div class="paragraph">
+<p>In WildFly {wildflyVersion}, datasource configuration has changed and needs to be
+defined in the <code>standalone/configuration/standalone.xml</code> file. Since
+WildFly ships with an example database that is already defined in the
+standalone.xml file, we will modify the <code>persistence.xml</code> file to use
+that example database. Looking in the <code>standalone.xml</code> file, you can see
+that the jndi-name for the example database is
+"java:jboss/datasources/ExampleDS".</p>
+</div>
+<div class="paragraph">
+<p>Modify the <code>jboss-seam-booking.jar/META-INF/persistence.xml</code> file to
+comment the existing jta-data-source element and replace it as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">&lt;!-- &lt;jta-data-source&gt;java:/bookingDatasource&lt;/jta-data-source&gt; --&gt;
+&lt;jta-data-source&gt;java:jboss/datasources/ExampleDS&lt;/jta-data-source&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>+
+Redeploy the application by deleting the
+<code>standalone/deployments/jboss-seam-booking.ear.failed</code> file and creating
+a blank <code>jboss-seam-booking.ear.dodeploy file</code> in the same directory.</p>
+</div>
+<div class="paragraph">
+<p>+</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="next-issue-java.lang.classnotfoundexception-org.hibernate.cache.hashtablecacheprovider">Next Issue: java.lang.ClassNotFoundException:</h3>
+<div class="paragraph">
+<p>org.hibernate.cache.HashtableCacheProvider</p>
+</div>
+<div class="paragraph">
+<p>When you deploy the application, the log contains the following error:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">ERROR [org.jboss.msc.service.fail] (MSC service thread 1-4) MSC00001: Failed to start service jboss.persistenceunit."jboss-seam-booking.ear/jboss-seam-booking.jar#bookingDatabase": org.jboss.msc.service.StartException in service jboss.persistenceunit."jboss-seam-booking.ear/jboss-seam-booking.jar#bookingDatabase": Failed to start service
+ at org.jboss.msc.service.ServiceControllerImpl$StartTask.run(ServiceControllerImpl.java:1786)
+ (... log messages removed ...)
+Caused by: javax.persistence.PersistenceException: [PersistenceUnit: bookingDatabase] Unable to build EntityManagerFactory
+ at org.hibernate.ejb.Ejb3Configuration.buildEntityManagerFactory(Ejb3Configuration.java:903)
+ {... log messages removed ...)
+Caused by: org.hibernate.HibernateException: could not instantiate RegionFactory [org.hibernate.cache.internal.bridge.RegionFactoryCacheProviderBridge]
+ at org.hibernate.cfg.SettingsFactory.createRegionFactory(SettingsFactory.java:355)
+ (... log messages removed ...)
+Caused by: java.lang.reflect.InvocationTargetException
+ at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method) [:1.6.0_25]
+ (... log messages removed ...)
+Caused by: org.hibernate.cache.CacheException: could not instantiate CacheProvider [org.hibernate.cache.HashtableCacheProvider]
+ at org.hibernate.cache.internal.bridge.RegionFactoryCacheProviderBridge.&lt;init&gt;(RegionFactoryCacheProviderBridge.java:68)
+ ... 20 more
+Caused by: java.lang.ClassNotFoundException: org.hibernate.cache.HashtableCacheProvider from [Module "org.hibernate:main" from local module loader @12a3793 (roots: /home/sgilda/tools/jboss7/modules)]
+ at org.jboss.modules.ModuleClassLoader.findClass(ModuleClassLoader.java:191)
+ (... log messages removed ...)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>+</p>
+</div>
+<div class="sect3">
+<h4 id="what-it-means-7">What it means:</h4>
+<div class="paragraph">
+<p>The ClassNotFoundException indicates a missing dependency. In this case,
+it can not find the class org.hibernate.cache.HashtableCacheProvider.</p>
+</div>
+<div class="paragraph">
+<p>+</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="how-to-resolve-it-7">How to resolve it:</h4>
+<div class="paragraph">
+<p>There is no module for "org.hibernate.cache". In this case, the JAR
+containing the class was part of the EAP 5.1 deployment. We will look
+for the JAR that contains the missing class in the
+<code>EAP5_HOME/jboss-eap-5.1/seam/lib/</code> directory.</p>
+</div>
+<div class="paragraph">
+<p>To do this, open a console and type the following:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">cd EAP5_HOME/jboss-eap-5.1/seam/lib
+grep 'org.hibernate.validator.InvalidValue' `find . -name '*.jar'`</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>+
+The result shows:</p>
+</div>
+<div class="paragraph">
+<p>+</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">Binary file ./hibernate-core.jar matches
+Binary file ./test/hibernate-all.jar matches</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>+
+In this case, we need to copy the <code>hibernate-core.jar</code> to the
+<code>jboss-seam-booking.ear/lib/</code> directory:</p>
+</div>
+<div class="paragraph">
+<p>+</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">cp EAP5_HOME/jboss-eap-5.1/seam/lib/hibernate-core.jar jboss-seam-booking.ear/lib</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>+
+Redeploy the application by deleting the
+<code>standalone/deployments/jboss-seam-booking.ear.failed</code> file and creating
+a blank <code>jboss-seam-booking.ear.dodeploy file</code> in the same directory.</p>
+</div>
+<div class="paragraph">
+<p>+</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="next-issue-java.lang.classcastexception-org.hibernate.cache.hashtablecacheprovider">Next Issue: java.lang.ClassCastException:</h3>
+<div class="paragraph">
+<p>org.hibernate.cache.HashtableCacheProvider</p>
+</div>
+<div class="paragraph">
+<p>When you deploy the application, the log contains the following error:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">ERROR [org.jboss.msc.service.fail] (MSC service thread 1-2) MSC00001: Failed to start service jboss.persistenceunit."jboss-seam-booking.ear/jboss-seam-booking.jar#bookingDatabase": org.jboss.msc.service.StartException in service jboss.persistenceunit."jboss-seam-booking.ear/jboss-seam-booking.jar#bookingDatabase": Failed to start service
+ at org.jboss.msc.service.ServiceControllerImpl$StartTask.run(ServiceControllerImpl.java:1786)
+ (... log messages removed ...)
+Caused by: javax.persistence.PersistenceException: [PersistenceUnit: bookingDatabase] Unable to build EntityManagerFactory
+ at org.hibernate.ejb.Ejb3Configuration.buildEntityManagerFactory(Ejb3Configuration.java:903)
+ (... log messages removed ...)
+Caused by: org.hibernate.HibernateException: could not instantiate RegionFactory [org.hibernate.cache.internal.bridge.RegionFactoryCacheProviderBridge]
+ at org.hibernate.cfg.SettingsFactory.createRegionFactory(SettingsFactory.java:355)
+ (... log messages removed ...)
+Caused by: java.lang.reflect.InvocationTargetException
+ at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method) [:1.6.0_25]
+ (... log messages removed ...)
+Caused by: org.hibernate.cache.CacheException: could not instantiate CacheProvider [org.hibernate.cache.HashtableCacheProvider]
+ at org.hibernate.cache.internal.bridge.RegionFactoryCacheProviderBridge.&lt;init&gt;(RegionFactoryCacheProviderBridge.java:68)
+ ... 20 more
+Caused by: java.lang.ClassCastException: org.hibernate.cache.HashtableCacheProvider cannot be cast to org.hibernate.cache.spi.CacheProvider
+ at org.hibernate.cache.internal.bridge.RegionFactoryCacheProviderBridge.&lt;init&gt;(RegionFactoryCacheProviderBridge.java:65)
+ ... 20 more</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>+</p>
+</div>
+<div class="sect3">
+<h4 id="what-it-means-8">What it means:</h4>
+<div class="paragraph">
+<p>A ClassCastException can be a result of many problems. If you look at
+this exception in the log, it appears the class
+org.hibernate.cache.HashtableCacheProvider extends
+org.hibernate.cache.spi.CacheProvider and is being loaded by a different
+class loader than the class it extends. The
+org.hibernate.cache.HashtableCacheProvider class is in in the
+hibernate-core.jar and is being loaded by the application class loader.
+The class it extends, org.hibernate.cache.spi.CacheProvider, is in the
+org/hibernate/main/hibernate-core-4.0.0.Beta1.jar and is implicitly
+loaded by that module.</p>
+</div>
+<div class="paragraph">
+<p>This is not obvious, but due to changes in Hibernate 4, this problem is
+caused by a backward compatibility issue due moving the
+HashtableCacheProvider class into another package. This class was moved
+from the org.hibernate.cache package to the org.hibernate.cache.internal
+package. If you don&#8217;t remove the hibernate.cache.provider_class property
+from the persistence.xml file, it will force the Seam application to
+bundle the old Hibernate libraries, resulting in ClassCastExceptions, In
+WildFly, you should move away from using HashtableCacheProvider and use
+Infinispan instead.</p>
+</div>
+<div class="paragraph">
+<p>+</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="how-to-resolve-it-8">How to resolve it:</h4>
+<div class="paragraph">
+<p>In WildFly, you need to comment out the hibernate.cache.provider_class
+property in the <code>jboss-seam-booking.jar/META-INF persistence.xml</code> file
+as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">&lt;!-- &lt;property name="hibernate.cache.provider_class" value="org.hibernate.cache.HashtableCacheProvider"/&gt; --&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>+
+Redeploy the application by deleting the
+<code>standalone/deployments/jboss-seam-booking.ear.failed</code> file and creating
+a blank <code>jboss-seam-booking.ear.dodeploy file</code> in the same directory.</p>
+</div>
+<div class="paragraph">
+<p>+</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="no-more-issues-deployment-errors-should-be-resolved">No more issues: Deployment errors should be resolved</h3>
+<div class="paragraph">
+<p>At this point, the application should deploy without errors, but when
+you access the URL " <a href="http://localhost:8080/seam-booking/"" class="bare">http://localhost:8080/seam-booking/"</a> in a browser
+and attempt "Account Login", you will get a runtime error "The page
+isn&#8217;t redirecting properly". In the next section, we will step through
+each runtime issue and how to debug and resolve it.</p>
+</div>
+<div class="paragraph">
+<p>+</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="step-3-debug-and-resolve-runtime-errors-and-exceptions">Step 3: Debug and resolve runtime errors and exceptions</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="first-issue-javax.naming.namenotfoundexception-name-jboss-seam-booking-not-found-in-context">First Issue: javax.naming.NameNotFoundException: Name</h3>
+<div class="paragraph">
+<p>'jboss-seam-booking' not found in context ''</p>
+</div>
+<div class="paragraph">
+<p>The application deploys successfully, but when you access the URL "
+<a href="http://localhost:8080/seam-booking/"" class="bare">http://localhost:8080/seam-booking/"</a> in a browser, you get "The page
+isn&#8217;t redirecting properly" and the log contains the following error:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">SEVERE [org.jboss.seam.jsf.SeamPhaseListener] (http--127.0.0.1-8080-1) swallowing exception: java.lang.IllegalStateException: Could not start transaction
+ at org.jboss.seam.jsf.SeamPhaseListener.begin(SeamPhaseListener.java:598) [jboss-seam.jar:]
+ (... log messages removed ...)
+Caused by: org.jboss.seam.InstantiationException: Could not instantiate Seam component: org.jboss.seam.transaction.synchronizations
+ at org.jboss.seam.Component.newInstance(Component.java:2170) [jboss-seam.jar:]
+ (... log messages removed ...)
+Caused by: javax.naming.NameNotFoundException: Name 'jboss-seam-booking' not found in context ''
+ at org.jboss.as.naming.util.NamingUtils.nameNotFoundException(NamingUtils.java:109)
+ (... log messages removed ...)</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="what-it-means-9">What it means:</h4>
+<div class="paragraph">
+<p>A NameNotFoundException indications a JNDI naming issue. JNDI naming
+rules have changed in WildFly and we need to modify the lookup names to
+follow the new rules.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="how-to-resolve-it-9">How to resolve it:</h4>
+<div class="paragraph">
+<p>To debug this, look earlier in the server log trace to what JNDI binding
+were used. Looking at the server log we see this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">15:01:16,138 INFO  [org.jboss.as.ejb3.deployment.processors.EjbJndiBindingsDeploymentUnitProcessor] (MSC service thread 1-1) JNDI bindings for session bean named RegisterAction in deployment unit subdeployment "jboss-seam-booking.jar" of deployment "jboss-seam-booking.ear" are as follows:
+ 
+ java:global/jboss-seam-booking/jboss-seam-booking.jar/RegisterAction!org.jboss.seam.example.booking.Register
+ java:app/jboss-seam-booking.jar/RegisterAction!org.jboss.seam.example.booking.Register
+ java:module/RegisterAction!org.jboss.seam.example.booking.Register
+ java:global/jboss-seam-booking/jboss-seam-booking.jar/RegisterAction
+ java:app/jboss-seam-booking.jar/RegisterAction
+ java:module/RegisterAction
+ 
+15:01:16,138 INFO  [org.jboss.as.ejb3.deployment.processors.EjbJndiBindingsDeploymentUnitProcessor] (MSC service thread 1-1) JNDI bindings for session bean named BookingListAction in deployment unit subdeployment "jboss-seam-booking.jar" of deployment "jboss-seam-booking.ear" are as follows:
+ 
+ java:global/jboss-seam-booking/jboss-seam-booking.jar/BookingListAction!org.jboss.seam.example.booking.BookingList
+ java:app/jboss-seam-booking.jar/BookingListAction!org.jboss.seam.example.booking.BookingList
+ java:module/BookingListAction!org.jboss.seam.example.booking.BookingList
+ java:global/jboss-seam-booking/jboss-seam-booking.jar/BookingListAction
+ java:app/jboss-seam-booking.jar/BookingListAction
+ java:module/BookingListAction
+ 
+15:01:16,138 INFO  [org.jboss.as.ejb3.deployment.processors.EjbJndiBindingsDeploymentUnitProcessor] (MSC service thread 1-1) JNDI bindings for session bean named HotelBookingAction in deployment unit subdeployment "jboss-seam-booking.jar" of deployment "jboss-seam-booking.ear" are as follows:
+ 
+ java:global/jboss-seam-booking/jboss-seam-booking.jar/HotelBookingAction!org.jboss.seam.example.booking.HotelBooking
+ java:app/jboss-seam-booking.jar/HotelBookingAction!org.jboss.seam.example.booking.HotelBooking
+ java:module/HotelBookingAction!org.jboss.seam.example.booking.HotelBooking
+ java:global/jboss-seam-booking/jboss-seam-booking.jar/HotelBookingAction
+ java:app/jboss-seam-booking.jar/HotelBookingAction
+ java:module/HotelBookingAction
+ 
+15:01:16,138 INFO  [org.jboss.as.ejb3.deployment.processors.EjbJndiBindingsDeploymentUnitProcessor] (MSC service thread 1-1) JNDI bindings for session bean named AuthenticatorAction in deployment unit subdeployment "jboss-seam-booking.jar" of deployment "jboss-seam-booking.ear" are as follows:
+ 
+ java:global/jboss-seam-booking/jboss-seam-booking.jar/AuthenticatorAction!org.jboss.seam.example.booking.Authenticator
+ java:app/jboss-seam-booking.jar/AuthenticatorAction!org.jboss.seam.example.booking.Authenticator
+ java:module/AuthenticatorAction!org.jboss.seam.example.booking.Authenticator
+ java:global/jboss-seam-booking/jboss-seam-booking.jar/AuthenticatorAction
+ java:app/jboss-seam-booking.jar/AuthenticatorAction
+ java:module/AuthenticatorAction
+ 
+15:01:16,139 INFO  [org.jboss.as.ejb3.deployment.processors.EjbJndiBindingsDeploymentUnitProcessor] (MSC service thread 1-1) JNDI bindings for session bean named ChangePasswordAction in deployment unit subdeployment "jboss-seam-booking.jar" of deployment "jboss-seam-booking.ear" are as follows:
+ 
+ java:global/jboss-seam-booking/jboss-seam-booking.jar/ChangePasswordAction!org.jboss.seam.example.booking.ChangePassword
+ java:app/jboss-seam-booking.jar/ChangePasswordAction!org.jboss.seam.example.booking.ChangePassword
+ java:module/ChangePasswordAction!org.jboss.seam.example.booking.ChangePassword
+ java:global/jboss-seam-booking/jboss-seam-booking.jar/ChangePasswordAction
+ java:app/jboss-seam-booking.jar/ChangePasswordAction
+ java:module/ChangePasswordAction
+ 
+15:01:16,139 INFO  [org.jboss.as.ejb3.deployment.processors.EjbJndiBindingsDeploymentUnitProcessor] (MSC service thread 1-1) JNDI bindings for session bean named HotelSearchingAction in deployment unit subdeployment "jboss-seam-booking.jar" of deployment "jboss-seam-booking.ear" are as follows:
+ 
+ java:global/jboss-seam-booking/jboss-seam-booking.jar/HotelSearchingAction!org.jboss.seam.example.booking.HotelSearching
+ java:app/jboss-seam-booking.jar/HotelSearchingAction!org.jboss.seam.example.booking.HotelSearching
+ java:module/HotelSearchingAction!org.jboss.seam.example.booking.HotelSearching
+ java:global/jboss-seam-booking/jboss-seam-booking.jar/HotelSearchingAction
+ java:app/jboss-seam-booking.jar/HotelSearchingAction
+ java:module/HotelSearchingAction
+ 
+15:01:16,140 INFO  [org.jboss.as.ejb3.deployment.processors.EjbJndiBindingsDeploymentUnitProcessor] (MSC service thread 1-6) JNDI bindings for session bean named EjbSynchronizations in deployment unit subdeployment "jboss-seam.jar" of deployment "jboss-seam-booking.ear" are as follows:
+ 
+ java:global/jboss-seam-booking/jboss-seam/EjbSynchronizations!org.jboss.seam.transaction.LocalEjbSynchronizations
+ java:app/jboss-seam/EjbSynchronizations!org.jboss.seam.transaction.LocalEjbSynchronizations
+ java:module/EjbSynchronizations!org.jboss.seam.transaction.LocalEjbSynchronizations
+ java:global/jboss-seam-booking/jboss-seam/EjbSynchronizations
+ java:app/jboss-seam/EjbSynchronizations
+ java:module/EjbSynchronizations
+ 
+15:01:16,140 INFO  [org.jboss.as.ejb3.deployment.processors.EjbJndiBindingsDeploymentUnitProcessor] (MSC service thread 1-6) JNDI bindings for session bean named TimerServiceDispatcher in deployment unit subdeployment "jboss-seam.jar" of deployment "jboss-seam-booking.ear" are as follows:
+ 
+ java:global/jboss-seam-booking/jboss-seam/TimerServiceDispatcher!org.jboss.seam.async.LocalTimerServiceDispatcher
+ java:app/jboss-seam/TimerServiceDispatcher!org.jboss.seam.async.LocalTimerServiceDispatcher
+ java:module/TimerServiceDispatcher!org.jboss.seam.async.LocalTimerServiceDispatcher
+ java:global/jboss-seam-booking/jboss-seam/TimerServiceDispatcher
+ java:app/jboss-seam/TimerServiceDispatcher
+ java:module/TimerServiceDispatcher</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We need to modify the WAR&#8217;s lib/components.xml file to use the new JNDI
+bindings. In the log, note the EJB JNDI bindings all start with
+"java:app/jboss-seam-booking.jar"</p>
+</div>
+<div class="paragraph">
+<p>Replace the &lt;core:init&gt; element as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">&lt;!--     &lt;core:init jndi-pattern="jboss-seam-booking/#{ejbName}/local" debug="true" distributable="false"/&gt; --&gt;
+&lt;core:init jndi-pattern="java:app/jboss-seam-booking.jar/#{ejbName}" debug="true" distributable="false"/&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>+
+Next, we need to add the EjbSynchronizations and TimerServiceDispatcher
+JNDI bindings. Add the following component elements to the file:</p>
+</div>
+<div class="paragraph">
+<p>+</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">&lt;component class="org.jboss.seam.transaction.EjbSynchronizations" jndi-name="java:app/jboss-seam/EjbSynchronizations"/&gt;
+&lt;component class="org.jboss.seam.async.TimerServiceDispatcher" jndi-name="java:app/jboss-seam/TimerServiceDispatcher"/&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>+
+The components.xml file should now look like this:</p>
+</div>
+<div class="paragraph">
+<p>+</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;components xmlns="http://jboss.com/products/seam/components"
+            xmlns:core="http://jboss.com/products/seam/core"
+            xmlns:security="http://jboss.com/products/seam/security"
+            xmlns:transaction="http://jboss.com/products/seam/transaction"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation=
+                "http://jboss.com/products/seam/core http://jboss.com/products/seam/core-2.2.xsd
+                 http://jboss.com/products/seam/transaction http://jboss.com/products/seam/transaction-2.2.xsd
+                 http://jboss.com/products/seam/security http://jboss.com/products/seam/security-2.2.xsd
+                 http://jboss.com/products/seam/components http://jboss.com/products/seam/components-2.2.xsd"&gt;
+ 
+    &lt;!-- &lt;core:init jndi-pattern="jboss-seam-booking/#{ejbName}/local" debug="true" distributable="false"/&gt; --&gt;
+    &lt;core:init jndi-pattern="java:app/jboss-seam-booking.jar/#{ejbName}" debug="true" distributable="false"/&gt;
+ 
+    &lt;core:manager conversation-timeout="120000"
+                  concurrent-request-timeout="500"
+                  conversation-id-parameter="cid"/&gt;
+ 
+    &lt;transaction:ejb-transaction/&gt;
+ 
+    &lt;security:identity authenticate-method="#{authenticator.authenticate}"/&gt;
+ 
+    &lt;component class="org.jboss.seam.transaction.EjbSynchronizations"
+            jndi-name="java:app/jboss-seam/EjbSynchronizations"/&gt;
+    &lt;component class="org.jboss.seam.async.TimerServiceDispatcher"
+            jndi-name="java:app/jboss-seam/TimerServiceDispatcher"/&gt;
+&lt;/components&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>+
+Redeploy the application by deleting the
+<code>standalone/deployments/jboss-seam-booking.ear.failed</code> file and creating
+a blank <code>jboss-seam-booking.ear.dodeploy</code> file in the same directory.</p>
+</div>
+<div class="paragraph">
+<p>+
+At this point, the application should deploy and run without error. When
+you access the URL " <a href="http://localhost:8080/seam-booking/"" class="bare">http://localhost:8080/seam-booking/"</a> in a browser,
+you will be able to login successfully.</p>
+</div>
+<div class="paragraph">
+<p>+</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="step-4-access-the-application">Step 4: Access the application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Access the URL " <a href="http://localhost:8080/seam-booking/"" class="bare">http://localhost:8080/seam-booking/"</a> in a browser and
+login with demo/demo. You should the Booking welcome page.</p>
+</div>
+<div class="paragraph">
+<p>+</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="summary-of-changes">Summary of Changes</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Although it would be much more efficient to determine dependencies in
+advance and add the implicit dependencies in one step, this exercise
+shows how problems appear in the log and provides some information on
+how to debug and resolve them.</p>
+</div>
+<div class="paragraph">
+<p>The following is a summary of changes made to the application when
+migrating it to WildFly:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>We created a <code>jboss-deployment-structure.xml</code> file in the EAR&#8217;s
+<code>META-INF/</code> directory. We added "dependencies" and "exclusions" to
+resolve ClassNotFoundExceptions. This file contains the following data:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">&lt;jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.0"&gt;
+  &lt;deployment&gt;
+     &lt;dependencies&gt;
+       &lt;module name="javax.faces.api" slot="1.2" export="true"/&gt;
+       &lt;module name="com.sun.jsf-impl" slot="1.2" export="true"/&gt;
+       &lt;module name="org.apache.commons.logging" export="true"/&gt;
+           &lt;module name="org.dom4j" export="true"/&gt;
+       &lt;module name="org.apache.commons.collections" export="true"/&gt;
+     &lt;/dependencies&gt;
+  &lt;/deployment&gt;
+  &lt;sub-deployment name="jboss-seam-booking.war"&gt;
+   &lt;exclusions&gt;
+       &lt;module name="javax.faces.api" slot="main"/&gt;
+       &lt;module name="com.sun.jsf-impl" slot="main"/&gt;
+     &lt;/exclusions&gt;
+     &lt;dependencies&gt;
+       &lt;module name="javax.faces.api" slot="1.2"/&gt;
+       &lt;module name="com.sun.jsf-impl" slot="1.2"/&gt;
+     &lt;/dependencies&gt;
+  &lt;/sub-deployment&gt;
+&lt;/jboss-deployment-structure&gt;</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>We copied the following JARs from the
+<code>EAP5_HOME/jboss-eap-5.1/seam/lib/</code> directory to the
+<code>jboss-seam-booking.ear/lib/</code> directory to resolve
+ClassNotFoundExceptions:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">hibernate-core.jar
+hibernate-validator.jar</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>We modified the \{\{jboss-seam-booking.jar/META-INF/persistence.xml}
+file as follows.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>First, we changed the jta-data-source element to use the Example
+database that ships with AS7:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">&lt;!-- &lt;jta-data-source&gt;java:/bookingDatasource&lt;/jta-data-source&gt; --&gt;
+&lt;jta-data-source&gt;java:jboss/datasources/ExampleDS&lt;/jta-data-source&gt;</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Next, we commented out the hibernate.cache.provider_class property:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">&lt;!-- &lt;property name="hibernate.cache.provider_class" value="org.hibernate.cache.HashtableCacheProvider"/&gt; --&gt;</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>We modified the WAR&#8217;s lib/components.xml file to use the new JNDI
+bindings</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>We replaced the &lt;core:init&gt; existing element as follows:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">&lt;!-- &lt;core:init jndi-pattern="jboss-seam-booking/#{ejbName}/local" debug="true" distributable="false"/&gt; --&gt;
+&lt;core:init jndi-pattern="java:app/jboss-seam-booking.jar/#{ejbName}" debug="true" distributable="false"/&gt;</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>We added component elements for the "EjbSynchronizations" and
+"TimerServiceDispatcher" JNDI bindings</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java"> &lt;component class="org.jboss.seam.transaction.EjbSynchronizations" jndi-name="java:app/jboss-seam/EjbSynchronizations"/&gt;
+ &lt;component class="org.jboss.seam.async.TimerServiceDispatcher" jndi-name="java:app/jboss-seam/TimerServiceDispatcher"/&gt;</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The unmodified EAR from EAP 5.1 (jboss-seam-booking-eap51.ear.tar.gz)
+and the EAR as modified to run on AS7
+(jboss-seam-booking-as7.ear.tar.gz) are attached to this document.</p>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div></div>
+</div>
+
+
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">WildFly is open. All dependencies of this project are available under the <a href='https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html' class='dark-background' target='_blank'>LGPL 2.1</a> or compatible license.<br/><br/>This website was built with <a href='https://jekyllrb.com/' class='dark-background' target='_blank'>Jekyll</a> is hosted on <a href='https://pages.github.com/' class='dark-background' target='_blank'>Github Pages</a> and is completely open source. If you want to make it better, <a href='https://github.com/wildfly/wildfly.org/fork' class='dark-background' target='_blank'>fork it</a> and show us what you’ve got.</p>
+
+    
+      <div class="width-1-12 project-links">
+        <strong>Navigation</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="/wildflysite/downloads" class="dark-background">Downloads</a></li>
+          
+            <li><a href="/wildflysitef/docs" class="dark-background">Docs</a></li>
+          
+            <li><a href="https://github.com/wildfly/wildfly" class="dark-background">Github</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <strong>Contribute</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="https://issues.jboss.org/browse/WFLY" class="dark-background">Submit a bug</a></li>
+          
+            <li><a href="https://community.jboss.org/en/wildfly?view=discussion" class="dark-background">Join the forum</a></li>
+          
+            <li><a href="https://github.com/wildfly/wildfly/fork" class="dark-background">Fork WildFly</a></li>
+          
+            <li><a href="https://twitter.com/WildFlyAS" class="dark-background">Follow us</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <strong>Get Help</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="https://community.jboss.org/en/wildfly?view=discussion" class="dark-background">Join the forum</a></li>
+          
+            <li><a href="https://www.hipchat.com/gFOhnVQke" class="dark-background">Join HipChat</a></li>
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-6-12 more-links">
+        <strong>Find more Red Hat Middleware Community Projects</strong>
+        <ul class="footer-links">
+          
+            <li><a href="https://www.apiman.io/" class="dark-background">APIMan</a></li>
+          
+            <li><a href="http://arquillian.org" class="dark-background">Arquillian</a></li>
+          
+            <li><a href="http://byteman.jboss.org/" class="dark-background">Byteman</a></li>
+          
+            <li><a href="http://capedwarf.org/" class="dark-background">CapeDwarf</a></li>
+          
+            <li><a href="https://github.com/alechenninger/chronicler" class="dark-background">Chronicler</a></li>
+          
+            <li><a href="https://github.com/darcy-framework" class="dark-background">Darcy</a></li>
+          
+            <li><a href="http://debezium.io/" class="dark-background">Debezium</a></li>
+          
+            <li><a href="https://www.drools.org/" class="dark-background">Drools</a></li>
+          
+            <li><a href="http://gatein.jboss.org/" class="dark-background">GateIn</a></li>
+          
+            <li><a href="http://www.hawkular.org/" class="dark-background">Hawkular</a></li>
+          
+            <li><a href="http://hawt.io/" class="dark-background">Hawtio</a></li>
+          
+            <li><a href="http://hibernate.org/" class="dark-background">Hibernate</a></li>
+          
+            <li><a href="http://www.infinispan.org/" class="dark-background">Infinispan</a></li>
+          
+            <li><a href="https://devstudio.jboss.com/" class="dark-background">JBoss DevStudio</a></li>
+          
+            <li><a href="http://forge.jboss.org/" class="dark-background">JBoss Forge</a></li>
+          
+            <li><a href="https://github.com/jboss-logging" class="dark-background">JBoss Logging</a></li>
+          
+            <li><a href="http://jbossremoting.jboss.org/" class="dark-background">JBoss Remoting</a></li>
+          
+            <li><a href="https://www.jbpm.org/" class="dark-background">jBPM</a></li>
+          
+            <li><a href="https://jsfunit.jboss.org/" class="dark-background">JSFUnit</a></li>
+          
+            <li><a href="https://www.keycloak.org/" class="dark-background">Keycloak</a></li>
+          
+            <li><a href="http://modcluster.io/" class="dark-background">Mod Cluster</a></li>
+          
+            <li><a href="http://modeshape.jboss.org/" class="dark-background">ModeShape</a></li>
+          
+            <li><a href="https://www.optaplanner.org/" class="dark-background">OptaPlanner</a></li>
+          
+            <li><a href="https://picketbox.jboss.org/" class="dark-background">Picketbox</a></li>
+          
+            <li><a href="http://resteasy.jboss.org/" class="dark-background">RESTEasy</a></li>
+          
+            <li><a href="https://riftsaw.jboss.org/" class="dark-background">Riftsaw</a></li>
+          
+            <li><a href="http://savara.jboss.org/" class="dark-background">Savara</a></li>
+          
+            <li><a href="http://seamframework.org/" class="dark-background">Seam</a></li>
+          
+            <li><a href="http://arquillian.org/" class="dark-background">Shrinkwrap</a></li>
+          
+            <li><a href="http://snowdrop.jboss.org/" class="dark-background">Snowdrop</a></li>
+          
+            <li><a href="https://switchyard.jboss.org/" class="dark-background">Switchyard</a></li>
+          
+            <li><a href="https://tattletale.jboss.org/" class="dark-background">Tattletale</a></li>
+          
+            <li><a href="http://teiid.jboss.org/" class="dark-background">Teiid</a></li>
+          
+            <li><a href="http://wildfly-swarm.io/" class="dark-background">WildFly Swarm</a></li>
+          
+            <li><a href="http://wise.jboss.org/" class="dark-background">Wise</a></li>
+          
+            <li><a href="https://xnio.jboss.org/" class="dark-background">XNIO</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" class="dark-background" target="_blank">CC by 3.0</a>
+    </span>
+    <span class="redhat">
+      a Red Hat sponsored project   
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/"><img src="/wildflysite/assets/img/RHLogo_white.svg"></a>
+    </span>
+  </div>
+</div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script type="text/javascript" src="/wildflysite/assets/javascript/mobile-nav.js"></script>
+</body>
+
+</html>

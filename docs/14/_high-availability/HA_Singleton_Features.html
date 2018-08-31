@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="">
+  <link rel="shortcut icon" type="image/png" href="/wildflysite/favicon.ico" >
+  <link rel="stylesheet" href="/wildflysite/assets/css/main.css" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+
+
+</head>
+
+<body class="HA Singleton Features">
+  <div class="content">
+    <div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          
+            <a href="/wildflysite/docs/14/" class="active">Docs</a>
+          
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+
+    <div class="docs-page grid-wrapper">
+  <div class="grid__item width-12-12 docs-v-icons">
+    <a href="/wildflysite/docs/13/" ><img src="/wildflysite/assets/img/docs/wildfly_icons_docs-13-inactive.png"></a>
+    <a href="https://docs.wildfly.org/12/" target="_blank"><img src="/wildflysite/assets/img/docs/wildfly_icons_docs-12-inactive.png"></a>
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-11-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-10-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-09-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-08-coming.png">
+  </div>
+  <div class="grid__item width-12-12"><h1 class="title">HA Singleton Features</h1></div>
+  <div class="grid__item width-3-12 doc-toc"><ul class="inline_toc">
+  <li><a href="#Singleton_subsystem">Singleton subsystem</a>
+    <ul>
+      <li><a href="#singleton-configuration">Configuration</a>
+        <ul>
+          <li><a href="#cache-configuration">Cache configuration</a></li>
+          <li><a href="#election-policies">Election policies</a>
+            <ul>
+              <li><a href="#preferences">Preferences</a></li>
+            </ul>
+          </li>
+          <li><a href="#quorum">Quorum</a></li>
+        </ul>
+      </li>
+      <li><a href="#non-ha-environments">Non-HA environments</a></li>
+    </ul>
+  </li>
+  <li><a href="#Singleton_deployments">Singleton deployments</a>
+    <ul>
+      <li><a href="#usage">Usage</a></li>
+    </ul>
+  </li>
+  <li><a href="#Singleton_MSC_services">Singleton MSC services</a>
+    <ul>
+      <li><a href="#installing-an-msc-service-using-an-existing-singleton-policy">Installing an MSC service using an existing singleton policy</a></li>
+      <li><a href="#installing-an-msc-service-using-dynamic-singleton-policy">Installing an MSC service using dynamic singleton policy</a></li>
+    </ul>
+  </li>
+</ul></div>
+  <div class="grid__item width-9-12 doc-content"><div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>In general, an HA or clustered singleton is a service that exists on
+multiple nodes in a cluster, but is active on just a single node at any
+given time. If the node providing the service fails or is shut down, a
+new singleton provider is chosen and started. Thus, other than a brief
+interval when one provider has stopped and another has yet to start, the
+service is always running on one node.</p>
+</div>
+</div>
+</div>
+<h1 id="Singleton_subsystem" class="sect0">Singleton subsystem</h1>
+<div class="paragraph">
+<p>WildFly 10 introduced a "singleton" subsystem, which defines a set of
+policies that define how an HA singleton should behave. A singleton
+policy can be used to instrument singleton deployments or to create
+singleton MSC services.</p>
+</div>
+<div class="sect1">
+<h2 id="singleton-configuration">Configuration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The
+<a href="https://github.com/wildfly/wildfly/blob/10.0.0.Final/clustering/singleton/extension/src/main/resources/schema/wildfly-singleton_1_0.xsd">default
+subsystem configuration</a> from WildFly&#8217;s ha and full-ha profile looks
+like:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;subsystem xmlns="urn:jboss:domain:singleton:1.0"&gt;
+    &lt;singleton-policies default="default"&gt;
+        &lt;singleton-policy name="default" cache-container="server"&gt;
+            &lt;simple-election-policy/&gt;
+        &lt;/singleton-policy&gt;
+    &lt;/singleton-policies&gt;
+&lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A singleton policy defines:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>A unique name</p>
+</li>
+<li>
+<p>A cache container and cache with which to register singleton provider candidates</p>
+</li>
+<li>
+<p>An election policy</p>
+</li>
+<li>
+<p>A quorum (optional)</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>One can add a new singleton policy via the following management
+operation:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>/subsystem=singleton/singleton-policy=foo:add(cache-container=server)</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="cache-configuration">Cache configuration</h3>
+<div class="paragraph">
+<p>The cache-container and cache attributes of a singleton policy must
+reference a valid cache from the Infinispan subsystem. If no specific
+cache is defined, the default cache of the cache container is assumed.
+This cache is used as a registry of which nodes can provide a given
+service and will typically use a replicated-cache configuration.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="election-policies">Election policies</h3>
+<div class="paragraph">
+<p>WildFly includes two singleton election policy implementations:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>simple</strong><br>
+Elects the provider (a.k.a. master) of a singleton service based on a
+specified position in a circular linked list of eligible nodes sorted by
+descending age. Position=0, the default value, refers to the oldest
+node, 1 is second oldest, etc. ; while position=-1 refers to the
+youngest node, -2 to the second youngest, etc.<br>
+e.g.</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>/subsystem=singleton/singleton-policy=foo/election-policy=simple:add(position=-1)</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p><strong>random</strong><br>
+Elects a random member to be the provider of a singleton service<br>
+e.g.</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>/subsystem=singleton/singleton-policy=foo/election-policy=random:add()</code></pre>
+</div>
+</div>
+</li>
+</ul>
+</div>
+<div class="sect3">
+<h4 id="preferences">Preferences</h4>
+<div class="paragraph">
+<p>Additionally, any singleton election policy may indicate a preference
+for one or more members of a cluster. Preferences may be defined either
+via node name or via outbound socket binding name. Node preferences
+always take precedent over the results of an election policy.<br>
+e.g.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>/subsystem=singleton/singleton-policy=foo/election-policy=simple:list-add(name=name-preferences, value=nodeA)
+/subsystem=singleton/singleton-policy=bar/election-policy=random:list-add(name=socket-binding-preferences, value=nodeA)</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="quorum">Quorum</h3>
+<div class="paragraph">
+<p>Network partitions are particularly problematic for singleton services,
+since they can trigger multiple singleton providers for the same service
+to run at the same time. To defend against this scenario, a singleton
+policy may define a quorum that requires a minimum number of nodes to be
+present before a singleton provider election can take place. A typical
+deployment scenario uses a quorum of N/2 + 1, where N is the anticipated
+cluster size. This value can be updated at runtime, and will immediately
+affect any active singleton services.<br>
+e.g.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>/subsystem=singleton/singleton-policy=foo:write-attribute(name=quorum, value=3)</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="non-ha-environments">Non-HA environments</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The singleton subsystem can be used in a non-HA profile, so long as the
+cache that it references uses a local-cache configuration. In this
+manner, an application leveraging singleton functionality (via the
+singleton API or using a singleton deployment descriptor) will continue
+function as if the server was a sole member of a cluster. For obvious
+reasons, the use of a quorum does not make sense in such a
+configuration.</p>
+</div>
+</div>
+</div>
+<h1 id="Singleton_deployments" class="sect0">Singleton deployments</h1>
+<div class="paragraph">
+<p>WildFly 10 resurrected the ability to start a given deployment on a
+single node in the cluster at any given time. If that node shuts down,
+or fails, the application will automatically start on another node on
+which the given deployment exists. Long time users of JBoss AS will
+recognize this functionality as being akin to the
+<a href="https://docs.jboss.org/jbossclustering/cluster_guide/5.1/html/deployment.chapt.html#d0e1220">HASingletonDeployer</a>,
+a.k.a. "
+<a href="https://docs.jboss.org/jbossclustering/cluster_guide/5.1/html/deployment.chapt.html#d0e1220">deploy-hasingleton</a>",
+feature of AS6 and earlier.</p>
+</div>
+<div class="sect1">
+<h2 id="usage">Usage</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A deployment indicates that it should be deployed as a singleton via a
+deployment descriptor. This can either be a standalone
+<code>/META-INF/singleton-deployment.xml</code> file or embedded within an existing
+jboss-all.xml descriptor. This descriptor may be applied to any
+deployment type, e.g. JAR, WAR, EAR, etc., with the exception of a
+subdeployment within an EAR.<br>
+e.g.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;singleton-deployment xmlns="urn:jboss:singleton-deployment:1.0" policy="foo"/&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The singleton deployment descriptor defines which
+<a href="#Singleton_subsystem">singleton policy</a> should be used to deploy the
+application. If undefined, the default singleton policy is used, as
+defined by the singleton subsystem.</p>
+</div>
+<div class="paragraph">
+<p>Using a standalone descriptor is often preferable, since it may be
+overlaid onto an existing deployment archive.<br>
+e.g.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>deployment-overlay add --name=singleton-policy-foo --content=/META-INF/singleton-deployment.xml=/path/to/singleton-deployment.xml --deployments=my-app.jar --redeploy-affected</code></pre>
+</div>
+</div>
+</div>
+</div>
+<h1 id="Singleton_MSC_services" class="sect0">Singleton MSC services</h1>
+<div class="paragraph">
+<p>The singleton service facility exposes a mechanism for installing an MSC service such that the service only starts on a single member of a cluster at a time.
+If the member providing the singleton service is shutdown or crashes, the facility automatically elects a new primary provider and starts the service on that node.
+In general, a singleton election happens in response to any change of membership, where the membership is defined as the set of cluster nodes on which the given service was installed.</p>
+</div>
+<div class="sect1">
+<h2 id="installing-an-msc-service-using-an-existing-singleton-policy">Installing an MSC service using an existing singleton policy</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>While singleton MSC services have been around since AS7, WildFly adds the ability to leverage the singleton subsystem to create singleton MSC services from existing singleton policies.</p>
+</div>
+<div class="paragraph">
+<p>The singleton subsystem exposes capabilities for each singleton policy it defines.</p>
+</div>
+<div class="paragraph">
+<p>These policies, encapsulated by the <code>org.wildfly.clustering.singleton.service.SingletonPolicy</code> interface, can be referenced via the following capability name:
+"org.wildfly.clustering.singleton.policy" + <em>policy-name</em></p>
+</div>
+<div class="paragraph">
+<p>You can reference the default singleton policy of the server via the name:
+"org.wildfly.clustering.singleton.default-policy"
+e.g.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">public class MyServiceActivator implements ServiceActivator {
+    @Override
+    public void activate(ServiceActivatorContext context) {
+        ServiceName name = ServiceName.parse("my.service.name");
+        // Use default singleton policy
+        Supplier&lt;SingletonPolicy&gt; policy = new ActiveServiceSupplier&lt;&gt;(context.getServiceTarget(), ServiceName.parse(SingletonDefaultRequirement.SINGLETON_POLICY.getName()));
+        ServiceBuilder&lt;?&gt; builder = policy.get().createSingletonServiceConfigurator(name).build(context.getServiceTarget());
+        Service service = new MyService();
+        builder.setInstance(service).install();
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="installing-an-msc-service-using-dynamic-singleton-policy">Installing an MSC service using dynamic singleton policy</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Alternatively, you can configure a singleton policy dynamically, which is particularly useful if you want to use a custom singleton election policy.
+<code>org.wildfly.clustering.singleton.service.SingletonPolicy</code> is a generalization of the <code>org.wildfly.clustering.singleton.service.SingletonServiceConfiguratorFactory</code> interface,
+which includes support for specifying an election policy and, optionally, a quorum.</p>
+</div>
+<div class="paragraph">
+<p>The 'SingletonServiceConfiguratorFactory' capability may be references using the following capability name:
+"org.wildfly.clustering.cache.singleton-service-configurator-factory" + <em>container-name</em> + "." + <em>cache-name</em></p>
+</div>
+<div class="paragraph">
+<p>You can reference a 'SingletonServiceConfiguratorFactory' using the default cache of a given cache container via the name:
+"org.wildfly.clustering.cache.default-singleton-service-configurator-factory" + <em>container-name</em></p>
+</div>
+<div class="paragraph">
+<p>e.g.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">public class MyServiceActivator implements ServiceActivator {
+    @Override
+    public void activate(ServiceActivatorContext context) {
+        String containerName = "foo";
+        ElectionPolicy policy = new MySingletonElectionPolicy();
+        int quorum = 3;
+        ServiceName name = ServiceName.parse("my.service.name");
+        // Use a SingletonServiceConfiguratorFactory backed by default cache of "foo" container
+        Supplier&lt;SingletonServiceConfiguratorFactory&gt; factory = new ActiveServiceSupplier&lt;&gt;(context.getServiceTarget(), ServiceName.parse(SingletonDefaultCacheRequirement.SINGLETON_SERVICE_CONFIGURATOR_FACTORY.resolve(containerName).getName()));
+        ServiceBuilder&lt;?&gt; builder = factory.get().createSingletonServiceConfigurator(name)
+                .electionPolicy(policy)
+                .requireQuorum(quorum)
+        		.build(context.getServiceTarget());
+        Service service = new MyService();
+        builder.setInstance(service).install();
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div></div>
+</div>
+
+
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">WildFly is open. All dependencies of this project are available under the <a href='https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html' class='dark-background' target='_blank'>LGPL 2.1</a> or compatible license.<br/><br/>This website was built with <a href='https://jekyllrb.com/' class='dark-background' target='_blank'>Jekyll</a> is hosted on <a href='https://pages.github.com/' class='dark-background' target='_blank'>Github Pages</a> and is completely open source. If you want to make it better, <a href='https://github.com/wildfly/wildfly.org/fork' class='dark-background' target='_blank'>fork it</a> and show us what you’ve got.</p>
+
+    
+      <div class="width-1-12 project-links">
+        <strong>Navigation</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="/wildflysite/downloads" class="dark-background">Downloads</a></li>
+          
+            <li><a href="/wildflysitef/docs" class="dark-background">Docs</a></li>
+          
+            <li><a href="https://github.com/wildfly/wildfly" class="dark-background">Github</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <strong>Contribute</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="https://issues.jboss.org/browse/WFLY" class="dark-background">Submit a bug</a></li>
+          
+            <li><a href="https://community.jboss.org/en/wildfly?view=discussion" class="dark-background">Join the forum</a></li>
+          
+            <li><a href="https://github.com/wildfly/wildfly/fork" class="dark-background">Fork WildFly</a></li>
+          
+            <li><a href="https://twitter.com/WildFlyAS" class="dark-background">Follow us</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <strong>Get Help</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="https://community.jboss.org/en/wildfly?view=discussion" class="dark-background">Join the forum</a></li>
+          
+            <li><a href="https://www.hipchat.com/gFOhnVQke" class="dark-background">Join HipChat</a></li>
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-6-12 more-links">
+        <strong>Find more Red Hat Middleware Community Projects</strong>
+        <ul class="footer-links">
+          
+            <li><a href="https://www.apiman.io/" class="dark-background">APIMan</a></li>
+          
+            <li><a href="http://arquillian.org" class="dark-background">Arquillian</a></li>
+          
+            <li><a href="http://byteman.jboss.org/" class="dark-background">Byteman</a></li>
+          
+            <li><a href="http://capedwarf.org/" class="dark-background">CapeDwarf</a></li>
+          
+            <li><a href="https://github.com/alechenninger/chronicler" class="dark-background">Chronicler</a></li>
+          
+            <li><a href="https://github.com/darcy-framework" class="dark-background">Darcy</a></li>
+          
+            <li><a href="http://debezium.io/" class="dark-background">Debezium</a></li>
+          
+            <li><a href="https://www.drools.org/" class="dark-background">Drools</a></li>
+          
+            <li><a href="http://gatein.jboss.org/" class="dark-background">GateIn</a></li>
+          
+            <li><a href="http://www.hawkular.org/" class="dark-background">Hawkular</a></li>
+          
+            <li><a href="http://hawt.io/" class="dark-background">Hawtio</a></li>
+          
+            <li><a href="http://hibernate.org/" class="dark-background">Hibernate</a></li>
+          
+            <li><a href="http://www.infinispan.org/" class="dark-background">Infinispan</a></li>
+          
+            <li><a href="https://devstudio.jboss.com/" class="dark-background">JBoss DevStudio</a></li>
+          
+            <li><a href="http://forge.jboss.org/" class="dark-background">JBoss Forge</a></li>
+          
+            <li><a href="https://github.com/jboss-logging" class="dark-background">JBoss Logging</a></li>
+          
+            <li><a href="http://jbossremoting.jboss.org/" class="dark-background">JBoss Remoting</a></li>
+          
+            <li><a href="https://www.jbpm.org/" class="dark-background">jBPM</a></li>
+          
+            <li><a href="https://jsfunit.jboss.org/" class="dark-background">JSFUnit</a></li>
+          
+            <li><a href="https://www.keycloak.org/" class="dark-background">Keycloak</a></li>
+          
+            <li><a href="http://modcluster.io/" class="dark-background">Mod Cluster</a></li>
+          
+            <li><a href="http://modeshape.jboss.org/" class="dark-background">ModeShape</a></li>
+          
+            <li><a href="https://www.optaplanner.org/" class="dark-background">OptaPlanner</a></li>
+          
+            <li><a href="https://picketbox.jboss.org/" class="dark-background">Picketbox</a></li>
+          
+            <li><a href="http://resteasy.jboss.org/" class="dark-background">RESTEasy</a></li>
+          
+            <li><a href="https://riftsaw.jboss.org/" class="dark-background">Riftsaw</a></li>
+          
+            <li><a href="http://savara.jboss.org/" class="dark-background">Savara</a></li>
+          
+            <li><a href="http://seamframework.org/" class="dark-background">Seam</a></li>
+          
+            <li><a href="http://arquillian.org/" class="dark-background">Shrinkwrap</a></li>
+          
+            <li><a href="http://snowdrop.jboss.org/" class="dark-background">Snowdrop</a></li>
+          
+            <li><a href="https://switchyard.jboss.org/" class="dark-background">Switchyard</a></li>
+          
+            <li><a href="https://tattletale.jboss.org/" class="dark-background">Tattletale</a></li>
+          
+            <li><a href="http://teiid.jboss.org/" class="dark-background">Teiid</a></li>
+          
+            <li><a href="http://wildfly-swarm.io/" class="dark-background">WildFly Swarm</a></li>
+          
+            <li><a href="http://wise.jboss.org/" class="dark-background">Wise</a></li>
+          
+            <li><a href="https://xnio.jboss.org/" class="dark-background">XNIO</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" class="dark-background" target="_blank">CC by 3.0</a>
+    </span>
+    <span class="redhat">
+      a Red Hat sponsored project   
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/"><img src="/wildflysite/assets/img/RHLogo_white.svg"></a>
+    </span>
+  </div>
+</div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script type="text/javascript" src="/wildflysite/assets/javascript/mobile-nav.js"></script>
+</body>
+
+</html>

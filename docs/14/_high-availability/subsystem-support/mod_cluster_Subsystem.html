@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="">
+  <link rel="shortcut icon" type="image/png" href="/wildflysite/favicon.ico" >
+  <link rel="stylesheet" href="/wildflysite/assets/css/main.css" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+
+
+</head>
+
+<body class="mod_cluster Subsystem">
+  <div class="content">
+    <div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          
+            <a href="/wildflysite/docs/14/" class="active">Docs</a>
+          
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+
+    <div class="docs-page grid-wrapper">
+  <div class="grid__item width-12-12 docs-v-icons">
+    <a href="/wildflysite/docs/13/" ><img src="/wildflysite/assets/img/docs/wildfly_icons_docs-13-inactive.png"></a>
+    <a href="https://docs.wildfly.org/12/" target="_blank"><img src="/wildflysite/assets/img/docs/wildfly_icons_docs-12-inactive.png"></a>
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-11-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-10-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-09-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-08-coming.png">
+  </div>
+  <div class="grid__item width-12-12"><h1 class="title">mod_cluster Subsystem</h1></div>
+  <div class="grid__item width-3-12 doc-toc"><ul class="inline_toc">
+  <li><a href="#configuration">Configuration</a>
+    <ul>
+      <li><a href="#instance-id-or-jvmroute">Instance ID or JVMRoute</a></li>
+      <li><a href="#proxies">Proxies</a></li>
+      <li><a href="#multiple-mod_cluster-configurations">Multiple mod_cluster Configurations</a></li>
+    </ul>
+  </li>
+  <li><a href="#runtime-operations">Runtime Operations</a>
+    <ul>
+      <li><a href="#operations-displaying-httpd-informations">operations displaying httpd information</a>
+        <ul>
+          <li><a href="#read-proxies-configuration">read-proxies-configuration</a></li>
+          <li><a href="#read-proxies-info">read-proxies-info</a></li>
+          <li><a href="#operations-that-handle-the-proxies-the-node-is-connected-too">operations that handle the proxies the node is connected too</a></li>
+          <li><a href="#list-proxies">list-proxies</a></li>
+          <li><a href="#remove-proxy">remove-proxy</a></li>
+          <li><a href="#add-proxy">add-proxy</a></li>
+        </ul>
+      </li>
+      <li><a href="#context-related-operations">Context related operations</a>
+        <ul>
+          <li><a href="#enable-context">enable-context</a></li>
+          <li><a href="#disable-context">disable-context</a></li>
+          <li><a href="#stop-context">stop-context</a></li>
+        </ul>
+      </li>
+      <li><a href="#node-related-operations">Node related operations</a>
+        <ul>
+          <li><a href="#refresh">refresh</a></li>
+          <li><a href="#reset">reset</a></li>
+        </ul>
+      </li>
+      <li><a href="#configuration-1">Configuration</a>
+        <ul>
+          <li><a href="#metric-configuration">Metric configuration</a>
+            <ul>
+              <li><a href="#add-metric">add-metric</a></li>
+              <li><a href="#remove-metric">remove-metric</a></li>
+              <li><a href="#add-custom-metric-remove-custom-metric">add-custom-metric / remove-custom-metric</a></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#SSL_Configuration_using_Elytron_Subsystem">SSL Configuration using Elytron Subsystem</a>
+    <ul>
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#defining-a-trust-store-with-the-trusted-certificates">Defining a Trust Store with the Trusted Certificates</a></li>
+      <li><a href="#defining-a-trust-manager-to-validate-certificates">Defining a Trust Manager To Validate Certificates</a></li>
+      <li><a href="#defining-a-client-ssl-context-and-configuring-mod_cluster-subsystem">Defining a Client SSL Context and Configuring mod_cluster Subsystem</a></li>
+      <li><a href="#using-a-certificate-revocation-list">Using a Certificate Revocation List</a></li>
+    </ul>
+  </li>
+</ul></div>
+  <div class="grid__item width-9-12 doc-content"><div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>The mod_cluster integration is done via the <code>mod_cluster</code> subsystem.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuration">Configuration</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="instance-id-or-jvmroute">Instance ID or JVMRoute</h3>
+<div class="paragraph">
+<p>The instance-id or JVMRoute defaults to <code>jboss.node.name</code> property passed
+on server startup (e.g. via <code>-Djboss.node.name=XYZ</code>).</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>[standalone@localhost:9990 /] /subsystem=undertow/:read-attribute(name=instance-id)
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; expression "${jboss.node.name}"
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To configure instance-id statically, configure the corresponding
+property in Undertow subsystem:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>[standalone@localhost:9990 /] /subsystem=undertow/:write-attribute(name=instance-id,value=myroute)
+{
+    "outcome" =&gt; "success",
+    "response-headers" =&gt; {
+        "operation-requires-reload" =&gt; true,
+        "process-state" =&gt; "reload-required"
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="proxies">Proxies</h3>
+<div class="paragraph">
+<p>By default, mod_cluster is configured for multicast-based discovery. To
+specify a static list of proxies, create a remote-socket-binding for
+each proxy and then reference them in the 'proxies' attribute. See the
+following example for configuration in the domain mode:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>[domain@localhost:9990 /] /socket-binding-group=ha-sockets/remote-destination-outbound-socket-binding=proxy1:add(host=10.21.152.86, port=6666)
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; undefined,
+    "server-groups" =&gt; undefined
+}
+[domain@localhost:9990 /] /socket-binding-group=ha-sockets/remote-destination-outbound-socket-binding=proxy2:add(host=10.21.152.87, port=6666)
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; undefined,
+    "server-groups" =&gt; undefined
+}
+[domain@localhost:9990 /] /profile=ha/subsystem=modcluster/proxy=default:write-attribute(name=proxies, value=[proxy1, proxy2])
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; undefined,
+    "server-groups" =&gt; undefined
+}
+[domain@localhost:9990 /] :reload-servers
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; undefined,
+    "server-groups" =&gt; undefined
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="multiple-mod_cluster-configurations">Multiple mod_cluster Configurations</h3>
+<div class="paragraph">
+<p>Since WildFly 14 mod_cluster subsystem supports multiple named proxy configurations also allowing for registering
+non-default Undertow servers with the reverse proxies. Moreover, this allows single application server node to register with
+different groups of proxy servers.</p>
+</div>
+<div class="paragraph">
+<p>See the following example which adds another Undertow AJP listener, server and a host and adds a new mod_cluster configuration
+which registers this host using advertise mechanism.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>/socket-binding-group=standard-sockets/socket-binding=ajp-other:add(port=8010)
+/subsystem=undertow/server=other-server:add
+/subsystem=undertow/server=other-server/ajp-listener=ajp-other:add(socket-binding=ajp-other)
+/subsystem=undertow/server=other-server/host=other-host:add(default-web-module=root-other.war)
+/subsystem=undertow/server=other-server/host=other-host/location=other:add(handler=welcome-content)
+/subsystem=undertow/server=other-server/host=other-host:write-attribute(name=alias,value=[localhost]))
+
+/socket-binding-group=standard-sockets/socket-binding=modcluster-other:add(multicast-address=224.0.1.106,multicast-port=23364)
+/subsystem=modcluster/proxy=other:add(advertise-socket=modcluster-other,balancer=other-balancer,connector=ajp-other)
+
+reload</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="runtime-operations">Runtime Operations</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The modcluster subsystem supports several operations:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>[standalone@localhost:9990 /] /subsystem=modcluster/proxy=default:read-operation-names
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; [
+        "add",
+        "add-custom-metric",
+        "add-metric",
+        "add-proxy",
+        "disable",
+        "disable-context",
+        "enable",
+        "enable-context",
+        "list-proxies",
+        "read-attribute",
+        "read-children-names",
+        "read-children-resources",
+        "read-children-types",
+        "read-operation-description",
+        "read-operation-names",
+        "read-proxies-configuration",
+        "read-proxies-info",
+        "read-resource",
+        "read-resource-description",
+        "refresh",
+        "remove-custom-metric",
+        "remove-metric",
+        "remove-proxy",
+        "reset",
+        "stop",
+        "stop-context",
+        "validate-address",
+        "write-attribute"
+    ]
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The operations specific to the modcluster subsystem are divided in 3
+categories the ones that affects the configuration and require a restart
+of the subsystem, the one that just modify the behaviour temporarily and
+the ones that display information from the httpd part.</p>
+</div>
+<div class="sect2">
+<h3 id="operations-displaying-httpd-informations">operations displaying httpd information</h3>
+<div class="paragraph">
+<p>There are 2 operations that display how Apache httpd sees the node:</p>
+</div>
+<div class="sect3">
+<h4 id="read-proxies-configuration">read-proxies-configuration</h4>
+<div class="paragraph">
+<p>Send a DUMP message to all Apache httpd the node is connected to and
+display the message received from Apache httpd.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>[standalone@localhost:9990 /] /subsystem=modcluster/proxy=default:read-proxies-configuration
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; [
+        "neo3:6666",
+        "balancer: [1] Name: mycluster Sticky: 1 [JSESSIONID]/[jsessionid] remove: 0 force: 1 Timeout: 0 Maxtry: 1
+node: [1:1],Balancer: mycluster,JVMRoute: 498bb1f0-00d9-3436-a341-7f012bc2e7ec,Domain: [],Host: 127.0.0.1,Port: 8080,Type: http,flushpackets: 0,flushwait: 10,ping: 10,smax: 26,ttl: 60,timeout: 0
+host: 1 [example.com] vhost: 1 node: 1
+host: 2 [localhost] vhost: 1 node: 1
+host: 3 [default-host] vhost: 1 node: 1
+context: 1 [/myapp] vhost: 1 node: 1 status: 1
+context: 2 [/] vhost: 1 node: 1 status: 1
+",
+        "jfcpc:6666",
+        "balancer: [1] Name: mycluster Sticky: 1 [JSESSIONID]/[jsessionid] remove: 0 force: 1 Timeout: 0 maxAttempts: 1
+node: [1:1],Balancer: mycluster,JVMRoute: 498bb1f0-00d9-3436-a341-7f012bc2e7ec,LBGroup: [],Host: 127.0.0.1,Port: 8080,Type: http,flushpackets: 0,flushwait: 10,ping: 10,smax: 26,ttl: 60,timeout: 0
+host: 1 [default-host] vhost: 1 node: 1
+host: 2 [localhost] vhost: 1 node: 1
+host: 3 [example.com] vhost: 1 node: 1
+context: 1 [/] vhost: 1 node: 1 status: 1
+context: 2 [/myapp] vhost: 1 node: 1 status: 1
+"
+    ]
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="read-proxies-info">read-proxies-info</h4>
+<div class="paragraph">
+<p>Send a INFO message to all Apache httpd the node is connected to and
+display the message received from Apache httpd.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>[standalone@localhost:9990 /] /subsystem=modcluster/proxy=default:read-proxies-info
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; [
+        "neo3:6666",
+        "Node: [1],Name: 498bb1f0-00d9-3436-a341-7f012bc2e7ec,Balancer: mycluster,Domain: ,Host: 127.0.0.1,Port: 8080,Type: http,Flushpackets: Off,Flushwait: 10000,Ping: 10000000,Smax: 26,Ttl: 60000000,Elected: 0,Read: 0,Transfered: 0,Connected: 0,Load: -1
+Vhost: [1:1:1], Alias: example.com
+Vhost: [1:1:2], Alias: localhost
+Vhost: [1:1:3], Alias: default-host
+Context: [1:1:1], Context: /myapp, Status: ENABLED
+Context: [1:1:2], Context: /, Status: ENABLED
+",
+        "jfcpc:6666",
+        "Node: [1],Name: 498bb1f0-00d9-3436-a341-7f012bc2e7ec,Balancer: mycluster,LBGroup: ,Host: 127.0.0.1,Port: 8080,Type: http,Flushpackets: Off,Flushwait: 10,Ping: 10,Smax: 26,Ttl: 60,Elected: 0,Read: 0,Transfered: 0,Connected: 0,Load: 1
+Vhost: [1:1:1], Alias: default-host
+Vhost: [1:1:2], Alias: localhost
+Vhost: [1:1:3], Alias: example.com
+Context: [1:1:1], Context: /, Status: ENABLED
+Context: [1:1:2], Context: /myapp, Status: ENABLED
+"
+    ]
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="operations-that-handle-the-proxies-the-node-is-connected-too">operations that handle the proxies the node is connected too</h4>
+<div class="paragraph">
+<p>There are 3 operation that could be used to manipulate the list of
+Apache httpd the node is connected to.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="list-proxies">list-proxies</h4>
+<div class="paragraph">
+<p>Displays the httpd that are connected to the node. The httpd could be
+discovered via the Advertise protocol or via the proxy-list attribute.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>[standalone@localhost:9990 subsystem=modcluster] :list-proxies
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; [
+        "proxy1:6666",
+        "proxy2:6666"
+    ]
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="remove-proxy">remove-proxy</h4>
+<div class="paragraph">
+<p>Remove a proxy from the discovered proxies or temporarily from the
+proxy-list attribute.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>[standalone@localhost:9990 subsystem=modcluster] :remove-proxy(host=jfcpc, port=6666)
+{"outcome" =&gt; "success"}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="add-proxy">add-proxy</h4>
+<div class="paragraph">
+<p>Add a proxy to the discovered proxies or temporarily to the proxy-list
+attribute.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>[standalone@localhost:9990 subsystem=modcluster] :add-proxy(host=jfcpc, port=6666)
+{"outcome" =&gt; "success"}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="context-related-operations">Context related operations</h3>
+<div class="paragraph">
+<p>Those operations allow to send context related commands to Apache httpd.
+They are send automatically when deploying or undeploying webapps.</p>
+</div>
+<div class="sect3">
+<h4 id="enable-context">enable-context</h4>
+<div class="paragraph">
+<p>Tell Apache httpd that the context is ready receive requests.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>[standalone@localhost:9990 /] /subsystem=modcluster/proxy=default:enable-context(context=/myapp, virtualhost=default-host)
+{"outcome" =&gt; "success"}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="disable-context">disable-context</h4>
+<div class="paragraph">
+<p>Tell Apache httpd that it shouldn&#8217;t send new session requests to the
+context of the virtualhost.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>[standalone@localhost:9990 /] /subsystem=modcluster/proxy=default:disable-context(context=/myapp, virtualhost=default-host)
+{"outcome" =&gt; "success"}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="stop-context">stop-context</h4>
+<div class="paragraph">
+<p>Tell Apache httpd that it shouldn&#8217;t send requests to the context of the
+virtualhost.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>[standalone@localhost:9990 /] /subsystem=modcluster/proxy=default:stop-context(context=/myapp, virtualhost=default-host, waittime=50)
+{"outcome" =&gt; "success"}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="node-related-operations">Node related operations</h3>
+<div class="paragraph">
+<p>Those operations are like the context operation but they apply to all
+webapps running on the node and operation that affect the whole node.</p>
+</div>
+<div class="sect3">
+<h4 id="refresh">refresh</h4>
+<div class="paragraph">
+<p>Refresh the node by sending a new CONFIG message to Apache httpd.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="reset">reset</h4>
+<div class="paragraph">
+<p>Reset the connection between Apache httpd and the node.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configuration-1">Configuration</h3>
+<div class="sect3">
+<h4 id="metric-configuration">Metric configuration</h4>
+<div class="paragraph">
+<p>There are 4 metric operations corresponding to add and remove load
+metrics to the dynamic-load-provider. Note that when nothing is defined
+a simple-load-provider is use with a fixed load factor of one.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>[standalone@localhost:9990 /] /subsystem=modcluster/proxy=default:read-resource(name=mod-cluster-config)
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; {"simple-load-provider" =&gt; {"factor" =&gt; "1"}}
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>that corresponds to the following configuration:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;subsystem xmlns="urn:jboss:domain:modcluster:1.0"&gt;
+            &lt;mod-cluster-config&gt;
+                &lt;simple-load-provider factor="1"/&gt;
+            &lt;/mod-cluster-config&gt;
+ &lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+<div class="sect4">
+<h5 id="add-metric">add-metric</h5>
+<div class="paragraph">
+<p>Add a metric to the dynamic-load-provider, the dynamic-load-provider in
+configuration is created if needed.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9990 /] /subsystem=modcluster/proxy=default:add-metric(type=cpu)
+{"outcome" =&gt; "success"}
+[standalone@localhost:9990 /] /subsystem=modcluster/proxy=default:read-resource(name=mod-cluster-config)
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; {
+        "dynamic-load-provider" =&gt; {
+            "history" =&gt; 9,
+            "decay" =&gt; 2,
+            "load-metric" =&gt; [{
+                "type" =&gt; "cpu"
+            }]
+        }
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="remove-metric">remove-metric</h5>
+<div class="paragraph">
+<p>Remove a metric from the dynamic-load-provider.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>[standalone@localhost:9990 /] /subsystem=modcluster/proxy=default:remove-metric(type=cpu)
+{"outcome" =&gt; "success"}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="add-custom-metric-remove-custom-metric">add-custom-metric / remove-custom-metric</h5>
+<div class="paragraph">
+<p>like the add-metric and remove-metric except they require a class
+parameter instead the type. Usually they needed additional properties
+which can be specified</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>[standalone@localhost:9990 /] /subsystem=modcluster/proxy=default:add-custom-metric(class=myclass, property=[("pro1" =&gt; "value1"), ("pro2" =&gt; "value2")]
+{"outcome" =&gt; "success"}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>which corresponds the following in the xml configuration file:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;subsystem xmlns="urn:jboss:domain:modcluster:1.0"&gt;
+    &lt;mod-cluster-config&gt;
+        &lt;dynamic-load-provider history="9" decay="2"&gt;
+            &lt;custom-load-metric class="myclass"&gt;
+                &lt;property name="pro1" value="value1"/&gt;
+                &lt;property name="pro2" value="value2"/&gt;
+            &lt;/custom-load-metric&gt;
+        &lt;/dynamic-load-provider&gt;
+    &lt;/mod-cluster-config&gt;
+&lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="SSL_Configuration_using_Elytron_Subsystem">SSL Configuration using Elytron Subsystem</h2>
+<div class="sectionbody">
+<div class="quoteblock abstract">
+<blockquote>
+This document provides information how to configure mod_cluster
+subsystem to protect communication between mod_cluster and load balancer
+using SSL/TLS using <a href="WildFly_Elytron_Security.html#Elytron_Subsystem">Elytron Subsystem</a>.
+</blockquote>
+</div>
+<div class="sect2">
+<h3 id="overview">Overview</h3>
+<div class="paragraph">
+<p>Elytron subsystem provides a powerful and flexible model to configure
+different security aspects for applications and the application server
+itself. At its core, Elytron subsystem exposes different capabilities to
+the application server in order centralize security related
+configuration in a single place and to allow other subsystems to consume
+these capabilities. One of the security capabilities exposed by Elytron
+subsystem is a Client <code>ssl-context</code> that can be used to configure
+mod_cluster subsystem to communicate with a load balancer using SSL/TLS.</p>
+</div>
+<div class="paragraph">
+<p>When protecting the communication between the application server and the
+load balancer, you need do define a Client <code>ssl-context</code> in order to:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Define a trust store holding the certificate chain that will be used
+to validate load balancer&#8217;s certificate</p>
+</li>
+<li>
+<p>Define a trust manager to perform validations against the load
+balancer&#8217;s certificate</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="defining-a-trust-store-with-the-trusted-certificates">Defining a Trust Store with the Trusted Certificates</h3>
+<div class="paragraph">
+<p>To define a trust store in Elytron you can execute the following CLI
+command:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>[standalone@localhost:9990 /] /subsystem=elytron/key-store=default-trust-store:add(type=JKS, relative-to=jboss.server.config.dir, path=application.truststore, credential-reference={clear-text=password})</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In order to successfully execute the command above you must have a
+<strong>application.truststore</strong> file inside your
+<strong>JBOSS_HOME/standalone/configuration</strong> directory. Where the trust store
+is protected by a password with a value <strong>password</strong>. The trust store must
+contain the certificates associated with the load balancer or a
+certificate chain in case the load balancer&#8217;s certificate is signed by a
+CA.</p>
+</div>
+<div class="paragraph">
+<p>We strongly recommend you to avoid using self-signed certificates with
+your load balancer. Ideally, certificates should be signed by a CA and
+your trust store should contain a certificate chain representing your
+ROOT and Intermediary CAs.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="defining-a-trust-manager-to-validate-certificates">Defining a Trust Manager To Validate Certificates</h3>
+<div class="paragraph">
+<p>To define a trust manager in Elytron you can execute the following CLI
+command:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>[standalone@localhost:9990 /] /subsystem=elytron/trust-managers=default-trust-manager:add(algorithm=PKIX, key-store=default-trust-store)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Here we are setting the <strong>default-trust-store</strong> as the source of the
+certificates that the application server trusts.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="defining-a-client-ssl-context-and-configuring-mod_cluster-subsystem">Defining a Client SSL Context and Configuring mod_cluster Subsystem</h3>
+<div class="paragraph">
+<p>Finally, you can create the Client SSL Context that is going to be used
+by the mod_cluster subsystem when connecting to the load balancer using
+SSL/TLS:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>[standalone@localhost:9990 /] /subsystem=elytron/client-ssl-context=modcluster-client-ssl-context:add(trust-managers=default-trust-manager)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now that the Client <code>ssl-context</code> is defined you can configure
+mod_cluster subsystem as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>[standalone@localhost:9990 /] /subsystem=modcluster/mod-cluster-config=configuration:write-attribute(name=ssl-context, value=modcluster-client-ssl-context)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Once you execute the last command above, reload the server:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>[standalone@localhost:9990 /] reload</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="using-a-certificate-revocation-list">Using a Certificate Revocation List</h3>
+<div class="paragraph">
+<p>In case you want to validate the load balancer certificate against a
+Certificate Revocation List (CRL), you can configure the <code>trust-manager</code>
+in Elytron subsystem as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>[standalone@localhost:9990 /] /subsystem=elytron/trust-managers=default-trust-manager:write-attribute(name=certificate-revocation-list.path, value=intermediate.crl.pem)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To use a CRL your trust store must contain the certificate chain in
+order to check validity of both CRL list and the load balancer`s
+certificate.</p>
+</div>
+<div class="paragraph">
+<p>A different way to configure a CRL is using the <em>Distribution Points</em>
+embedded in your certificates. For that, you need to configure a
+<code>certificate-revocation-list</code> as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>/subsystem=elytron/trust-managers=default-trust-manager:write-attribute(name=certificate-revocation-list)</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div></div>
+</div>
+
+
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">WildFly is open. All dependencies of this project are available under the <a href='https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html' class='dark-background' target='_blank'>LGPL 2.1</a> or compatible license.<br/><br/>This website was built with <a href='https://jekyllrb.com/' class='dark-background' target='_blank'>Jekyll</a> is hosted on <a href='https://pages.github.com/' class='dark-background' target='_blank'>Github Pages</a> and is completely open source. If you want to make it better, <a href='https://github.com/wildfly/wildfly.org/fork' class='dark-background' target='_blank'>fork it</a> and show us what you’ve got.</p>
+
+    
+      <div class="width-1-12 project-links">
+        <strong>Navigation</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="/wildflysite/downloads" class="dark-background">Downloads</a></li>
+          
+            <li><a href="/wildflysitef/docs" class="dark-background">Docs</a></li>
+          
+            <li><a href="https://github.com/wildfly/wildfly" class="dark-background">Github</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <strong>Contribute</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="https://issues.jboss.org/browse/WFLY" class="dark-background">Submit a bug</a></li>
+          
+            <li><a href="https://community.jboss.org/en/wildfly?view=discussion" class="dark-background">Join the forum</a></li>
+          
+            <li><a href="https://github.com/wildfly/wildfly/fork" class="dark-background">Fork WildFly</a></li>
+          
+            <li><a href="https://twitter.com/WildFlyAS" class="dark-background">Follow us</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <strong>Get Help</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="https://community.jboss.org/en/wildfly?view=discussion" class="dark-background">Join the forum</a></li>
+          
+            <li><a href="https://www.hipchat.com/gFOhnVQke" class="dark-background">Join HipChat</a></li>
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-6-12 more-links">
+        <strong>Find more Red Hat Middleware Community Projects</strong>
+        <ul class="footer-links">
+          
+            <li><a href="https://www.apiman.io/" class="dark-background">APIMan</a></li>
+          
+            <li><a href="http://arquillian.org" class="dark-background">Arquillian</a></li>
+          
+            <li><a href="http://byteman.jboss.org/" class="dark-background">Byteman</a></li>
+          
+            <li><a href="http://capedwarf.org/" class="dark-background">CapeDwarf</a></li>
+          
+            <li><a href="https://github.com/alechenninger/chronicler" class="dark-background">Chronicler</a></li>
+          
+            <li><a href="https://github.com/darcy-framework" class="dark-background">Darcy</a></li>
+          
+            <li><a href="http://debezium.io/" class="dark-background">Debezium</a></li>
+          
+            <li><a href="https://www.drools.org/" class="dark-background">Drools</a></li>
+          
+            <li><a href="http://gatein.jboss.org/" class="dark-background">GateIn</a></li>
+          
+            <li><a href="http://www.hawkular.org/" class="dark-background">Hawkular</a></li>
+          
+            <li><a href="http://hawt.io/" class="dark-background">Hawtio</a></li>
+          
+            <li><a href="http://hibernate.org/" class="dark-background">Hibernate</a></li>
+          
+            <li><a href="http://www.infinispan.org/" class="dark-background">Infinispan</a></li>
+          
+            <li><a href="https://devstudio.jboss.com/" class="dark-background">JBoss DevStudio</a></li>
+          
+            <li><a href="http://forge.jboss.org/" class="dark-background">JBoss Forge</a></li>
+          
+            <li><a href="https://github.com/jboss-logging" class="dark-background">JBoss Logging</a></li>
+          
+            <li><a href="http://jbossremoting.jboss.org/" class="dark-background">JBoss Remoting</a></li>
+          
+            <li><a href="https://www.jbpm.org/" class="dark-background">jBPM</a></li>
+          
+            <li><a href="https://jsfunit.jboss.org/" class="dark-background">JSFUnit</a></li>
+          
+            <li><a href="https://www.keycloak.org/" class="dark-background">Keycloak</a></li>
+          
+            <li><a href="http://modcluster.io/" class="dark-background">Mod Cluster</a></li>
+          
+            <li><a href="http://modeshape.jboss.org/" class="dark-background">ModeShape</a></li>
+          
+            <li><a href="https://www.optaplanner.org/" class="dark-background">OptaPlanner</a></li>
+          
+            <li><a href="https://picketbox.jboss.org/" class="dark-background">Picketbox</a></li>
+          
+            <li><a href="http://resteasy.jboss.org/" class="dark-background">RESTEasy</a></li>
+          
+            <li><a href="https://riftsaw.jboss.org/" class="dark-background">Riftsaw</a></li>
+          
+            <li><a href="http://savara.jboss.org/" class="dark-background">Savara</a></li>
+          
+            <li><a href="http://seamframework.org/" class="dark-background">Seam</a></li>
+          
+            <li><a href="http://arquillian.org/" class="dark-background">Shrinkwrap</a></li>
+          
+            <li><a href="http://snowdrop.jboss.org/" class="dark-background">Snowdrop</a></li>
+          
+            <li><a href="https://switchyard.jboss.org/" class="dark-background">Switchyard</a></li>
+          
+            <li><a href="https://tattletale.jboss.org/" class="dark-background">Tattletale</a></li>
+          
+            <li><a href="http://teiid.jboss.org/" class="dark-background">Teiid</a></li>
+          
+            <li><a href="http://wildfly-swarm.io/" class="dark-background">WildFly Swarm</a></li>
+          
+            <li><a href="http://wise.jboss.org/" class="dark-background">Wise</a></li>
+          
+            <li><a href="https://xnio.jboss.org/" class="dark-background">XNIO</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" class="dark-background" target="_blank">CC by 3.0</a>
+    </span>
+    <span class="redhat">
+      a Red Hat sponsored project   
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/"><img src="/wildflysite/assets/img/RHLogo_white.svg"></a>
+    </span>
+  </div>
+</div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script type="text/javascript" src="/wildflysite/assets/javascript/mobile-nav.js"></script>
+</body>
+
+</html>

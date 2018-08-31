@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="">
+  <link rel="shortcut icon" type="image/png" href="/wildflysite/favicon.ico" >
+  <link rel="stylesheet" href="/wildflysite/assets/css/main.css" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+
+
+</head>
+
+<body class="SSL with Client Cert Migration">
+  <div class="content">
+    <div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          
+            <a href="/wildflysite/docs/14/" class="active">Docs</a>
+          
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+
+    <div class="docs-page grid-wrapper">
+  <div class="grid__item width-12-12 docs-v-icons">
+    <a href="/wildflysite/docs/13/" ><img src="/wildflysite/assets/img/docs/wildfly_icons_docs-13-inactive.png"></a>
+    <a href="https://docs.wildfly.org/12/" target="_blank"><img src="/wildflysite/assets/img/docs/wildfly_icons_docs-12-inactive.png"></a>
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-11-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-10-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-09-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-08-coming.png">
+  </div>
+  <div class="grid__item width-12-12"><h1 class="title">SSL with Client Cert Migration</h1></div>
+  <div class="grid__item width-3-12 doc-toc"><ul class="inline_toc">
+  <li><a href="#realms-and-domains">Realms and Domains</a></li>
+  <li><a href="#principal-decoder">Principal decoder</a></li>
+  <li><a href="#http-authentication-factory">HTTP Authentication Factory</a></li>
+  <li><a href="#sasl-authentication-factory">SASL Authentication Factory</a></li>
+  <li><a href="#ssl-context">SSL Context</a></li>
+  <li><a href="#using-for-management">Using for Management</a>
+    <ul>
+      <li><a href="#admin-clients">Admin Clients</a>
+        <ul>
+          <li><a href="#cli-client-configuration">CLI Client Configuration</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul></div>
+  <div class="grid__item width-9-12 doc-content"><div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>This section will cover how to create the various resources required to achieve CLIENT_CERT authentication with fallback to username / password authentication for both HTTP and SASL (i.e. Remoting) - both are being covered at the same time as predominantly they require the same core configuration, it is not until the definition of the authentication factories that the configuration becomes really specific.</p>
+</div>
+<div class="paragraph">
+<p>This suppose you have configured legacy Client-Cert SSL authentication using <code>truststore</code> in legacy <code>security-realm</code>, for example by <a href="Admin_Guide.html#add-client-cert-to-ssl">Admin Guide#Add Client-Cert to SSL</a>, and your configuration looks like:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;security-realm name="ManagementRealm"&gt;
+  &lt;server-identities&gt;
+    &lt;ssl&gt;
+      &lt;keystore path="server.keystore" relative-to="jboss.server.config.dir" keystore-password="keystore_password" alias="server" key-password="key_password" /&gt;
+    &lt;/ssl&gt;
+  &lt;/server-identities&gt;
+  &lt;authentication&gt;
+    &lt;truststore path="server.truststore" relative-to="jboss.server.config.dir" keystore-password="truststore_password" /&gt;
+    &lt;local default-user="$local"/&gt;
+    &lt;properties path="mgmt-users.properties" relative-to="jboss.server.config.dir"/&gt;
+  &lt;/authentication&gt;
+&lt;/security-realm&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This also suppose you have already followed <a href="#Simple_SSL_Migration">Simple SSL Migration</a> section, so your partialy migrated configuration looks like:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;subsystem xmlns="urn:wildfly:elytron:1.0" ...&gt;
+    ...
+    &lt;tls&gt;
+        &lt;key-stores&gt;
+            &lt;key-store name="LocalhostKeyStore"&gt;
+                &lt;credential-reference clear-text="keystore_password"/&gt;
+                &lt;implementation type="JKS"/&gt;
+                &lt;file path="server.keystore" relative-to="jboss.server.config.dir"/&gt;
+            &lt;/key-store&gt;
+            &lt;key-store name="TrustStore"&gt;
+                &lt;credential-reference clear-text="truststore_password"/&gt;
+                &lt;implementation type="JKS"/&gt;
+                &lt;file path="server.truststore" relative-to="jboss.server.config.dir"/&gt;
+            &lt;/key-store&gt;
+        &lt;/key-stores&gt;
+        &lt;key-managers&gt;
+            &lt;key-manager name="LocalhostKeyManager" key-store="LocalhostKeyStore" alias-filter="server"&gt;
+                &lt;credential-reference clear-text="key_password"/&gt;
+            &lt;/key-manager&gt;
+        &lt;/key-managers&gt;
+        &lt;trust-managers&gt;
+            &lt;trust-manager name="TrustManager" key-store="TrustStore"/&gt;
+        &lt;/trust-managers&gt;
+        &lt;server-ssl-contexts&gt;
+            &lt;server-ssl-context name="LocalhostSslContext" need-client-auth="true" key-manager="LocalhostKeyManager" trust-manager="TrustManager"/&gt;
+        &lt;/server-ssl-contexts&gt;
+    &lt;/tls&gt;
+&lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>However following steps are needed to be user identity provided to your applications or management console.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="realms-and-domains">Realms and Domains</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We use users stored in standard properties files, so we can predefined Elytron security domain <code>ManagementDomain</code> and realm <code>ManagementRealm</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">    &lt;security-domains&gt;
+        &lt;security-domain name="ManagementDomain" default-realm="ManagementRealm" permission-mapper="default-permission-mapper"&gt;
+            &lt;realm name="ManagementRealm" role-decoder="groups-to-roles"/&gt;
+            &lt;realm name="local"/&gt;
+        &lt;/security-domain&gt;
+    &lt;/security-domains&gt;
+    &lt;security-realms&gt;
+        &lt;properties-realm name="ManagementRealm"&gt;
+            &lt;users-properties path="mgmt-users.properties" relative-to="jboss.server.config.dir" digest-realm-name="ManagementRealm"/&gt;
+            &lt;groups-properties path="mgmt-groups.properties" relative-to="jboss.server.config.dir"/&gt;
+        &lt;/properties-realm&gt;
+    &lt;/security-realms&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The security realm will be used in two situations:
+* Authentication in password fallback case, when certificate authentication fails
+* Authorization in both - password and certificate auth - cases - the realm will provide roles of individual users</p>
+</div>
+<div class="paragraph">
+<p>This mean, for any client certificate there have to exists user in the security realm.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="principal-decoder">Principal decoder</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>When certificate authentication is used and the security realm accepts usernames to resolve an identity, there have to be defined way to obtain username from a client certificate.
+In this case we will use first CN attribute in certificate subject:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>./subsystem=elytron/x500-attribute-principal-decoder=x500-decoder:add(attribute-name=CN, maximum-segments=1)</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Resulting in: -</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;subsystem xmlns="urn:wildfly:elytron:1.1" final-providers="combined-providers" disallowed-providers="OracleUcrypto"&gt;
+  ...
+  &lt;mappers&gt;
+    ...
+    &lt;x500-attribute-principal-decoder name="x500-decoder" attribute-name="CN" maximum-segments="1"/&gt;
+    ...
+  &lt;/mappers&gt;
+  ...
+&lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="http-authentication-factory">HTTP Authentication Factory</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>For the HTTP connections we now define a HTTP authentication factory using the previously defined resources and it is configured to support CLIENT_CERT and DIGEST authentication.</p>
+</div>
+<div class="paragraph">
+<p>Because our security realm is not able to verify client certificates (properties realm verifies passwords only), we need to add configuring mechanism factory first, which will disable certificate verification against the security realm:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>/subsystem=elytron/configurable-http-server-mechanism-factory=configured-cert:add(http-server-mechanism-factory=global, properties={org.wildfly.security.http.skip-certificate-verification=true})</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As following, we can create HTTP authentication alone:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>./subsystem=elytron/http-authentication-factory=client-cert-digest:add(http-server-mechanism-factory=configured-cert, \
+  security-domain=ManagementDomain, \
+ mechanism-configurations=[{ \
+  mechanism-name=CLIENT_CERT, \
+  pre-realm-principal-transformer=x500-decoder}, \
+ {mechanism-name=DIGEST, mechanism-realm-configurations=[{realm-name=ManagementRealm}]}])</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Resulting in: -</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>&lt;subsystem xmlns="urn:wildfly:elytron:1.1" final-providers="combined-providers" disallowed-providers="OracleUcrypto"&gt;
+  ...
+  &lt;http&gt;
+    ...
+    &lt;http-authentication-factory name="client-cert-digest" http-server-mechanism-factory="global" security-domain="ManagementDomain"&gt;
+      &lt;mechanism-configuration&gt;
+        &lt;mechanism mechanism-name="CLIENT_CERT" pre-realm-principal-transformer="x500-decoder"/&gt;
+        &lt;mechanism mechanism-name="DIGEST"&gt;
+          &lt;mechanism-realm realm-name="ManagementRealm"/&gt;
+        &lt;/mechanism&gt;
+      &lt;/mechanism-configuration&gt;
+    &lt;/http-authentication-factory&gt;
+    ...
+    &lt;configurable-http-server-mechanism-factory name="configured-cert" http-server-mechanism-factory="global"&gt;
+        &lt;properties&gt;
+            &lt;property name="org.wildfly.security.http.skip-certificate-verification" value="true"/&gt;
+        &lt;/properties&gt;
+    &lt;/configurable-http-server-mechanism-factory&gt;
+    ...
+  &lt;/http&gt;
+  ...
+&lt;/subsystem&gt;</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="sasl-authentication-factory">SASL Authentication Factory</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The architecture of the two authentication factories if very similar so a SASL authentication factory can be defined in the same way as the HTTP equivalent.
+However, as EXTERNAL SASL mechanism does not do any certificate verification, there is no need for configuring SASL server factory.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>./subsystem=elytron/sasl-authentication-factory=client-cert-digest:add(sasl-server-factory=elytron, \
+  security-domain=ManagementDomain, \
+  mechanism-configurations=[{mechanism-name=EXTERNAL, \
+  pre-realm-principal-transformer=x500-decoder}, \
+  {mechanism-name=DIGEST-MD5, mechanism-realm-configurations=[{realm-name=ManagementRealm}]}])</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This results in: -</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;subsystem xmlns="urn:wildfly:elytron:1.1" final-providers="combined-providers" disallowed-providers="OracleUcrypto"&gt;
+  ...
+  &lt;sasl&gt;
+    ...
+    &lt;sasl-authentication-factory name="client-cert-digest" sasl-server-factory="elytron" security-domain="ManagementDomain"&gt;
+      &lt;mechanism-configuration&gt;
+        &lt;mechanism mechanism-name="EXTERNAL" pre-realm-principal-transformer="x500-decoder"/&gt;
+        &lt;mechanism mechanism-name="DIGEST-MD5"&gt;
+          &lt;mechanism-realm realm-name="ManagementRealm"/&gt;
+        &lt;/mechanism&gt;
+      &lt;/mechanism-configuration&gt;
+    &lt;/sasl-authentication-factory&gt;
+    ...
+  &lt;/sasl&gt;
+  ...
+&lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>There is used the same principal transformer as defined for HTTP.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="ssl-context">SSL Context</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The SSL context was already defined, but we need to modify it to not fail on client certificate authentication failure, but to fallback to password authentication.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>./subsystem=elytron/server-ssl-context=LocalhostSslContext:write-attribute(name=need-client-auth, value=false)
+./subsystem=elytron/server-ssl-context=LocalhostSslContext:write-attribute(name=want-client-auth, value=true)</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Resulting in: -</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;subsystem xmlns="urn:wildfly:elytron:1.1" final-providers="combined-providers" disallowed-providers="OracleUcrypto"&gt;
+  ...
+  &lt;tls&gt;
+    ...
+    &lt;server-ssl-contexts&gt;
+      &lt;server-ssl-context name="LocalhostSslContext" want-client-auth="true" need-client-auth="false" key-manager="LocalhostKeyManager" trust-manager="TrustManager"/&gt;
+    &lt;/server-ssl-contexts&gt;
+  &lt;/tls&gt;
+&lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As we will be supporting fallback to username/password authentication need-client-auth is set to false. This allows connections to be established but an alternative form of authentication will be required.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="using-for-management">Using for Management</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>At this point the management interfaces can be updated to use the newly defined resources, we need to add references to the two new authentication factories and the SSL context, we can also remove the existing reference to the legacy security realm. As this is modifying existing interfaces a server reload will also be required.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>./core-service=management/management-interface=http-interface:write-attribute(name=ssl-context, value=LocalhostSslContext)
+./core-service=management/management-interface=http-interface:write-attribute(name=secure-socket-binding, value=management-https)
+./core-service=management/management-interface=http-interface:write-attribute(name=http-authentication-factory, value=client-cert-digest)
+./core-service=management/management-interface=http-interface:write-attribute(name=http-upgrade.sasl-authentication-factory, value=client-cert-digest)
+./core-service=management/management-interface=http-interface:undefine-attribute(name=security-realm)
+:reload</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The management interface configuration then becomes: -</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;management&gt;
+  ...
+  &lt;management-interfaces&gt;
+    &lt;http-interface http-authentication-factory="client-cert-digest" ssl-context="LocalhostSslContext"&gt;
+      &lt;http-upgrade enabled="true" sasl-authentication-factory="client-cert-digest"/&gt;
+      &lt;socket-binding http="management-http" https="management-https"/&gt;
+    &lt;/http-interface&gt;
+  &lt;/management-interfaces&gt;
+  ...
+&lt;/management&gt;</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="admin-clients">Admin Clients</h3>
+<div class="paragraph">
+<p>At this stage assuming the same files have been used as in this example it should be possible to connect to the management interface of the server either using a web browser or the JBoss CLI with username and password from your original <code>mgmt-users.properties</code> file.</p>
+</div>
+<div class="paragraph">
+<p>For certificate based authentication certificates signed by your CA, whose subject DN resolves to username existing in properties realm will be accepted.</p>
+</div>
+<div class="sect3">
+<h4 id="cli-client-configuration">CLI Client Configuration</h4>
+<div class="paragraph">
+<p>This suppose you have used following configuration in <code>bin/jboss-cli.xml</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;ssl&gt;
+  &lt;alias&gt;adminalias&lt;/alias&gt;
+  &lt;key-store&gt;admin.keystore&lt;/key-store&gt;
+  &lt;key-store-password&gt;keystore_password&lt;/key-store-password&gt;
+  &lt;trust-store&gt;ca.truststore&lt;/trust-store&gt;
+  &lt;trust-store-password&gt;truststore_password&lt;/trust-store-password&gt;
+&lt;/ssl&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can stay using this configuration, but since the integration of WildFly Elytron it is possible with the CLI to use a configuration file wildfly-config.xml to define the security settings including the settings for the client side SSL context.</p>
+</div>
+<div class="paragraph">
+<p>In such case, following wildfly-config.xml can be created in the location the JBoss CLI is being started from: -</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+
+&lt;configuration&gt;
+    &lt;authentication-client xmlns="urn:elytron:1.0"&gt;
+        &lt;key-stores&gt;
+            &lt;key-store name="admin" type="jks" &gt;
+                &lt;file name="admin.keystore"/&gt;
+                &lt;key-store-clear-password password="keystore_password" /&gt;
+            &lt;/key-store&gt;
+            &lt;key-store name="ca" type="jks"&gt;
+                &lt;file name="ca.truststore"/&gt;
+                &lt;key-store-clear-password password="truststore_password" /&gt;
+            &lt;/key-store&gt;
+        &lt;/key-stores&gt;
+        &lt;ssl-context-rules&gt;
+            &lt;rule use-ssl-context="default" /&gt;
+        &lt;/ssl-context-rules&gt;
+        &lt;ssl-contexts&gt;
+            &lt;ssl-context name="default"&gt;
+                &lt;key-store-ssl-certificate key-store-name="admin" alias="adminalias"&gt;
+                    &lt;key-store-clear-password password="key_password" /&gt;
+                &lt;/key-store-ssl-certificate&gt;
+                &lt;trust-store key-store-name="ca" /&gt;
+            &lt;/ssl-context&gt;
+        &lt;/ssl-contexts&gt;
+    &lt;/authentication-client&gt;
+&lt;/configuration&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The CLI can now be started using the following command: -</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>./jboss-cli.sh -c -Dwildfly.config.url=wildfly-config.xml</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The :whoami command can be used within the CLI to double check the current identity.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>[standalone@localhost:9993 /] :whoami(verbose=true)
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; {
+        "identity" =&gt; {"username" =&gt; "admin"},
+        "mapped-roles" =&gt; ["SuperUser"]
+    }
+}</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div></div>
+</div>
+
+
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">WildFly is open. All dependencies of this project are available under the <a href='https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html' class='dark-background' target='_blank'>LGPL 2.1</a> or compatible license.<br/><br/>This website was built with <a href='https://jekyllrb.com/' class='dark-background' target='_blank'>Jekyll</a> is hosted on <a href='https://pages.github.com/' class='dark-background' target='_blank'>Github Pages</a> and is completely open source. If you want to make it better, <a href='https://github.com/wildfly/wildfly.org/fork' class='dark-background' target='_blank'>fork it</a> and show us what you’ve got.</p>
+
+    
+      <div class="width-1-12 project-links">
+        <strong>Navigation</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="/wildflysite/downloads" class="dark-background">Downloads</a></li>
+          
+            <li><a href="/wildflysitef/docs" class="dark-background">Docs</a></li>
+          
+            <li><a href="https://github.com/wildfly/wildfly" class="dark-background">Github</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <strong>Contribute</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="https://issues.jboss.org/browse/WFLY" class="dark-background">Submit a bug</a></li>
+          
+            <li><a href="https://community.jboss.org/en/wildfly?view=discussion" class="dark-background">Join the forum</a></li>
+          
+            <li><a href="https://github.com/wildfly/wildfly/fork" class="dark-background">Fork WildFly</a></li>
+          
+            <li><a href="https://twitter.com/WildFlyAS" class="dark-background">Follow us</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <strong>Get Help</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="https://community.jboss.org/en/wildfly?view=discussion" class="dark-background">Join the forum</a></li>
+          
+            <li><a href="https://www.hipchat.com/gFOhnVQke" class="dark-background">Join HipChat</a></li>
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-6-12 more-links">
+        <strong>Find more Red Hat Middleware Community Projects</strong>
+        <ul class="footer-links">
+          
+            <li><a href="https://www.apiman.io/" class="dark-background">APIMan</a></li>
+          
+            <li><a href="http://arquillian.org" class="dark-background">Arquillian</a></li>
+          
+            <li><a href="http://byteman.jboss.org/" class="dark-background">Byteman</a></li>
+          
+            <li><a href="http://capedwarf.org/" class="dark-background">CapeDwarf</a></li>
+          
+            <li><a href="https://github.com/alechenninger/chronicler" class="dark-background">Chronicler</a></li>
+          
+            <li><a href="https://github.com/darcy-framework" class="dark-background">Darcy</a></li>
+          
+            <li><a href="http://debezium.io/" class="dark-background">Debezium</a></li>
+          
+            <li><a href="https://www.drools.org/" class="dark-background">Drools</a></li>
+          
+            <li><a href="http://gatein.jboss.org/" class="dark-background">GateIn</a></li>
+          
+            <li><a href="http://www.hawkular.org/" class="dark-background">Hawkular</a></li>
+          
+            <li><a href="http://hawt.io/" class="dark-background">Hawtio</a></li>
+          
+            <li><a href="http://hibernate.org/" class="dark-background">Hibernate</a></li>
+          
+            <li><a href="http://www.infinispan.org/" class="dark-background">Infinispan</a></li>
+          
+            <li><a href="https://devstudio.jboss.com/" class="dark-background">JBoss DevStudio</a></li>
+          
+            <li><a href="http://forge.jboss.org/" class="dark-background">JBoss Forge</a></li>
+          
+            <li><a href="https://github.com/jboss-logging" class="dark-background">JBoss Logging</a></li>
+          
+            <li><a href="http://jbossremoting.jboss.org/" class="dark-background">JBoss Remoting</a></li>
+          
+            <li><a href="https://www.jbpm.org/" class="dark-background">jBPM</a></li>
+          
+            <li><a href="https://jsfunit.jboss.org/" class="dark-background">JSFUnit</a></li>
+          
+            <li><a href="https://www.keycloak.org/" class="dark-background">Keycloak</a></li>
+          
+            <li><a href="http://modcluster.io/" class="dark-background">Mod Cluster</a></li>
+          
+            <li><a href="http://modeshape.jboss.org/" class="dark-background">ModeShape</a></li>
+          
+            <li><a href="https://www.optaplanner.org/" class="dark-background">OptaPlanner</a></li>
+          
+            <li><a href="https://picketbox.jboss.org/" class="dark-background">Picketbox</a></li>
+          
+            <li><a href="http://resteasy.jboss.org/" class="dark-background">RESTEasy</a></li>
+          
+            <li><a href="https://riftsaw.jboss.org/" class="dark-background">Riftsaw</a></li>
+          
+            <li><a href="http://savara.jboss.org/" class="dark-background">Savara</a></li>
+          
+            <li><a href="http://seamframework.org/" class="dark-background">Seam</a></li>
+          
+            <li><a href="http://arquillian.org/" class="dark-background">Shrinkwrap</a></li>
+          
+            <li><a href="http://snowdrop.jboss.org/" class="dark-background">Snowdrop</a></li>
+          
+            <li><a href="https://switchyard.jboss.org/" class="dark-background">Switchyard</a></li>
+          
+            <li><a href="https://tattletale.jboss.org/" class="dark-background">Tattletale</a></li>
+          
+            <li><a href="http://teiid.jboss.org/" class="dark-background">Teiid</a></li>
+          
+            <li><a href="http://wildfly-swarm.io/" class="dark-background">WildFly Swarm</a></li>
+          
+            <li><a href="http://wise.jboss.org/" class="dark-background">Wise</a></li>
+          
+            <li><a href="https://xnio.jboss.org/" class="dark-background">XNIO</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" class="dark-background" target="_blank">CC by 3.0</a>
+    </span>
+    <span class="redhat">
+      a Red Hat sponsored project   
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/"><img src="/wildflysite/assets/img/RHLogo_white.svg"></a>
+    </span>
+  </div>
+</div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script type="text/javascript" src="/wildflysite/assets/javascript/mobile-nav.js"></script>
+</body>
+
+</html>

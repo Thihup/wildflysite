@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="">
+  <link rel="shortcut icon" type="image/png" href="/wildflysite/favicon.ico" >
+  <link rel="stylesheet" href="/wildflysite/assets/css/main.css" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+
+
+</head>
+
+<body class="Agroal configuration">
+  <div class="content">
+    <div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          
+            <a href="/wildflysite/docs/14/" class="active">Docs</a>
+          
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+
+    <div class="docs-page grid-wrapper">
+  <div class="grid__item width-12-12 docs-v-icons">
+    <a href="/wildflysite/docs/13/" ><img src="/wildflysite/assets/img/docs/wildfly_icons_docs-13-inactive.png"></a>
+    <a href="https://docs.wildfly.org/12/" target="_blank"><img src="/wildflysite/assets/img/docs/wildfly_icons_docs-12-inactive.png"></a>
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-11-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-10-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-09-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-08-coming.png">
+  </div>
+  <div class="grid__item width-12-12"><h1 class="title">Agroal configuration</h1></div>
+  <div class="grid__item width-3-12 doc-toc"><ul class="inline_toc">
+  <li><a href="#agroal-subssystem-enable">Enabling the subsystem</a></li>
+  <li><a href="#agroal-driver-installation">JDBC Driver Installation</a></li>
+  <li><a href="#agroal-common-datasource-definitions">Common Datasource Definitions</a>
+    <ul>
+      <li><a href="#agroal-connection-factory">Connection Factory definition</a></li>
+      <li><a href="#agroal-connection-pool">Connection Pool definition</a></li>
+      <li><a href="#agroal-common-attributes">Common datasource attributes</a></li>
+      <li><a href="#agroal-datasource-attributes">DataSource specific attributes</a></li>
+      <li><a href="#agroal-xa-datasource-attributes">XADataSource specific attributes</a></li>
+    </ul>
+  </li>
+</ul></div>
+  <div class="grid__item width-9-12 doc-content"><div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>The Agroal subsystem allows the definition of datasources. Declaring a new datasource consists of two separate steps: provide a JDBC driver and define a datasource that references the driver you installed.</p>
+</div>
+<div class="paragraph">
+<p>The Agroal subsystem is provided by the <a href="https://agroal.github.io/">Agroal</a> project. For a detailed description of the available configuration properties, please consult the project documentation.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="agroal-subssystem-enable">Enabling the subsystem</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If the WildFly configuration does not have Agroal subsystem enabled by default, it can be enabled in the following ways.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;extensions&gt;
+    &lt;extension module="org.wildfly.extension.datasources-agroal"/&gt;
+    [...]
+&lt;/extensions&gt;
+&lt;subsystem xmlns="urn:jboss:domain:agroal:1.0"&gt;
+    [...]
+&lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9990  /] /extension=org.wildfly.extension.datasources-agroal:add
+{"outcome" =&gt; "success"}
+[standalone@localhost:9990  /] /subsystem=datasources-agroal:add
+{
+    "outcome" =&gt; "success",
+    "response-headers" =&gt; {
+        "operation-requires-reload" =&gt; true,
+        "process-state" =&gt; "reload-required"
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="agroal-driver-installation">JDBC Driver Installation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A driver definition is a reference to a class in a JDBC driver. Multiple definitions can be created on the same JDBC driver for multiple classes in it. Agroal requires an implementation of java.sql.Driver or javax.sql.DataSource for non-XA datasources, while for XA a javax.sql.XADataSource implementation is required.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+Agroal will try to load an java.sql.Driver from the specified module if the <em>class</em> is not defined
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Tip</div>
+</td>
+<td class="content">
+Any installed <em>driver</em> provides an operation called <em>class-info</em> that lists all the properties available for that particular class, that can be set in the <em>connection-factory</em>.
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;subsystem xmlns="urn:jboss:domain:agroal:1.0"&gt;
+    [...]
+    &lt;drivers&gt;
+        &lt;driver name="h2" module="com.h2database.h2" class="org.h2.Driver"/&gt;
+    &lt;/drivers&gt;
+&lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9990  /] /subsystem=datasources-agroal/driver=h2:read-resource
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; {
+        "class" =&gt; "org.h2.Driver",
+        "module" =&gt; "com.h2database.h2"
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="agroal-common-datasource-definitions">Common Datasource Definitions</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Agroal provides both XA and non-XA datasources and most of the attributes that define them are common. This definition is mainly split in two logical units: the <em>connection factory</em> and the <em>connection pool</em>. As the name implies, the <em>connection factory</em> has all that is required to create new connections and <em>connection pool</em> defines how connections are handled by the pool.</p>
+</div>
+<div class="sect2">
+<h3 id="agroal-connection-factory">Connection Factory definition</h3>
+<div class="paragraph">
+<p>The <em>connection factory</em> requires a reference to a <em>driver</em> (see <a href="#">agroal-driver-installation</a>). With a java.sql.Driver the preferred way to 'point' to the database is to specify an <em>url</em> attribute while for javax.sql.DataSource and javax.sql.XADataSource the preferred way is to specify <em>connection-properties</em>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+Attributes <em>username</em> and <em>password</em> are provided for basic authentication with the database. Agroal does not allow <em>username</em> and <em>password</em> to be set as <em>connection-properties</em> due to security requirements.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Other features provided by the <em>connection-factory</em> definition include the possibility of executing a SQL statement right after the connection has been created and to specify the isolation level of transactions in the database.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;subsystem xmlns="urn:jboss:domain:agroal:1.0"&gt;
+     &lt;datasource [...]&gt;
+        [...]
+        &lt;connection-factory driver="h2" url="jdbc:h2:tcp://localhost:1701" transaction-isolation="SERIALIZABLE" new-connection-sql="SELECT 1" username="sa" password="sa"&gt;
+            &lt;connection-properties&gt;
+                &lt;property name="aProperty" value="aValue"/&gt;
+                &lt;property name="anotherProperty" value="anotherValue"/&gt;
+            &lt;/connection-properties&gt;
+        &lt;/connection-factory&gt;
+    &lt;/datasource&gt;
+    [...]
+&lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">---
+[standalone@localhost:9990  /] /subsystem=datasources-agroal/datasource=sample:read-resource
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; {
+        "connection-factory" =&gt; {
+            "driver" =&gt; "h2",
+            "url" =&gt; "jdbc:h2:tcp://localhost:1701",
+            "transaction-isolation" =&gt; "SERIALIZABLE",
+            "new-connection-sql" =&gt; "SELECT 1",
+            "username" =&gt; "sa",
+            "password" =&gt; "sa",
+            "connection-properties" =&gt; {
+                "aProperty" =&gt; "aValue",
+                "anotherProperty" =&gt; "anotherValue"
+            }
+        }
+        [...]
+    }
+}
+---</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="agroal-connection-pool">Connection Pool definition</h3>
+<div class="paragraph">
+<p>The main attributes of the <em>connection-pool</em> definition are the ones that control it&#8217;s size. While the <em>initial size</em> attribute is only taken into account while bootstrapping the pool, <em>min size</em> and <em>max size</em> are always enforced and can be changed at any time without requiring a reload of the server.</p>
+</div>
+<div class="paragraph">
+<p>Another important attribute of the <em>connection-pool</em> is the <em>blocking timeout</em> that defines the maximum amount of time a thread will wait for a connection. If that time elapses and still no connection is available an exception is thrown. Keep in mind that the default value is <em>0</em>, meaning that a thread will wait forever for a connection to become available. Changing this setting does not require a reload of the server.</p>
+</div>
+<div class="paragraph">
+<p>The <em>connection pool</em> provides other convenient features like background validation of connections on the pool, removal of idle connections from the pool and detection of connections held for too long by one thread. All these features are disabled by default and can be enabled by specifying an interval of time on the corresponding attribute.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+There is a set of flush operations that perform many of these features on-demand. These are <em>flush-all</em> to close all connections immediately, <em>flush-graceful</em> to close all connections under normal operation, <em>flush-invalid</em> to remove any invalid connections from the pool and <em>flush-idle</em> to remove any connections not being used.
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;subsystem xmlns="urn:jboss:domain:agroal:1.0"&gt;
+     &lt;datasource [...]&gt;
+        [...]
+        &lt;connection-pool max-size="30" min-size="10" initial-size="20" blocking-timeout="1000" background-validation="6000" leak-detection="5000" idle-removal="5"/&gt;
+    &lt;/datasource&gt;
+    [...]
+&lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">---
+[standalone@localhost:9990  /] /subsystem=datasources-agroal/datasource=sample:read-resource
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; {
+        "connection-pool" =&gt; {
+            "max-size" =&gt; 30,
+            "min-size" =&gt; 10,
+            "initial-size" =&gt; 20,
+            "blocking-timeout" =&gt; 1000,
+            "background-validation" =&gt; 6000,
+            "leak-detection" =&gt; 5000,
+            "idle-removal" =&gt; 5
+        }
+        [...]
+    }
+}
+---</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="agroal-common-attributes">Common datasource attributes</h3>
+<div class="paragraph">
+<p>All datasources in Agroal have a name that&#8217;s used to locate them in the WildFly runtime model and are bound to a JNDI name.</p>
+</div>
+<div class="paragraph">
+<p>The attribute <em>statistics-enabled</em> allow the collection of metrics regarding the pool that can be queried in the runtime model</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+There is also a <em>reset-statistics</em> operation provided.
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;subsystem xmlns="urn:jboss:domain:agroal:1.0"&gt;
+    &lt;xa-datasource name="sample-xa" jndi-name="java:jboss/datasources/ExampleXADS" statistics-enabled="true"&gt;
+        [...]
+    &lt;/xa-datasource&gt;
+    [...]
+&lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">---
+[standalone@localhost:9990  /] /subsystem=datasources-agroal/datasource=sample-xa:read-resource
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; {
+        "jndi-name" =&gt; "java:jboss/datasources/ExampleXADS",
+        "statistics-enabled" =&gt; true
+        [...]
+    }
+}
+---</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The available statistics include the number of created / destroyed connections and the number of connections in use / available in the pool. There are also statistics for the time it takes to create a connection and for how long have threads been blocked waiting for a connection.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">[standalone@localhost:9990  /] /subsystem=datasources-agroal/datasource=sample:read-resource(include-runtime)
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; {
+        "statistics" =&gt; {
+            "acquire-count" =&gt; 10L,
+            "active-count" =&gt; 3L,
+            "available-count" =&gt; 17L,
+            "awaiting-count" =&gt; 0L,
+            "creation-count" =&gt; 20L,
+            "destroy-count" =&gt; 0L,
+            "flush-count" =&gt; 0L,
+            "invalid-count" =&gt; 0L,
+            "leak-detection-count" =&gt; 0L,
+            "max-used-count" =&gt; 20L,
+            "reap-count" =&gt; 0L,
+            "blocking-time-average-ms" =&gt; 0L,
+            "blocking-time-max-ms" =&gt; 0L,
+            "blocking-time-total-ms" =&gt; 0L,
+            "creation-time-average-ms" =&gt; 96L,
+            "creation-time-max-ms" =&gt; 815L,
+            "creation-time-total-ms" =&gt; 964L
+        }
+        [...]
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="agroal-datasource-attributes">DataSource specific attributes</h3>
+<div class="paragraph">
+<p>In addition to all the common attributes, a <em>datasource</em> definition may disable the JTA integration.</p>
+</div>
+<div class="paragraph">
+<p>Deferred enlistment is not supported, meaning that if JTA is enabled a connection must always be obtained within the scope of a transaction. The connection will always be enlisted with that transaction (lazy enlistment is not supported).</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Tip</div>
+</td>
+<td class="content">
+The <em>connectable</em> attribute allows a non-XA datasource to take part in an XA transaction ('Last Resource Commit Optimization (LRCO)' / 'Commit Markable Resource')
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;subsystem xmlns="urn:jboss:domain:agroal:1.0"&gt;
+    &lt;datasource name="sample" jndi-name="java:jboss/datasources/ExampleDS" jta="false" connectable="false" statistics-enabled="true"&gt;
+        [...]
+    &lt;/datasource&gt;
+    [...]
+&lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">---
+[standalone@localhost:9990  /] /subsystem=datasources-agroal/datasource=sample-xa:read-resource
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; {
+        "connectable" =&gt; false,
+        "jta" =&gt; false,
+        [...]
+    }
+}
+---</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="agroal-xa-datasource-attributes">XADataSource specific attributes</h3>
+<div class="paragraph">
+<p>At the moment there are no attributes specific to a XADataSource definition.</p>
+</div>
+</div>
+</div>
+</div></div>
+</div>
+
+
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">WildFly is open. All dependencies of this project are available under the <a href='https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html' class='dark-background' target='_blank'>LGPL 2.1</a> or compatible license.<br/><br/>This website was built with <a href='https://jekyllrb.com/' class='dark-background' target='_blank'>Jekyll</a> is hosted on <a href='https://pages.github.com/' class='dark-background' target='_blank'>Github Pages</a> and is completely open source. If you want to make it better, <a href='https://github.com/wildfly/wildfly.org/fork' class='dark-background' target='_blank'>fork it</a> and show us what you’ve got.</p>
+
+    
+      <div class="width-1-12 project-links">
+        <strong>Navigation</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="/wildflysite/downloads" class="dark-background">Downloads</a></li>
+          
+            <li><a href="/wildflysitef/docs" class="dark-background">Docs</a></li>
+          
+            <li><a href="https://github.com/wildfly/wildfly" class="dark-background">Github</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <strong>Contribute</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="https://issues.jboss.org/browse/WFLY" class="dark-background">Submit a bug</a></li>
+          
+            <li><a href="https://community.jboss.org/en/wildfly?view=discussion" class="dark-background">Join the forum</a></li>
+          
+            <li><a href="https://github.com/wildfly/wildfly/fork" class="dark-background">Fork WildFly</a></li>
+          
+            <li><a href="https://twitter.com/WildFlyAS" class="dark-background">Follow us</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <strong>Get Help</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="https://community.jboss.org/en/wildfly?view=discussion" class="dark-background">Join the forum</a></li>
+          
+            <li><a href="https://www.hipchat.com/gFOhnVQke" class="dark-background">Join HipChat</a></li>
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-6-12 more-links">
+        <strong>Find more Red Hat Middleware Community Projects</strong>
+        <ul class="footer-links">
+          
+            <li><a href="https://www.apiman.io/" class="dark-background">APIMan</a></li>
+          
+            <li><a href="http://arquillian.org" class="dark-background">Arquillian</a></li>
+          
+            <li><a href="http://byteman.jboss.org/" class="dark-background">Byteman</a></li>
+          
+            <li><a href="http://capedwarf.org/" class="dark-background">CapeDwarf</a></li>
+          
+            <li><a href="https://github.com/alechenninger/chronicler" class="dark-background">Chronicler</a></li>
+          
+            <li><a href="https://github.com/darcy-framework" class="dark-background">Darcy</a></li>
+          
+            <li><a href="http://debezium.io/" class="dark-background">Debezium</a></li>
+          
+            <li><a href="https://www.drools.org/" class="dark-background">Drools</a></li>
+          
+            <li><a href="http://gatein.jboss.org/" class="dark-background">GateIn</a></li>
+          
+            <li><a href="http://www.hawkular.org/" class="dark-background">Hawkular</a></li>
+          
+            <li><a href="http://hawt.io/" class="dark-background">Hawtio</a></li>
+          
+            <li><a href="http://hibernate.org/" class="dark-background">Hibernate</a></li>
+          
+            <li><a href="http://www.infinispan.org/" class="dark-background">Infinispan</a></li>
+          
+            <li><a href="https://devstudio.jboss.com/" class="dark-background">JBoss DevStudio</a></li>
+          
+            <li><a href="http://forge.jboss.org/" class="dark-background">JBoss Forge</a></li>
+          
+            <li><a href="https://github.com/jboss-logging" class="dark-background">JBoss Logging</a></li>
+          
+            <li><a href="http://jbossremoting.jboss.org/" class="dark-background">JBoss Remoting</a></li>
+          
+            <li><a href="https://www.jbpm.org/" class="dark-background">jBPM</a></li>
+          
+            <li><a href="https://jsfunit.jboss.org/" class="dark-background">JSFUnit</a></li>
+          
+            <li><a href="https://www.keycloak.org/" class="dark-background">Keycloak</a></li>
+          
+            <li><a href="http://modcluster.io/" class="dark-background">Mod Cluster</a></li>
+          
+            <li><a href="http://modeshape.jboss.org/" class="dark-background">ModeShape</a></li>
+          
+            <li><a href="https://www.optaplanner.org/" class="dark-background">OptaPlanner</a></li>
+          
+            <li><a href="https://picketbox.jboss.org/" class="dark-background">Picketbox</a></li>
+          
+            <li><a href="http://resteasy.jboss.org/" class="dark-background">RESTEasy</a></li>
+          
+            <li><a href="https://riftsaw.jboss.org/" class="dark-background">Riftsaw</a></li>
+          
+            <li><a href="http://savara.jboss.org/" class="dark-background">Savara</a></li>
+          
+            <li><a href="http://seamframework.org/" class="dark-background">Seam</a></li>
+          
+            <li><a href="http://arquillian.org/" class="dark-background">Shrinkwrap</a></li>
+          
+            <li><a href="http://snowdrop.jboss.org/" class="dark-background">Snowdrop</a></li>
+          
+            <li><a href="https://switchyard.jboss.org/" class="dark-background">Switchyard</a></li>
+          
+            <li><a href="https://tattletale.jboss.org/" class="dark-background">Tattletale</a></li>
+          
+            <li><a href="http://teiid.jboss.org/" class="dark-background">Teiid</a></li>
+          
+            <li><a href="http://wildfly-swarm.io/" class="dark-background">WildFly Swarm</a></li>
+          
+            <li><a href="http://wise.jboss.org/" class="dark-background">Wise</a></li>
+          
+            <li><a href="https://xnio.jboss.org/" class="dark-background">XNIO</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" class="dark-background" target="_blank">CC by 3.0</a>
+    </span>
+    <span class="redhat">
+      a Red Hat sponsored project   
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/"><img src="/wildflysite/assets/img/RHLogo_white.svg"></a>
+    </span>
+  </div>
+</div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script type="text/javascript" src="/wildflysite/assets/javascript/mobile-nav.js"></script>
+</body>
+
+</html>

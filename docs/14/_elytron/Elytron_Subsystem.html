@@ -1,0 +1,1771 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="">
+  <link rel="shortcut icon" type="image/png" href="/wildflysite/favicon.ico" >
+  <link rel="stylesheet" href="/wildflysite/assets/css/main.css" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+
+
+</head>
+
+<body class="Elytron Subsystem">
+  <div class="content">
+    <div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          
+            <a href="/wildflysite/docs/14/" class="active">Docs</a>
+          
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+
+    <div class="docs-page grid-wrapper">
+  <div class="grid__item width-12-12 docs-v-icons">
+    <a href="/wildflysite/docs/13/" ><img src="/wildflysite/assets/img/docs/wildfly_icons_docs-13-inactive.png"></a>
+    <a href="https://docs.wildfly.org/12/" target="_blank"><img src="/wildflysite/assets/img/docs/wildfly_icons_docs-12-inactive.png"></a>
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-11-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-10-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-09-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-08-coming.png">
+  </div>
+  <div class="grid__item width-12-12"><h1 class="title">Elytron Subsystem</h1></div>
+  <div class="grid__item width-3-12 doc-toc"><ul class="inline_toc">
+  <li><a href="#get-started-using-the-elytron-subsystem">Get Started using the Elytron Subsystem</a></li>
+  <li><a href="#provided-components">Provided components</a>
+    <ul>
+      <li><a href="#factories">Factories</a></li>
+      <li><a href="#principal-transformers">Principal Transformers</a></li>
+      <li><a href="#principal-decoders">Principal Decoders</a></li>
+      <li><a href="#realm-mappers">Realm Mappers</a></li>
+      <li><a href="#realms">Realms</a></li>
+      <li><a href="#permission-mappers">Permission Mappers</a></li>
+      <li><a href="#role-decoders">Role Decoders</a></li>
+      <li><a href="#role-mappers">Role Mappers</a></li>
+      <li><a href="#ssl-components">SSL Components</a></li>
+      <li><a href="#other">Other</a></li>
+    </ul>
+  </li>
+  <li><a href="#out-of-the-box-configuration">Out of the Box Configuration</a></li>
+  <li><a href="#default-application-authentication-configuration">Default Application Authentication Configuration</a>
+    <ul>
+      <li><a href="#update-wildfly-to-use-the-default-elytron-components-for-application-authentication">Update WildFly to Use the Default Elytron Components for Application</a></li>
+      <li><a href="#default-elytron-application-domain-configuration">Default Elytron ApplicationDomain Configuration</a></li>
+    </ul>
+  </li>
+  <li><a href="#default-management-authentication-configuration">Default Management Authentication Configuration</a>
+    <ul>
+      <li><a href="#update-wildfly-to-use-the-default-elytron-components-for-management-authentication">Update WildFly to Use the Default Elytron Components for Management</a>
+        <ul>
+          <li><a href="#set-http-authentication-factory-to-use-management-http-authentication">Set http-authentication-factory to use</a></li>
+          <li><a href="#set-sasl-authentication-factory-to-use-management-sasl-authentication">Set sasl-authentication-factory to use</a></li>
+          <li><a href="#undefine-security-realm">Undefine security-realm</a></li>
+          <li><a href="#reload-wildfly-for-the-changes-to-take-affect.">Reload WildFly for the changes to take affect.</a></li>
+        </ul>
+      </li>
+      <li><a href="#default-elytron-management-http-authentication-configuration">Default Elytron Management HTTP Authentication Configuration</a></li>
+      <li><a href="#default-elytron-management-cli-authentication">Default Elytron Management CLI Authentication</a></li>
+    </ul>
+  </li>
+  <li><a href="#comparing-legacy-approaches-to-elytron-approaches">Comparing Legacy Approaches to Elytron Approaches</a></li>
+</ul></div>
+  <div class="grid__item width-9-12 doc-content"><div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>WildFly Elytron is a security framework used to unify security across
+the entire application server. The <em>elytron</em> subsystem enables a single
+point of configuration for securing both applications and the management
+interfaces. WildFly Elytron also provides a set of APIs and SPIs for
+providing custom implementations of functionality and integrating with
+the <em>elytron</em> subsystem.</p>
+</div>
+<div class="paragraph">
+<p>In addition, there are several other important features of the WildFly
+Elytron:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Stronger authentication mechanisms for HTTP and SASL authentication.</p>
+</li>
+<li>
+<p>Improved architecture that allows for <em>SecurityIdentities</em> to be
+propagated across security domains and transparently transformed ready
+to be used for authorization. This transformation takes place using
+configurable role decoders, role mappers, and permission mappers.</p>
+</li>
+<li>
+<p>Centralized point for SSL/TLS configuration including cipher suites
+and protocols.</p>
+</li>
+<li>
+<p>SSL/TLS optimizations such as eager <em>SecureIdentity</em> construction and
+closely tying authorization to establishing an SSL/TLS connection. Eager
+<em>SecureIdentity</em> construction eliminates the need for a <em>SecureIdentity</em>
+to be constructed on a per-request basis. Closely tying authentication
+to establishing an SSL/TLS connection enables permission checks to
+happen <em>BEFORE</em> the first request is received.</p>
+</li>
+<li>
+<p>A secure credential store that replaces the previous vault
+implementation to store clear text credentials.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The new <em>elytron</em> subsystem exists in parallel to the legacy <em>security</em>
+subsystem and legacy core management authentication. Both the legacy and
+Elytron methods may be used for securing the management interfaces as
+well as providing security for applications.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="get-started-using-the-elytron-subsystem">Get Started using the Elytron Subsystem</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To get started using Elytron, refer to these topics:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Use the default Elytron components for
+<a href="#default-application-authentication-configuration">application</a>
+and
+<a href="#default-management-authentication-configuration">management</a>
+authentication</p>
+</li>
+<li>
+<p>Secure an application with a new identity store stored in a
+<a href="#configure-authentication-with-a-filesystem-based-identity-store">filesystem</a>
+or
+<a href="#configure-authentication-with-a-database-identity-store">database</a>.</p>
+</li>
+<li>
+<p>Set up one-way SSL/TLS for
+<a href="#enable-one-way-ssltls-for-applications">applications</a>
+or the
+<a href="#enable-one-way-ssltls-for-the-management-interfaces">management interfaces</a>.</p>
+</li>
+<li>
+<p>Set up two-way SSL/TLS for
+<a href="#enable-two-way-ssltls-in-wildfly-for-applications">applications</a>
+or the
+<a href="#enable-two-way-ssltls-for-the-management-interfaces">management interfaces</a>.</p>
+</li>
+<li>
+<p><a href="#create-and-use-a-credential-store">Create a credential store and use it with your SSL/TLS configuration</a>.</p>
+</li>
+<li>
+<p><a href="#configure-authentication-with-certificates">Use certificate-based authentication with applications</a>.</p>
+</li>
+<li>
+<p><a href="#override-an-applications-authentication-configuration">Override an application&#8217;s authentication configuration</a>
+with Elytron authentication.</p>
+</li>
+<li>
+<p><a href="#configure-authentication-with-a-kerberos-based-identity-store">Configure Kerberos authentication for applications</a>.</p>
+</li>
+<li>
+<p>Secure
+<a href="#configure-authentication-with-an-ldap-based-identity-store">applications</a>
+and the
+<a href="#secure-the-management-interfaces-with-a-new-identity-store">management interfaces</a> with an LDAP-based identity store.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="provided-components">Provided components</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Wildfly Elytron provides a default set of implementations in the
+<em>elytron</em> subsystem.</p>
+</div>
+<div class="sect2">
+<h3 id="factories">Factories</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Component</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">aggregate-http-server-mechanism-factory</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An HTTP server factory
+definition where the HTTP server factory is an aggregation of other HTTP
+server factories.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">aggregate-sasl-server-factory</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A SASL server factory definition where
+the SASL server factory is an aggregation of other SASL server
+factories.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">configurable-http-server-mechanism-factory</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A SASL server factory
+definition where the SASL server factory is an aggregation of other SASL
+server factories.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">configurable-sasl-server-factory</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A SASL server factory definition
+where the SASL server factory is an aggregation of other SASL server
+factories.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">custom-credential-security-factory</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A custom credential SecurityFactory
+definition.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">http-authentication-factory</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Resource containing the association of a
+security domain with a HttpServerAuthenticationMechanismFactory.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">kerberos-security-factory</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A security factory for obtaining a
+GSSCredential for use during authentication.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">mechanism-provider-filtering-sasl-server-factory</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A SASL server factory
+definition that enables filtering by provider where the factory was
+loaded using a provider.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">provider-http-server-mechanism-factory</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An HTTP server factory
+definition where the HTTP server factory is an aggregation of factories
+from the provider list.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">provider-sasl-server-factory</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A SASL server factory definition where
+the SASL server factory is an aggregation of factories from the provider
+list.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">sasl-authentication-factory</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Resource containing the association of a
+security domain with a SaslServerFactory.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">service-loader-http-server-mechanism-factory</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An HTTP server factory
+definition where the HTTP server factory is an aggregation of factories
+identified using a ServiceLoader</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">service-loader-sasl-server-factory</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A SASL server factory definition
+where the SASL server factory is an aggregation of factories identified
+using a ServiceLoader</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="principal-transformers">Principal Transformers</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Component</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">aggregate-principal-transformer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A principal transformer definition
+where the principal transformer is an aggregation of other principal
+transformers.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">chained-principal-transformer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A principal transformer definition where
+the principal transformer is a chaining of other principal transformers.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">constant-principal-transformer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A principal transformer definition
+where the principal transformer always returns the same constant.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">custom-principal-transformer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A custom principal transformer
+definition.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">regex-principal-transformer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A regular expression based principal
+transformer</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">regex-validating-principal-transformer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A regular expression based
+principal transformer which uses the regular expression to validate the
+name.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="principal-decoders">Principal Decoders</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Component</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">aggregate-principal-decoder</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A principal decoder definition where the
+principal decoder is an aggregation of other principal decoders.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">concatenating-principal-decoder</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A principal decoder definition where
+the principal decoder is a concatenation of other principal decoders.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">constant-principal-decoder</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Definition of a principal decoder that
+always returns the same constant.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">custom-principal-decoder</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Definition of a custom principal decoder.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x500-attribute-principal-decoder</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Definition of a X500 attribute based
+principal decoder.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="realm-mappers">Realm Mappers</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Component</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">constant-realm-mapper</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Definition of a constant realm mapper that
+always returns the same value.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">custom-realm-mapper</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Definition of a custom realm mapper</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">mapped-regex-realm-mapper</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Definition of a realm mapper implementation
+that first uses a regular expression to extract the realm name, this is
+then converted using the configured mapping of realm names.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">simple-regex-realm-mapper</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Definition of a simple realm mapper that
+attempts to extract the realm name using the capture group from the
+regular expression, if that does not provide a match then the delegate
+realm mapper is used instead.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="realms">Realms</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Component</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">aggregate-realm</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A realm definition that is an aggregation of two
+realms, one for the authentication steps and one for loading the
+identity for the authorization steps.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">caching-realm</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A realm definition that enables caching to another
+security realm. Caching strategy is Least Recently Used where least
+accessed entries are discarded when maximum number of entries is
+reached.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">custom-modifiable-realm</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Custom realm configured as being modifiable
+will be expected to implement the ModifiableSecurityRealm interface. By
+configuring a realm as being modifiable management operations will be
+made available to manipulate the realm.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">custom-realm</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A custom realm definitions can implement either the s
+SecurityRealm interface or the ModifiableSecurityRealm interface.
+Regardless of which interface is implemented management operations will
+not be exposed to manage the realm. However other services that depend
+on the realm will still be able to perform a type check and cast to gain
+access to the modification API.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">filesystem-realm</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A simple security realm definition backed by the
+filesystem.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">identity-realm</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A security realm definition where identities are
+represented in the management model.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">jdbc-realm</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A security realm definition backed by database using JDBC.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">key-store-realm</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A security realm definition backed by a keystore.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ldap-realm</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A security realm definition backed by LDAP.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">properties-realm</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A security realm definition backed by properties
+files.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">token-realm</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A security realm definition capable of validating and
+extracting identities from security tokens.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="permission-mappers">Permission Mappers</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Component</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">custom-permission-mapper</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Definition of a custom permission mapper.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">logical-permission-mapper</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Definition of a logical permission mapper.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">simple-permission-mapper</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Definition of a simple configured permission
+mapper.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">constant-permission-mapper</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Definition of a permission mapper that
+always returns the same constant.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="role-decoders">Role Decoders</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Component</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">custom-role-decoder</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Definition of a custom RoleDecoder</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">simple-role-decoder</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Definition of a simple RoleDecoder that takes a
+single attribute and maps it directly to roles.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="role-mappers">Role Mappers</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Component</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">add-prefix-role-mapper</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A role mapper definition for a role mapper that
+adds a prefix to each provided.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">add-suffix-role-mapper</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A role mapper definition for a role mapper that
+adds a suffix to each provided.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">constant-role-mapper</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A role mapper definition where a constant set of
+roles is always returned.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">aggregate-role-mapper</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A role mapper definition where the role mapper
+is an aggregation of other role mappers.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">logical-role-mapper</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A role mapper definition for a role mapper that
+performs a logical operation using two referenced role mappers.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">custom-role-mapper</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Definition of a custom role mapper</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">mapped-role-mapper</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A role mapper definition for a role mapper that uses
+configured mapping of role names to map role names.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="ssl-components">SSL Components</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Component</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">client-ssl-context</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An SSLContext for use on the client side of a
+connection.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">filtering-key-store</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A filtering keystore definition, which provides a
+keystore by filtering a key-store.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">key-manager</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A key manager definition for creating the key manager
+list as used to create an SSL context.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">key-store</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A keystore definition.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ldap-key-store</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An LDAP keystore definition, which loads a keystore
+from an LDAP server.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">server-ssl-context</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An SSL context for use on the server side of a
+connection.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">trust-manager</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A trust manager definition for creating the
+TrustManager list as used to create an SSL context.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">certificate-authority-account</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A certificate authority account which can
+be used to obtain and revoke signed certificates.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="other">Other</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Component</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">aggregate-providers</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An aggregation of two or more Provider[]
+resources.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">authentication-configuration</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An individual authentication
+configuration definition, which is used by clients deployed to Wildfly
+and other resources for authenticating when making a remote connection.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">authentication-context</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An individual authentication context
+definition, which is used to supply an ssl-context and
+authentication-configuration when clients deployed to Wildfly and other
+resources make a remoting connection.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">credential-store</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Credential store to keep alias for sensitive
+information such as passwords for external services.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">dir-context</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The configuration to connect to a directory (LDAP) server.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">provider-loader</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A definition for a provider loader.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">security-domain</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A security domain definition.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">security-property</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A definition of a security property to be set.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="out-of-the-box-configuration">Out of the Box Configuration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>WildFly provides a set of components configured by default. While these
+components are ready to use, the legacy <em>security</em> subsystem and legacy
+core management authentication is still used by default. To configure
+WildFly to use the these configured components as well as create new
+ones, see the <a href="#Using_the_Elytron_Subsystem">Using the Elytron
+Subsystem</a> section.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Default Component</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ApplicationDomain</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The ApplicationDomain security domain uses
+ApplicationRealm and groups-to-roles for authentication. It also uses
+default-permission-mapper to assign the login permission.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ManagementDomain</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The ManagementDomain security domain uses two
+security realms for authentication: ManagementRealm with groups-to-roles
+and local with super-user-mapper. It also uses default-permission-mapper
+to assign the login permission.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">local (security realm)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The local security realm does no authentication
+and sets the identity of principals to $local</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ApplicationRealm</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The ApplicationRealm security realm is a properties
+realm that authenticates principals using application-users.properties
+and assigns roles using application-roles.properties. These files are
+located under jboss.server.config.dir, which by default, maps to
+EAP_HOME/standalone/configuration. They are also the same files used by
+the legacy security default configuration.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ManagementRealm</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The ManagementRealm security realm is a properties
+realm that authenticates principals using mgmt-users.properties and
+assigns roles using mgmt-groups.properties. These files are located
+under jboss.server.config.dir, which by default, maps to
+EAP_HOME/standalone/configuration. They are also the same files used by
+the legacy security default configuration.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">default-permission-mapper</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The default-permission-mapper mapper is a
+simple permission mapper that uses the default-permissions permission set
+to assign the full set of permissions that an identity would require to
+access any services on the server. For example, the default-permission-mapper
+mapper uses org.wildfly.extension.batch.jberet.deployment.BatchPermission
+specified by the default-permissions permission set to assign permission for
+batch jobs. The batch permissions are start, stop, restart, abandon, and read
+which aligns with javax.batch.operations.JobOperator. The default-permission-mapper
+mapper also uses org.wildfly.security.auth.permission.LoginPermission specified
+by the the login-permission permission set to assign the login permission.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">local (mapper)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The local mapper is a constant role mapper that maps to
+the local security realm. This is used to map authentication to the
+local security realm.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">groups-to-roles</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The groups-to-roles mapper is a simple-role-decoder
+that will decode the groups information of a principal and use it for
+the role information.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">super-user-mapper</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The super-user-mapper mapper is a constant role
+mapper that maps the SuperUser role to a principal.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">management-http-authentication</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The management-http-authentication
+http-authentication-factory can be used for doing authentication over
+http. It uses the global provider-http-server-mechanism-factory to
+filter authentication mechanism and uses ManagementDomain for
+authenticating principals. It accepts the DIGEST authentication
+mechanisms and exposes it as ManagementRealm to applications.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">global (provider-http-server-mechanism-factory)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This is the HTTP
+server factory mechanism definition used to list the provided
+authentication mechanisms when creating an http authentication factory.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">management-sasl-authentication</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The management-sasl-authentication
+sasl-authentication-factory can be used for authentication using SASL.
+It uses the configured sasl-server-factory to filter authentication
+mechanisms, which also uses the global provider-sasl-server-factory to
+filter by provider names. management-sasl-authentication uses the
+ManagementDomain security domain for authentication of principals. It
+also maps authentication using JBOSS-LOCAL-USER mechanisms using the
+local realm mapper and authentication using DIGEST-MD5 to
+ManagementRealm.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">application-sasl-authentication</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The application-sasl-authentication
+sasl-authentication-factory can be used for authentication using SASL.
+It uses the configured sasl-server-factory to filter authentication
+mechanisms, which also uses the global provider-sasl-server-factory to
+filter by provider names. application-sasl-authentication uses the
+ApplicationDomain security domain for authentication of principals.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">global (provider-sasl-server-factory)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This is the SASL server factory
+definition used to create SASL authentication factories.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">elytron (mechanism-provider-filtering-sasl-server-factor)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This is used
+to filter which sasl-authentication-factory is used based on the
+provider. In this case, elytron will match on the WildFlyElytron
+provider name.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">configured (configurable-sasl-server-factory)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This is used to filter
+sasl-authentication-factory is used based on the mechanism name. In this
+case, configured will match on JBOSS-LOCAL-USER and DIGEST-MD5. It also
+sets the wildfly.sasl.local-user.default-user to $local.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">combined-providers</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Is an aggregate provider that aggreates the elytron
+and openssl provider loaders.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">elytron</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A provider loader</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">openssl</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A provider loader</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><strong>Default WildFly Configuration</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">/subsystem=elytron:read-resource(recursive=true)
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; {
+        "default-authentication-context" =&gt; undefined,
+        "disallowed-providers" =&gt; ["OracleUcrypto"],
+        "final-providers" =&gt; "combined-providers",
+        "initial-providers" =&gt; undefined,
+        "security-properties" =&gt; undefined,
+        "add-prefix-role-mapper" =&gt; undefined,
+        "add-suffix-role-mapper" =&gt; undefined,
+        "aggregate-http-server-mechanism-factory" =&gt; undefined,
+        "aggregate-principal-decoder" =&gt; undefined,
+        "aggregate-principal-transformer" =&gt; undefined,
+        "aggregate-providers" =&gt; {"combined-providers" =&gt; {"providers" =&gt; [
+            "elytron",
+            "openssl"
+        ]}},
+        "aggregate-realm" =&gt; undefined,
+        "aggregate-role-mapper" =&gt; undefined,
+        "aggregate-sasl-server-factory" =&gt; undefined,
+        "aggregate-security-event-listener" =&gt; undefined,
+        "authentication-configuration" =&gt; undefined,
+        "authentication-context" =&gt; undefined,
+        "caching-realm" =&gt; undefined,
+        "certificate-authority-account" =&gt; undefined,
+        "chained-principal-transformer" =&gt; undefined,
+        "client-ssl-context" =&gt; undefined,
+        "concatenating-principal-decoder" =&gt; undefined,
+        "configurable-http-server-mechanism-factory" =&gt; undefined,
+        "configurable-sasl-server-factory" =&gt; {"configured" =&gt; {
+            "filters" =&gt; undefined,
+            "properties" =&gt; {"wildfly.sasl.local-user.default-user" =&gt; "$local"},
+            "protocol" =&gt; undefined,
+            "sasl-server-factory" =&gt; "elytron",
+            "server-name" =&gt; undefined
+        }},
+        "constant-permission-mapper" =&gt; undefined,
+        "constant-principal-decoder" =&gt; undefined,
+        "constant-principal-transformer" =&gt; undefined,
+        "constant-realm-mapper" =&gt; {"local" =&gt; {"realm-name" =&gt; "local"}},
+        "constant-role-mapper" =&gt; {"super-user-mapper" =&gt; {"roles" =&gt; ["SuperUser"]}},
+        "credential-store" =&gt; undefined,
+        "custom-credential-security-factory" =&gt; undefined,
+        "custom-modifiable-realm" =&gt; undefined,
+        "custom-permission-mapper" =&gt; undefined,
+        "custom-principal-decoder" =&gt; undefined,
+        "custom-principal-transformer" =&gt; undefined,
+        "custom-realm" =&gt; undefined,
+        "custom-realm-mapper" =&gt; undefined,
+        "custom-role-decoder" =&gt; undefined,
+        "custom-role-mapper" =&gt; undefined,
+        "custom-security-event-listener" =&gt; undefined,
+        "dir-context" =&gt; undefined,
+        "file-audit-log" =&gt; {"local-audit" =&gt; {
+            "format" =&gt; "JSON",
+            "path" =&gt; "audit.log",
+            "relative-to" =&gt; "jboss.server.log.dir",
+            "synchronized" =&gt; true
+        }},
+        "filesystem-realm" =&gt; undefined,
+        "filtering-key-store" =&gt; undefined,
+        "http-authentication-factory" =&gt; {
+            "management-http-authentication" =&gt; {
+                "http-server-mechanism-factory" =&gt; "global",
+                "mechanism-configurations" =&gt; [{
+                    "mechanism-name" =&gt; "DIGEST",
+                    "mechanism-realm-configurations" =&gt; [{"realm-name" =&gt; "ManagementRealm"}]
+                }],
+                "security-domain" =&gt; "ManagementDomain"
+            }
+        },
+        "identity-realm" =&gt; {"local" =&gt; {
+            "attribute-name" =&gt; undefined,
+            "attribute-values" =&gt; undefined,
+            "identity" =&gt; "$local"
+        }},
+        "jdbc-realm" =&gt; undefined,
+        "kerberos-security-factory" =&gt; undefined,
+        "key-manager" =&gt; undefined,
+        "key-store" =&gt; undefined,
+        "key-store-realm" =&gt; undefined,
+        "ldap-key-store" =&gt; undefined,
+        "ldap-realm" =&gt; undefined,
+        "logical-permission-mapper" =&gt; undefined,
+        "logical-role-mapper" =&gt; undefined,
+        "mapped-regex-realm-mapper" =&gt; undefined,
+        "mapped-role-mapper" =&gt; undefined,
+        "mechanism-provider-filtering-sasl-server-factory" =&gt; {"elytron" =&gt; {
+            "enabling" =&gt; true,
+            "filters" =&gt; [{"provider-name" =&gt; "WildFlyElytron"}],
+            "sasl-server-factory" =&gt; "global"
+        }},
+        "periodic-rotating-file-audit-log" =&gt; undefined,
+        "permission-set" =&gt; {
+            "login-permission" =&gt; {"permissions" =&gt; [{"class-name" =&gt; "org.wildfly.security.auth.permission.LoginPermission"}]},
+            "default-permissions" =&gt; {"permissions" =&gt; [
+                {
+                    "class-name" =&gt; "org.wildfly.extension.batch.jberet.deployment.BatchPermission",
+                    "module" =&gt; "org.wildfly.extension.batch.jberet",
+                    "target-name" =&gt; "*"
+                },
+                {
+                    "class-name" =&gt; "org.wildfly.transaction.client.RemoteTransactionPermission",
+                    "module" =&gt; "org.wildfly.transaction.client"
+                },
+                {
+                    "class-name" =&gt; "org.jboss.ejb.client.RemoteEJBPermission",
+                    "module" =&gt; "org.jboss.ejb-client"
+                }
+            ]}
+        },
+        "policy" =&gt; undefined,
+        "properties-realm" =&gt; {
+            "ApplicationRealm" =&gt; {
+                "groups-attribute" =&gt; "groups",
+                "groups-properties" =&gt; {
+                    "path" =&gt; "application-roles.properties",
+                    "relative-to" =&gt; "jboss.server.config.dir"
+                },
+                "users-properties" =&gt; {
+                    "path" =&gt; "application-users.properties",
+                    "relative-to" =&gt; "jboss.server.config.dir",
+                    "digest-realm-name" =&gt; "ApplicationRealm"
+                }
+            },
+            "ManagementRealm" =&gt; {
+                "groups-attribute" =&gt; "groups",
+                "groups-properties" =&gt; {
+                    "path" =&gt; "mgmt-groups.properties",
+                    "relative-to" =&gt; "jboss.server.config.dir"
+                },
+                "users-properties" =&gt; {
+                    "path" =&gt; "mgmt-users.properties",
+                    "relative-to" =&gt; "jboss.server.config.dir",
+                    "digest-realm-name" =&gt; "ManagementRealm"
+                }
+            }
+        },
+        "provider-http-server-mechanism-factory" =&gt; {"global" =&gt; {"providers" =&gt; undefined}},
+        "provider-loader" =&gt; {
+            "elytron" =&gt; {
+                "argument" =&gt; undefined,
+                "class-names" =&gt; undefined,
+                "configuration" =&gt; undefined,
+                "module" =&gt; "org.wildfly.security.elytron",
+                "path" =&gt; undefined,
+                "relative-to" =&gt; undefined
+            },
+            "openssl" =&gt; {
+                "argument" =&gt; undefined,
+                "class-names" =&gt; undefined,
+                "configuration" =&gt; undefined,
+                "module" =&gt; "org.wildfly.openssl",
+                "path" =&gt; undefined,
+                "relative-to" =&gt; undefined
+            }
+        },
+        "provider-sasl-server-factory" =&gt; {"global" =&gt; {"providers" =&gt; undefined}},
+        "regex-principal-transformer" =&gt; undefined,
+        "regex-validating-principal-transformer" =&gt; undefined,
+        "sasl-authentication-factory" =&gt; {
+            "application-sasl-authentication" =&gt; {
+                "mechanism-configurations" =&gt; [
+                    {
+                        "mechanism-name" =&gt; "JBOSS-LOCAL-USER",
+                        "realm-mapper" =&gt; "local"
+                    },
+                    {
+                        "mechanism-name" =&gt; "DIGEST-MD5",
+                        "mechanism-realm-configurations" =&gt; [{"realm-name" =&gt; "ApplicationRealm"}]
+                    }
+                ],
+                "sasl-server-factory" =&gt; "configured",
+                "security-domain" =&gt; "ApplicationDomain"
+            },
+            "management-sasl-authentication" =&gt; {
+                "mechanism-configurations" =&gt; [
+                    {
+                        "mechanism-name" =&gt; "JBOSS-LOCAL-USER",
+                        "realm-mapper" =&gt; "local"
+                    },
+                    {
+                        "mechanism-name" =&gt; "DIGEST-MD5",
+                        "mechanism-realm-configurations" =&gt; [{"realm-name" =&gt; "ManagementRealm"}]
+                    }
+                ],
+                "sasl-server-factory" =&gt; "configured",
+                "security-domain" =&gt; "ManagementDomain"
+            }
+        },
+        "security-domain" =&gt; {
+            "ApplicationDomain" =&gt; {
+                "default-realm" =&gt; "ApplicationRealm",
+                "outflow-anonymous" =&gt; false,
+                "outflow-security-domains" =&gt; undefined,
+                "permission-mapper" =&gt; "default-permission-mapper",
+                "post-realm-principal-transformer" =&gt; undefined,
+                "pre-realm-principal-transformer" =&gt; undefined,
+                "principal-decoder" =&gt; undefined,
+                "realm-mapper" =&gt; undefined,
+                "realms" =&gt; [
+                    {
+                        "realm" =&gt; "ApplicationRealm",
+                        "role-decoder" =&gt; "groups-to-roles"
+                    },
+                    {"realm" =&gt; "local"}
+                ],
+                "role-mapper" =&gt; undefined,
+                "security-event-listener" =&gt; undefined,
+                "trusted-security-domains" =&gt; undefined
+            },
+            "ManagementDomain" =&gt; {
+                "default-realm" =&gt; "ManagementRealm",
+                "outflow-anonymous" =&gt; false,
+                "outflow-security-domains" =&gt; undefined,
+                "permission-mapper" =&gt; "default-permission-mapper",
+                "post-realm-principal-transformer" =&gt; undefined,
+                "pre-realm-principal-transformer" =&gt; undefined,
+                "principal-decoder" =&gt; undefined,
+                "realm-mapper" =&gt; undefined,
+                "realms" =&gt; [
+                    {
+                        "realm" =&gt; "ManagementRealm",
+                        "role-decoder" =&gt; "groups-to-roles"
+                    },
+                    {
+                        "realm" =&gt; "local",
+                        "role-mapper" =&gt; "super-user-mapper"
+                    }
+                ],
+                "role-mapper" =&gt; undefined,
+                "security-event-listener" =&gt; undefined,
+                "trusted-security-domains" =&gt; undefined
+            }
+        },
+        "server-ssl-context" =&gt; undefined,
+        "service-loader-http-server-mechanism-factory" =&gt; undefined,
+        "service-loader-sasl-server-factory" =&gt; undefined,
+        "simple-permission-mapper" =&gt; {"default-permission-mapper" =&gt; {
+            "mapping-mode" =&gt; "first",
+            "permission-mappings" =&gt; [
+                {
+                    "principals" =&gt; ["anonymous"],
+                    "permission-sets" =&gt; [{"permission-set" =&gt; "default-permissions"}]
+                },
+                {
+                    "match-all" =&gt; true,
+                    "permission-sets" =&gt; [
+                        {"permission-set" =&gt; "login-permission"},
+                        {"permission-set" =&gt; "default-permissions"}
+                    ]
+                }
+            ]
+        }},
+        "simple-regex-realm-mapper" =&gt; undefined,
+        "simple-role-decoder" =&gt; {"groups-to-roles" =&gt; {"attribute" =&gt; "groups"}},
+        "size-rotating-file-audit-log" =&gt; undefined,
+        "syslog-audit-log" =&gt; undefined,
+        "token-realm" =&gt; undefined,
+        "trust-manager" =&gt; undefined,
+        "x500-attribute-principal-decoder" =&gt; undefined
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="default-application-authentication-configuration">Default Application Authentication Configuration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>By default, applications are secured using legacy security domains.
+Applications must specify a security domain in their <em>web.xml</em> as well
+as the authentication method. If no security domain is specified by the
+application, WildFly will use the provided <em>other</em> legacy security
+domain.</p>
+</div>
+<div class="sect2">
+<h3 id="update-wildfly-to-use-the-default-elytron-components-for-application-authentication">Update WildFly to Use the Default Elytron Components for Application</h3>
+<div class="paragraph">
+<p>Authentication</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">/subsystem=undertow/application-security-domain=exampleApplicationDomain:add(http-authentication-factory=example-http-auth)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For more information on configuring an http-authentication-factory, see <a href="#configure-an-http-authentication-factory">configure an http-authentication-factory</a></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="default-elytron-application-domain-configuration">Default Elytron ApplicationDomain Configuration</h3>
+<div class="paragraph">
+<p>The http-authentication-factory can be configured to use the <em>ApplicationDomain</em>
+security domain.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">/subsystem=elytron/security-domain=ApplicationDomain:read-resource()
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; {
+        "default-realm" =&gt; "ApplicationRealm",
+        "permission-mapper" =&gt; "default-permission-mapper",
+        "post-realm-principal-transformer" =&gt; undefined,
+        "pre-realm-principal-transformer" =&gt; undefined,
+        "principal-decoder" =&gt; undefined,
+        "realm-mapper" =&gt; undefined,
+        "realms" =&gt; [{
+            "realm" =&gt; "ApplicationRealm",
+            "role-decoder" =&gt; "groups-to-roles"
+        }],
+        "role-mapper" =&gt; undefined,
+        "trusted-security-domains" =&gt; undefined
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <em>ApplicationDomain</em> security domain is backed by the
+<em>ApplicationRealm</em> Elytron security realm, which is a properties-based
+realm.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">/subsystem=elytron/properties-realm=ApplicationRealm:read-resource()
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; {
+        "groups-attribute" =&gt; "groups",
+        "groups-properties" =&gt; {
+            "path" =&gt; "application-roles.properties",
+            "relative-to" =&gt; "jboss.server.config.dir"
+        },
+        "users-properties" =&gt; {
+            "path" =&gt; "application-users.properties",
+            "relative-to" =&gt; "jboss.server.config.dir",
+            "digest-realm-name" =&gt; "ApplicationRealm"
+        }
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="default-management-authentication-configuration">Default Management Authentication Configuration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>By default, the WildFly management interfaces are secured by the legacy
+core management authentication.</p>
+</div>
+<div class="paragraph">
+<p><strong>Default Configuration</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">/core-service=management/management-interface=http-interface:read-resource()
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; {
+        "allowed-origins" =&gt; undefined,
+        "console-enabled" =&gt; true,
+        "http-authentication-factory" =&gt; undefined,
+        "http-upgrade" =&gt; {"enabled" =&gt; true},
+        "http-upgrade-enabled" =&gt; true,
+        "sasl-protocol" =&gt; "remote",
+        "secure-socket-binding" =&gt; undefined,
+        "security-realm" =&gt; "ManagementRealm",
+        "server-name" =&gt; undefined,
+        "socket-binding" =&gt; "management-http",
+        "ssl-context" =&gt; undefined
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>WildFly does provide <em>management-http-authentication</em> and
+<em>management-sasl-authentication</em> in the <em>elytron</em> subsystem for securing
+the management interfaces as well.</p>
+</div>
+<div class="sect2">
+<h3 id="update-wildfly-to-use-the-default-elytron-components-for-management-authentication">Update WildFly to Use the Default Elytron Components for Management</h3>
+<div class="paragraph">
+<p>Authentication</p>
+</div>
+<div class="sect3">
+<h4 id="set-http-authentication-factory-to-use-management-http-authentication">Set http-authentication-factory to use</h4>
+<div class="paragraph">
+<p>management-http-authentication</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">/core-service=management/management-interface=http-interface:write-attribute( \
+  name=http-authentication-factory, \
+  value=management-http-authentication \
+)</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="set-sasl-authentication-factory-to-use-management-sasl-authentication">Set sasl-authentication-factory to use</h4>
+<div class="paragraph">
+<p>management-sasl-authentication</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">/core-service=management/management-interface=http-interface:write-attribute( \
+  name=http-upgrade.sasl-authentication-factory, \
+  value=management-sasl-authentication \
+)</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="undefine-security-realm">Undefine security-realm</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">/core-service=management/management-interface=http-interface:undefine-attribute(name=security-realm)</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="reload-wildfly-for-the-changes-to-take-affect.">Reload WildFly for the changes to take affect.</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">reload</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The management interfaces are now secured using the default components
+provided by the 'elytron' subsystem.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="default-elytron-management-http-authentication-configuration">Default Elytron Management HTTP Authentication Configuration</h3>
+<div class="paragraph">
+<p>When you access the management interface over HTTP, for example when
+using the web-based management console, WildFly will use the
+<em>management-http-authentication</em> http-authentication-factory.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">/subsystem=elytron/http-authentication-factory=management-http-authentication:read-resource()
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; {
+        "http-server-mechanism-factory" =&gt; "global",
+        "mechanism-configurations" =&gt; [{
+            "mechanism-name" =&gt; "DIGEST",
+            "mechanism-realm-configurations" =&gt; [{"realm-name" =&gt; "ManagementRealm"}]
+        }],
+        "security-domain" =&gt; "ManagementDomain"
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <em>management-http-authentication</em> http-authentication-factory, is
+configured to use the <em>ManagementDomain</em> security domain.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">/subsystem=elytron/security-domain=ManagementDomain:read-resource()
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; {
+        "default-realm" =&gt; "ManagementRealm",
+        "outflow-anonymous" =&gt; false,
+        "outflow-security-domains" =&gt; undefined,
+        "permission-mapper" =&gt; "default-permission-mapper",
+        "post-realm-principal-transformer" =&gt; undefined,
+        "pre-realm-principal-transformer" =&gt; undefined,
+        "principal-decoder" =&gt; undefined,
+        "realm-mapper" =&gt; undefined,
+        "realms" =&gt; [
+            {
+                "realm" =&gt; "ManagementRealm",
+                "role-decoder" =&gt; "groups-to-roles"
+            },
+            {
+                "realm" =&gt; "local",
+                "role-mapper" =&gt; "super-user-mapper"
+            }
+        ],
+        "role-mapper" =&gt; undefined,
+        "security-event-listener" =&gt; undefined,
+        "trusted-security-domains" =&gt; undefined
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <em>ManagementDomain</em> security domain is backed by the
+<em>ManagementRealm</em> Elytron security realm, which is a properties-based
+realm.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">/subsystem=elytron/properties-realm=ManagementRealm:read-resource()
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; {
+        "groups-attribute" =&gt; "groups",
+        "groups-properties" =&gt; {
+            "path" =&gt; "mgmt-groups.properties",
+            "relative-to" =&gt; "jboss.server.config.dir"
+        },
+        "plain-text" =&gt; false,
+        "users-properties" =&gt; {
+            "path" =&gt; "mgmt-users.properties",
+            "relative-to" =&gt; "jboss.server.config.dir",
+            "digest-realm-name" =&gt; "ManagementRealm"
+        }
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="default-elytron-management-cli-authentication">Default Elytron Management CLI Authentication</h3>
+<div class="paragraph">
+<p>By default, the management CLI ( <em>jboss-cli.sh</em>) is configured to
+connect over <em>remote+http</em>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Default jboss-cli.xml</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;jboss-cli xmlns="urn:jboss:cli:3.3"&gt;
+ 
+    &lt;default-protocol use-legacy-override="true"&gt;remote+http&lt;/default-protocol&gt;
+ 
+    &lt;!-- The default controller to connect to when 'connect' command is executed w/o arguments --&gt;
+    &lt;default-controller&gt;
+        &lt;protocol&gt;remote+http&lt;/protocol&gt;
+        &lt;host&gt;localhost&lt;/host&gt;
+        &lt;port&gt;9990&lt;/port&gt;
+    &lt;/default-controller&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This will establish a connection over HTTP and use HTTP upgrade to
+change the communication protocol to <em>native</em>. The HTTP upgrade
+connection is secured in the <em>http-upgrade</em> section of the
+<em>http-interface</em> using a <em>sasl-authentication-factory</em>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example Configuration with Default Components</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">/core-service=management/management-interface=http-interface:read-resource()
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; {
+        "allowed-origins" =&gt; undefined,
+        "console-enabled" =&gt; true,
+        "http-authentication-factory" =&gt; "management-http-authentication",
+        "http-upgrade" =&gt; {
+            "enabled" =&gt; true,
+            "sasl-authentication-factory" =&gt; "management-sasl-authentication"
+        },
+        "http-upgrade-enabled" =&gt; true,
+        "sasl-protocol" =&gt; "remote",
+        "secure-socket-binding" =&gt; undefined,
+        "security-realm" =&gt; undefined,
+        "server-name" =&gt; undefined,
+        "socket-binding" =&gt; "management-http",
+        "ssl-context" =&gt; undefined
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The default sasl-authentication-factory is
+<em>management-sasl-authentication</em>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">/subsystem=elytron/sasl-authentication-factory=management-sasl-authentication:read-resource()
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; {
+        "mechanism-configurations" =&gt; [
+            {
+                "mechanism-name" =&gt; "JBOSS-LOCAL-USER",
+                "realm-mapper" =&gt; "local"
+            },
+            {
+                "mechanism-name" =&gt; "DIGEST-MD5",
+                "mechanism-realm-configurations" =&gt; [{"realm-name" =&gt; "ManagementRealm"}]
+            }
+        ],
+        "sasl-server-factory" =&gt; "configured",
+        "security-domain" =&gt; "ManagementDomain"
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <em>management-sasl-authentication</em> sasl-authentication-factory
+specifies <em>JBOSS-LOCAL-USER</em> and <em>DIGEST-MD5</em> mechanisms.</p>
+</div>
+<div class="paragraph">
+<p><strong>JBOSS-LOCAL-USER Realm</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">/subsystem=elytron/identity-realm=local:read-resource()
+{
+    "outcome" =&gt; "success",
+    "result" =&gt; {
+        "attribute-name" =&gt; undefined,
+        "attribute-values" =&gt; undefined,
+        "identity" =&gt; "$local"
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <em>local</em> Elytron security realm is for handling silent authentication
+for local users.</p>
+</div>
+<div class="paragraph">
+<p>The <em>ManagementRealm</em> Elytron security realm is the same realm used in
+the <em>management-http-authentication</em> http-authentication-factory.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="comparing-legacy-approaches-to-elytron-approaches">Comparing Legacy Approaches to Elytron Approaches</h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Legacy Approach</th>
+<th class="tableblock halign-left valign-top">Elytron Approach</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">UsersRoles Login Module</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Configure Authentication with a Properties
+File-Based Identity Store</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Database Login Module</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Configure Authentication with a Database
+Identity Store</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ldap, LdapExtended, AdvancedLdap, AdvancedADLdap Login Modules</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Configure Authentication with an LDAP-Based Identity Store</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Certificate, Certificate Roles Login Module</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Configure Authentication
+with Certificates</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Kerberos, SPNEGO Login Modules</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Configure Authentication with a
+Kerberos-Based Identity Store</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Kerberos, SPNEGO Login Modules with Fallback</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Configure Authentication
+with a Form as a Fallback for Kerberos</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">RoleMapping Login Module</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Configure Authentication
+with a Mapped Role Mapper</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Vault</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Create and Use a Credential Store</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Legacy Security Realms</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Secure the Management Interfaces with a New
+Identity Store, Silent Authentication</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">RBAC</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Using RBAC with Elytron</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Legacy Security Realms for One-way and Two-way SSL/TLS for Applications</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Enable One-way SSL/TLS for Applications, Enable Two-way SSL/TLS in
+WildFly for Applications</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Legacy Security Realms for One-way and Two-way SSL/TLS for Management
+Interfaces</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Enable One-way for the Management Interfaces Using the
+Elytron Subsystem, Enable Two-way SSL/TLS for the Management Interfaces
+using the Elytron Subsystem</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div></div>
+</div>
+
+
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">WildFly is open. All dependencies of this project are available under the <a href='https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html' class='dark-background' target='_blank'>LGPL 2.1</a> or compatible license.<br/><br/>This website was built with <a href='https://jekyllrb.com/' class='dark-background' target='_blank'>Jekyll</a> is hosted on <a href='https://pages.github.com/' class='dark-background' target='_blank'>Github Pages</a> and is completely open source. If you want to make it better, <a href='https://github.com/wildfly/wildfly.org/fork' class='dark-background' target='_blank'>fork it</a> and show us what you’ve got.</p>
+
+    
+      <div class="width-1-12 project-links">
+        <strong>Navigation</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="/wildflysite/downloads" class="dark-background">Downloads</a></li>
+          
+            <li><a href="/wildflysitef/docs" class="dark-background">Docs</a></li>
+          
+            <li><a href="https://github.com/wildfly/wildfly" class="dark-background">Github</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <strong>Contribute</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="https://issues.jboss.org/browse/WFLY" class="dark-background">Submit a bug</a></li>
+          
+            <li><a href="https://community.jboss.org/en/wildfly?view=discussion" class="dark-background">Join the forum</a></li>
+          
+            <li><a href="https://github.com/wildfly/wildfly/fork" class="dark-background">Fork WildFly</a></li>
+          
+            <li><a href="https://twitter.com/WildFlyAS" class="dark-background">Follow us</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <strong>Get Help</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="https://community.jboss.org/en/wildfly?view=discussion" class="dark-background">Join the forum</a></li>
+          
+            <li><a href="https://www.hipchat.com/gFOhnVQke" class="dark-background">Join HipChat</a></li>
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-6-12 more-links">
+        <strong>Find more Red Hat Middleware Community Projects</strong>
+        <ul class="footer-links">
+          
+            <li><a href="https://www.apiman.io/" class="dark-background">APIMan</a></li>
+          
+            <li><a href="http://arquillian.org" class="dark-background">Arquillian</a></li>
+          
+            <li><a href="http://byteman.jboss.org/" class="dark-background">Byteman</a></li>
+          
+            <li><a href="http://capedwarf.org/" class="dark-background">CapeDwarf</a></li>
+          
+            <li><a href="https://github.com/alechenninger/chronicler" class="dark-background">Chronicler</a></li>
+          
+            <li><a href="https://github.com/darcy-framework" class="dark-background">Darcy</a></li>
+          
+            <li><a href="http://debezium.io/" class="dark-background">Debezium</a></li>
+          
+            <li><a href="https://www.drools.org/" class="dark-background">Drools</a></li>
+          
+            <li><a href="http://gatein.jboss.org/" class="dark-background">GateIn</a></li>
+          
+            <li><a href="http://www.hawkular.org/" class="dark-background">Hawkular</a></li>
+          
+            <li><a href="http://hawt.io/" class="dark-background">Hawtio</a></li>
+          
+            <li><a href="http://hibernate.org/" class="dark-background">Hibernate</a></li>
+          
+            <li><a href="http://www.infinispan.org/" class="dark-background">Infinispan</a></li>
+          
+            <li><a href="https://devstudio.jboss.com/" class="dark-background">JBoss DevStudio</a></li>
+          
+            <li><a href="http://forge.jboss.org/" class="dark-background">JBoss Forge</a></li>
+          
+            <li><a href="https://github.com/jboss-logging" class="dark-background">JBoss Logging</a></li>
+          
+            <li><a href="http://jbossremoting.jboss.org/" class="dark-background">JBoss Remoting</a></li>
+          
+            <li><a href="https://www.jbpm.org/" class="dark-background">jBPM</a></li>
+          
+            <li><a href="https://jsfunit.jboss.org/" class="dark-background">JSFUnit</a></li>
+          
+            <li><a href="https://www.keycloak.org/" class="dark-background">Keycloak</a></li>
+          
+            <li><a href="http://modcluster.io/" class="dark-background">Mod Cluster</a></li>
+          
+            <li><a href="http://modeshape.jboss.org/" class="dark-background">ModeShape</a></li>
+          
+            <li><a href="https://www.optaplanner.org/" class="dark-background">OptaPlanner</a></li>
+          
+            <li><a href="https://picketbox.jboss.org/" class="dark-background">Picketbox</a></li>
+          
+            <li><a href="http://resteasy.jboss.org/" class="dark-background">RESTEasy</a></li>
+          
+            <li><a href="https://riftsaw.jboss.org/" class="dark-background">Riftsaw</a></li>
+          
+            <li><a href="http://savara.jboss.org/" class="dark-background">Savara</a></li>
+          
+            <li><a href="http://seamframework.org/" class="dark-background">Seam</a></li>
+          
+            <li><a href="http://arquillian.org/" class="dark-background">Shrinkwrap</a></li>
+          
+            <li><a href="http://snowdrop.jboss.org/" class="dark-background">Snowdrop</a></li>
+          
+            <li><a href="https://switchyard.jboss.org/" class="dark-background">Switchyard</a></li>
+          
+            <li><a href="https://tattletale.jboss.org/" class="dark-background">Tattletale</a></li>
+          
+            <li><a href="http://teiid.jboss.org/" class="dark-background">Teiid</a></li>
+          
+            <li><a href="http://wildfly-swarm.io/" class="dark-background">WildFly Swarm</a></li>
+          
+            <li><a href="http://wise.jboss.org/" class="dark-background">Wise</a></li>
+          
+            <li><a href="https://xnio.jboss.org/" class="dark-background">XNIO</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" class="dark-background" target="_blank">CC by 3.0</a>
+    </span>
+    <span class="redhat">
+      a Red Hat sponsored project   
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/"><img src="/wildflysite/assets/img/RHLogo_white.svg"></a>
+    </span>
+  </div>
+</div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script type="text/javascript" src="/wildflysite/assets/javascript/mobile-nav.js"></script>
+</body>
+
+</html>

@@ -1,20 +1,19 @@
 <!DOCTYPE html>
-<html lang="en"><head>
+<html>
+
+<head>
   <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
-<title>Using the Elytron Subsystem | Wildfly</title>
-<meta name="generator" content="Jekyll v3.8.3" />
-<meta property="og:title" content="Using the Elytron Subsystem" />
-<meta property="og:locale" content="en_US" />
-<link rel="canonical" href="https://jbossorg.github.io/wildflysite/docs/13/_elytron/Using_the_Elytron_Subsystem.html" />
-<meta property="og:url" content="https://jbossorg.github.io/wildflysite/docs/13/_elytron/Using_the_Elytron_Subsystem.html" />
-<meta property="og:site_name" content="Wildfly" />
-<script type="application/ld+json">
-{"@type":"WebPage","url":"https://jbossorg.github.io/wildflysite/docs/13/_elytron/Using_the_Elytron_Subsystem.html","headline":"Using the Elytron Subsystem","@context":"http://schema.org"}</script>
-<!-- End Jekyll SEO tag -->
-<link rel="stylesheet" href="/wildflysite/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://jbossorg.github.io/wildflysite/feed.xml" title="Wildfly" /></head>
-<body><div class="header navigation">
+  <meta name="description" content="">
+  <link rel="shortcut icon" type="image/png" href="/wildflysite/favicon.ico" >
+  <link rel="stylesheet" href="/wildflysite/assets/css/main.css" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+
+
+</head>
+
+<body class="Using the Elytron Subsystem">
+  <div class="content">
+    <div class="header navigation">
   <div class="logo-wrapper">
     <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
   </div>
@@ -39,7 +38,7 @@
         </li>
         <li>
           
-            <a href="/wildflysite/docs/13/" class="active">Docs</a>
+            <a href="/wildflysite/docs/14/" class="active">Docs</a>
           
         </li>
         <li>
@@ -49,9 +48,258 @@
     </nav>
   </div>
 </div>
-<main class="page-content" aria-label="Content">
-      <div class="wrapper">
-        <div class="sect1">
+
+    <div class="docs-page grid-wrapper">
+  <div class="grid__item width-12-12 docs-v-icons">
+    <a href="/wildflysite/docs/13/" ><img src="/wildflysite/assets/img/docs/wildfly_icons_docs-13-inactive.png"></a>
+    <a href="https://docs.wildfly.org/12/" target="_blank"><img src="/wildflysite/assets/img/docs/wildfly_icons_docs-12-inactive.png"></a>
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-11-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-10-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-09-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-08-coming.png">
+  </div>
+  <div class="grid__item width-12-12"><h1 class="title">Using the Elytron Subsystem</h1></div>
+  <div class="grid__item width-3-12 doc-toc"><ul class="inline_toc">
+  <li><a href="#set-up-and-configure-authentication-for-applications">Set Up and Configure Authentication for Applications</a>
+    <ul>
+      <li><a href="#configure-authentication-with-a-properties-file-based-identity-store">Configure Authentication with a Properties File-Based Identity Store</a>
+        <ul>
+          <li><a href="#create-properties-files">Create properties files:</a></li>
+          <li><a href="#configure-a-properties-realm-in-wildfly">Configure a properties-realm in WildFly:</a></li>
+          <li><a href="#configure-a-security-domain">Configure a security-domain:</a></li>
+          <li><a href="#configure-an-http-authentication-factory">Configure an http-authentication-factory:</a></li>
+          <li><a href="#configure-an-application-security-domain-in-the-undertow-subsystem">Configure an application-security-domain in the Undertow subsystem:</a></li>
+          <li><a href="#configure-your-applications-web.xml-and-jboss-web.xml.">Configure your application’s web.xml and jboss-web.xml.</a></li>
+        </ul>
+      </li>
+      <li><a href="#configure-authentication-with-a-filesystem-based-identity-store">Configure Authentication with a Filesystem-Based Identity Store</a>
+        <ul>
+          <li><a href="#chose-a-directory-for-users">Chose a directory for users:</a></li>
+          <li><a href="#configure-a-filesystem-realm-in-wildfly">Configure a filesystem-realm in WildFly:</a></li>
+          <li><a href="#add-a-user">Add a user:</a></li>
+          <li><a href="#add-a-simple-role-decoder">Add a simple-role-decoder:</a></li>
+          <li><a href="#configure-a-security-domain-1">Configure a security-domain:</a></li>
+          <li><a href="#configure-an-http-authentication-factory-1">Configure an http-authentication-factory:</a></li>
+          <li><a href="#configure-an-application-security-domain-in-the-undertow-subsystem-1">Configure an application-security-domain in the Undertow subsystem:</a></li>
+          <li><a href="#configure-your-applications-web.xml-and-jboss-web.xml.-1">Configure your application’s web.xml and jboss-web.xml.</a></li>
+        </ul>
+      </li>
+      <li><a href="#configure-authentication-with-a-database-identity-store">Configure Authentication with a Database Identity Store</a>
+        <ul>
+          <li><a href="#determine-your-database-format-for-usernames-passwords-and-roles">Determine your database format for usernames, passwords, and roles:</a></li>
+          <li><a href="#configure-a-datasource">Configure a datasource:</a></li>
+          <li><a href="#configure-a-jdbc-realm-in-wildfly">Configure a jdbc-realm in WildFly:</a></li>
+          <li><a href="#configure-a-security-domain-2">Configure a security-domain:</a></li>
+          <li><a href="#configure-an-http-authentication-factory-2">Configure an http-authentication-factory:</a></li>
+          <li><a href="#configure-an-application-security-domain-in-the-undertow-subsystem-2">Configure an application-security-domain in the Undertow subsystem:</a></li>
+          <li><a href="#configure-your-applications-web.xml-and-jboss-web.xml.-2">Configure your application’s web.xml and jboss-web.xml.</a></li>
+        </ul>
+      </li>
+      <li><a href="#configure-authentication-with-an-ldap-based-identity-store">Configure Authentication with an LDAP-Based Identity Store</a>
+        <ul>
+          <li><a href="#determine-your-ldap-format-for-usernames-passwords-and-roles">Determine your LDAP format for usernames, passwords, and roles:</a></li>
+          <li><a href="#configure-a-dir-context">Configure a dir-context:</a></li>
+          <li><a href="#configure-an-ldap-realm-in-wildfly">Configure an ldap-realm in WildFly:</a></li>
+          <li><a href="#add-a-simple-role-decoder-1">Add a simple-role-decoder:</a></li>
+          <li><a href="#configure-a-security-domain-3">Configure a security-domain:</a></li>
+          <li><a href="#configure-an-http-authentication-factory-3">Configure an http-authentication-factory:</a></li>
+          <li><a href="#configure-an-application-security-domain-in-the-undertow-subsystem-3">Configure an application-security-domain in the Undertow subsystem:</a></li>
+          <li><a href="#configure-your-applications-web.xml-and-jboss-web.xml.-3">Configure your application’s web.xml and jboss-web.xml.</a></li>
+        </ul>
+      </li>
+      <li><a href="#configure-authentication-with-certificates">Configure Authentication with Certificates</a>
+        <ul>
+          <li><a href="#configure-a-key-store-realm.">Configure a key-store-realm.</a></li>
+          <li><a href="#create-a-decoder.">Create a Decoder.</a></li>
+          <li><a href="#add-a-constant-role-mapper-for-assigning-roles.">Add a constant-role-mapper for assigning roles.</a></li>
+          <li><a href="#configure-a-security-domain.">Configure a security-domain.</a></li>
+          <li><a href="#configure-an-http-authentication-factory.">Configure an http-authentication-factory.</a></li>
+          <li><a href="#configure-an-application-security-domain-in-the-undertow-subsystem.">Configure an application-security-domain in the Undertow subsystem.</a></li>
+          <li><a href="#update-server-ssl-context.">Update server-ssl-context.</a></li>
+          <li><a href="#configure-your-applications-web.xml-and-jboss-web.xml.-4">Configure your application’s web.xml and jboss-web.xml.</a></li>
+        </ul>
+      </li>
+      <li><a href="#configure-authentication-with-a-kerberos-based-identity-store">Configure Authentication with a Kerberos-Based Identity Store</a>
+        <ul>
+          <li><a href="#configure-a-kerberos-security-factory.">Configure a kerberos-security-factory.</a></li>
+          <li><a href="#configure-the-system-properties-for-kerberos.">Configure the system properties for Kerberos.</a></li>
+          <li><a href="#configure-an-eltyron-security-realm-for-assigning-roles.">Configure an Eltyron security realm for assigning roles.</a></li>
+          <li><a href="#add-a-simple-role-decoder.">Add a simple-role-decoder.</a></li>
+          <li><a href="#configure-a-security-domain.-1">Configure a security-domain.</a></li>
+          <li><a href="#configure-an-http-authentication-factory-that-uses-the-kerberos-security-factory.">Configure an http-authentication-factory that uses the</a></li>
+          <li><a href="#configure-an-application-security-domain-in-the-undertow-subsystem-4">Configure an application-security-domain in the Undertow subsystem:</a></li>
+          <li><a href="#configure-your-applications-web.xml-jboss-web.xml-and-jboss-deployment-structure.xml.">Configure your application’s web.xml, jboss-web.xml and</a></li>
+        </ul>
+      </li>
+      <li><a href="#configure-authentication-with-a-form-as-a-fallback-for-kerberos">Configure Authentication with a Form as a Fallback for Kerberos</a>
+        <ul>
+          <li><a href="#configure-kerberos-based-authentication.">Configure kerberos-based authentication.</a></li>
+          <li><a href="#add-a-mechanism-for-form-authentication-in-the-http-authentication-factory.">Add a mechanism for FORM authentication in the</a></li>
+          <li><a href="#add-additional-fallback-principals.">Add additional fallback principals.</a></li>
+          <li><a href="#update-the-web.xml-for-form-fallback.">Update the web.xml for FORM fallback.</a></li>
+        </ul>
+      </li>
+      <li><a href="#configure-applications-to-use-elytron-or-legacy-security-for-authentication">Configure Applications to Use Elytron or Legacy Security for</a>
+        <ul>
+          <li><a href="#configure-your-applications-web.xml.">Configure your application’s web.xml.</a></li>
+          <li><a href="#configure-your-application-to-use-a-security-domain.">Configure your application to use a security domain.</a></li>
+          <li><a href="#using-elytron-and-legacy-security-subsystems-in-parallel">Using Elytron and Legacy Security Subsystems in Parallel</a></li>
+        </ul>
+      </li>
+      <li><a href="#override-an-applications-authentication-configuration">Override an Application’s Authentication Configuration</a></li>
+      <li><a href="#create-and-use-a-credential-store">Create and Use a Credential Store</a>
+        <ul>
+          <li><a href="#create-credential-store.">Create credential store.</a></li>
+          <li><a href="#add-a-credential-to-a-credential-store.">Add a credential to a credential store.</a></li>
+          <li><a href="#list-all-credentials-in-a-credential-store.">List all credentials in a credential store.</a></li>
+          <li><a href="#remove-a-credential-from-a-credential-store.">Remove a credential from a credential store.</a></li>
+          <li><a href="#use-a-credential-store.">Use a credential store.</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#set-up-and-configure-authentication-for-the-management-interfaces">Set up and Configure Authentication for the Management Interfaces</a>
+    <ul>
+      <li><a href="#secure-the-management-interfaces-with-a-new-identity-store">Secure the Management Interfaces with a New Identity Store</a>
+        <ul>
+          <li><a href="#create-a-security-domain-and-any-supporting-security-realms-decoders-or-mappers-for-your-identity-store.">Create a security domain and any supporting security realms,</a></li>
+          <li><a href="#create-an-http-authentication-factory-or-sasl-authentication-factory.">Create an http-authentication-factory or</a></li>
+          <li><a href="#update-the-management-interfaces-to-use-your-http-authentication-factory-or-sasl-authentication-factory.">Update the management interfaces to use your</a></li>
+        </ul>
+      </li>
+      <li><a href="#silent-authentication">Silent Authentication</a>
+        <ul>
+          <li><a href="#add-silent-authentication-to-an-existing-sasl-authentication-factory.">Add silent authentication to an existing</a></li>
+          <li><a href="#create-a-new-sasl-server-factory-with-silent-authentication.">Create a new sasl-server-factory with silent authentication.</a></li>
+          <li><a href="#remove-silent-authentication-from-an-existing-sasl-server-factory">Remove silent authentication from an existing sasl-server-factory:</a></li>
+        </ul>
+      </li>
+      <li><a href="#using-rbac-with-elytron">Using RBAC with Elytron</a></li>
+    </ul>
+  </li>
+  <li><a href="#configure-ssltls">Configure SSL/TLS</a>
+    <ul>
+      <li><a href="#enable-one-way-ssltls-for-applications">Enable One-way SSL/TLS for Applications</a>
+        <ul>
+          <li><a href="#one-way-ssl-applications-using-security-command">Using a security command:</a></li>
+          <li><a href="#one-way-ssl-applications-using-elytron-subsystem-commands">Using Elytron subsystem commands:</a>
+            <ul>
+              <li><a href="#configure-a-key-store-in-wildfly">Configure a key-store in WildFly:</a></li>
+              <li><a href="#configure-a-key-manager-in-that-references-your-key-store">Configure a key-manager that references your key-store:</a></li>
+              <li><a href="#configure-a-server-ssl-context-in-that-references-your-key-manager">Configure a server-ssl-context that references your key-manager:</a></li>
+              <li><a href="#check-and-see-if-the-https-listener-is-configured-to-use-a-legacy-security-realm-for-its-ssl-configuration">Check and see if the https-listener is configured to use a legacy security realm for its SSL configuration:</a></li>
+              <li><a href="#reload-the-server">Reload the server:</a></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><a href="#enable-two-way-ssltls-in-wildfly-for-applications">Enable Two-way SSL/TLS in WildFly for Applications</a>
+        <ul>
+          <li><a href="#two-way-ssl-applications-using-security-command">Using a security command:</a></li>
+          <li><a href="#two-way-ssl-applications-using-elytron-subsystem-commands">Using Elytron subsystem commands:</a>
+            <ul>
+              <li><a href="#obtain-or-generate-your-keystores-applications">Obtain or generate your key stores:</a></li>
+              <li><a href="#configure-a-key-manager-in-that-references-your-key-store-key-store">Configure a key-manager that references your key store key-store:</a></li>
+              <li><a href="#configure-a-trust-manager-in-that-references-your-truststore-key-store">Configure a trust-manager that references your truststore key-store:</a></li>
+              <li><a href="#configure-a-server-ssl-context-in-that-references-your-key-manager-trust-manager-and-enables-client-authentication">Configure a server-ssl-context that references your key-manager, trust-manager, and enables client authentication:</a></li>
+              <li><a href="#check-and-see-if-the-https-listener-is-configured-to-use-a-legacy-security-realm-for-its-ssl-configuration-1">Check and see if the https-listener is configured to use a legacy security realm for its SSL configuration:</a></li>
+              <li><a href="#remove-the-reference-to-the-legacy-security-realm-and-update-the-https-listener-to-use-the-ssl-context-from-elytron">Remove the reference to the legacy security realm and update the</a></li>
+              <li><a href="#reload-the-server-1">Reload the server</a></li>
+            </ul>
+          </li>
+          <li><a href="#import-server-certificate-into-client-truststore-applications">Import the server certificate into the client truststore</a></li>
+          <li><a href="#configure-your-client-to-use-the-client-certificate-applications">Configure your client to use the client certificate</a></li>
+        </ul>
+      </li>
+      <li><a href="#enable-one-way-ssltls-for-the-management-interfaces">Enable One-way SSL/TLS for the Management Interfaces</a>
+        <ul>
+          <li><a href="#one-way-ssl-management-interfaces-using-security-command">Using a security command:</a></li>
+          <li><a href="#one-way-ssl-management-interfaces-using-elytron-subsystem-commands">Using Elytron subsystem commands:</a>
+            <ul>
+              <li><a href="#configure-key-store">Configure a key-store:</a></li>
+              <li><a href="#create-a-key-manager-and-server-ssl-context">Create a key-manager and server-ssl-context.</a></li>
+              <li><a href="#enable-https-on-the-management-interface.">Enable HTTPS on the management interface.</a></li>
+              <li><a href="#reload-the-wildfly-instance.">Reload the WildFly instance.</a></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><a href="#enable-two-way-ssltls-for-the-management-interfaces">Enable Two-way SSL/TLS for the Management Interfaces</a>
+        <ul>
+          <li><a href="#two-way-ssl-management-interfaces-using-security-command">Using a security command:</a></li>
+          <li><a href="#two-way-ssl-management-interfaces-using-elytron-subsystem-commands">Using Elytron subsystem commands:</a>
+            <ul>
+              <li><a href="#obtain-or-generate-your-key-stores-management">Obtain or generate your key stores.</a></li>
+              <li><a href="#configure-a-key-manager-trust-manager-and-server-ssl-context-for-the-server-key-store-and-trust-store">Configure a key-manager, trust-manager, and server-ssl-context for the server key store and trust store.</a></li>
+              <li><a href="#enable-https-on-the-management-interface.-1">Enable HTTPS on the management interface.</a></li>
+              <li><a href="#reload-the-wildfly-instance.-1">Reload the WildFly instance.</a></li>
+            </ul>
+          </li>
+          <li><a href="#import-server-certificate-into-client-truststore-management">Import the server certificate into the client truststore.</a></li>
+          <li><a href="#configure-your-client-to-use-the-client-certificate-management">Configure your client to use the client certificate.</a></li>
+        </ul>
+      </li>
+      <li><a href="#keystore-manipulation-operations">KeyStore manipulation operations</a>
+        <ul>
+          <li><a href="#generate-key-pair">Generate a key pair</a></li>
+          <li><a href="#generate-certificate-signing-request">Generate a certificate signing request</a></li>
+          <li><a href="#import-certificate">Import a certificate or certificate chain</a></li>
+          <li><a href="#export-certificate">Export a certificate</a></li>
+          <li><a href="#change-alias">Change an alias</a></li>
+          <li><a href="#store-changes">Store changes made to key-stores</a></li>
+        </ul>
+      </li>
+      <li><a href="#using-an-ldap-key-store">Using an ldap-key-store</a>
+        <ul>
+          <li><a href="#configure-a-dir-context.">Configure a dir-context.</a></li>
+          <li><a href="#configure-an-ldap-key-store.">Configure an ldap-key-store.</a></li>
+          <li><a href="#use-the-ldap-key-store.">Use the ldap-key-store.</a></li>
+        </ul>
+      </li>
+      <li><a href="#using-a-filtering-key-store">Using a filtering-key-store</a>
+        <ul>
+          <li><a href="#configure-a-key-store.">Configure a key-store.</a></li>
+          <li><a href="#configure-a-filtering-key-store.">Configure a filtering-key-store.</a></li>
+          <li><a href="#use-the-filtering-key-store.">Use the filtering-key-store.</a></li>
+        </ul>
+      </li>
+      <li><a href="#reload-a-keystore">Reload a Keystore</a></li>
+      <li><a href="#check-the-content-of-a-keystore-by-alias">Check the Content of a Keystore by Alias</a></li>
+      <li><a href="#custom-components">Custom Components</a></li>
+    </ul>
+  </li>
+  <li><a href="#configuring-the-elytron-and-security-subsystems">Configuring the Elytron and Security Subsystems</a>
+    <ul>
+      <li><a href="#enable-and-disable-the-elytron-subsystem">Enable and Disable the Elytron Subsystem</a>
+        <ul>
+          <li><a href="#to-add-the-elytron-extension-required-for-the-elytron-subsystem">To add the elytron extension required for the elytron subsystem:</a></li>
+          <li><a href="#to-enable-the-elytron-subsystem-in-wildfly">To enable the Elytron subsystem in WildFly:</a></li>
+          <li><a href="#to-disable-the-elytron-subsystem-in-wildfly">To disable the Elytron subsystem in WildFly:</a></li>
+        </ul>
+      </li>
+      <li><a href="#enable-and-disable-the-security-subsystem">Enable and Disable the Security Subsystem</a>
+        <ul>
+          <li><a href="#to-disable-the-security-subsystem-in-wildfly">To disable the security subsystem in WildFly:</a></li>
+          <li><a href="#to-enable-the-security-subsystem-in-wildfly">To enable the security subsystem in WildFly:</a></li>
+        </ul>
+      </li>
+      <li><a href="#use-the-elytron-and-security-subsystems-in-parallel">Use the Elytron and Security Subsystems in Parallel</a></li>
+    </ul>
+  </li>
+  <li><a href="#creating-elytron-subsystem-components">Creating Elytron Subsystem Components</a>
+    <ul>
+      <li><a href="#create-an-elytron-security-realm">Create an Elytron Security Realm</a></li>
+      <li><a href="#create-an-elytron-role-decoder">Create an Elytron Role Decoder</a></li>
+      <li><a href="#create-an-elytron-permission-set">Create an Elytron Permission Set</a></li>
+      <li><a href="#create-an-elytron-permission-mapper">Create an Elytron Permission Mapper</a></li>
+      <li><a href="#create-an-elytron-role-mapper">Create an Elytron Role Mapper</a></li>
+      <li><a href="#create-an-elytron-security-domain">Create an Elytron Security Domain</a></li>
+      <li><a href="#create-an-elytron-authentication-factory">Create an Elytron Authentication Factory</a></li>
+      <li><a href="#create-an-elytron-policy-provider">Create an Elytron Policy Provider</a></li>
+    </ul>
+  </li>
+</ul></div>
+  <div class="grid__item width-9-12 doc-content"><div class="sect1">
 <h2 id="set-up-and-configure-authentication-for-applications">Set Up and Configure Authentication for Applications</h2>
 <div class="sectionbody">
 <div class="sect2">
@@ -2433,32 +2681,160 @@ default:</p>
 </div>
 </div>
 </div>
-</div>
-      </div>
-    </main><footer class="site-footer h-card">
-  <data class="u-url" href="/wildflysite/"></data>
-
-  <div class="wrapper">
-
-    <h2 class="footer-heading">Wildfly</h2>
-
-    <div class="footer-col-wrapper">
-      <div class="footer-col footer-col-1">
-        <ul class="contact-list">
-          <li class="p-name">Wildfly</li></ul>
-      </div>
-
-      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/wildfly"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#github"></use></svg> <span class="username">wildfly</span></a></li><li><a href="https://www.twitter.com/WildFlyAS"><svg class="svg-icon"><use xlink:href="/wildflysite/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">WildFlyAS</span></a></li></ul>
+</div></div>
 </div>
 
-      <div class="footer-col footer-col-3">
-        <p></p>
-      </div>
-    </div>
+
 
   </div>
 
-</footer>
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">WildFly is open. All dependencies of this project are available under the <a href='https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html' class='dark-background' target='_blank'>LGPL 2.1</a> or compatible license.<br/><br/>This website was built with <a href='https://jekyllrb.com/' class='dark-background' target='_blank'>Jekyll</a> is hosted on <a href='https://pages.github.com/' class='dark-background' target='_blank'>Github Pages</a> and is completely open source. If you want to make it better, <a href='https://github.com/wildfly/wildfly.org/fork' class='dark-background' target='_blank'>fork it</a> and show us what you’ve got.</p>
+
+    
+      <div class="width-1-12 project-links">
+        <strong>Navigation</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="/wildflysite/downloads" class="dark-background">Downloads</a></li>
+          
+            <li><a href="/wildflysitef/docs" class="dark-background">Docs</a></li>
+          
+            <li><a href="https://github.com/wildfly/wildfly" class="dark-background">Github</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <strong>Contribute</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="https://issues.jboss.org/browse/WFLY" class="dark-background">Submit a bug</a></li>
+          
+            <li><a href="https://community.jboss.org/en/wildfly?view=discussion" class="dark-background">Join the forum</a></li>
+          
+            <li><a href="https://github.com/wildfly/wildfly/fork" class="dark-background">Fork WildFly</a></li>
+          
+            <li><a href="https://twitter.com/WildFlyAS" class="dark-background">Follow us</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <strong>Get Help</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="https://community.jboss.org/en/wildfly?view=discussion" class="dark-background">Join the forum</a></li>
+          
+            <li><a href="https://www.hipchat.com/gFOhnVQke" class="dark-background">Join HipChat</a></li>
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-6-12 more-links">
+        <strong>Find more Red Hat Middleware Community Projects</strong>
+        <ul class="footer-links">
+          
+            <li><a href="https://www.apiman.io/" class="dark-background">APIMan</a></li>
+          
+            <li><a href="http://arquillian.org" class="dark-background">Arquillian</a></li>
+          
+            <li><a href="http://byteman.jboss.org/" class="dark-background">Byteman</a></li>
+          
+            <li><a href="http://capedwarf.org/" class="dark-background">CapeDwarf</a></li>
+          
+            <li><a href="https://github.com/alechenninger/chronicler" class="dark-background">Chronicler</a></li>
+          
+            <li><a href="https://github.com/darcy-framework" class="dark-background">Darcy</a></li>
+          
+            <li><a href="http://debezium.io/" class="dark-background">Debezium</a></li>
+          
+            <li><a href="https://www.drools.org/" class="dark-background">Drools</a></li>
+          
+            <li><a href="http://gatein.jboss.org/" class="dark-background">GateIn</a></li>
+          
+            <li><a href="http://www.hawkular.org/" class="dark-background">Hawkular</a></li>
+          
+            <li><a href="http://hawt.io/" class="dark-background">Hawtio</a></li>
+          
+            <li><a href="http://hibernate.org/" class="dark-background">Hibernate</a></li>
+          
+            <li><a href="http://www.infinispan.org/" class="dark-background">Infinispan</a></li>
+          
+            <li><a href="https://devstudio.jboss.com/" class="dark-background">JBoss DevStudio</a></li>
+          
+            <li><a href="http://forge.jboss.org/" class="dark-background">JBoss Forge</a></li>
+          
+            <li><a href="https://github.com/jboss-logging" class="dark-background">JBoss Logging</a></li>
+          
+            <li><a href="http://jbossremoting.jboss.org/" class="dark-background">JBoss Remoting</a></li>
+          
+            <li><a href="https://www.jbpm.org/" class="dark-background">jBPM</a></li>
+          
+            <li><a href="https://jsfunit.jboss.org/" class="dark-background">JSFUnit</a></li>
+          
+            <li><a href="https://www.keycloak.org/" class="dark-background">Keycloak</a></li>
+          
+            <li><a href="http://modcluster.io/" class="dark-background">Mod Cluster</a></li>
+          
+            <li><a href="http://modeshape.jboss.org/" class="dark-background">ModeShape</a></li>
+          
+            <li><a href="https://www.optaplanner.org/" class="dark-background">OptaPlanner</a></li>
+          
+            <li><a href="https://picketbox.jboss.org/" class="dark-background">Picketbox</a></li>
+          
+            <li><a href="http://resteasy.jboss.org/" class="dark-background">RESTEasy</a></li>
+          
+            <li><a href="https://riftsaw.jboss.org/" class="dark-background">Riftsaw</a></li>
+          
+            <li><a href="http://savara.jboss.org/" class="dark-background">Savara</a></li>
+          
+            <li><a href="http://seamframework.org/" class="dark-background">Seam</a></li>
+          
+            <li><a href="http://arquillian.org/" class="dark-background">Shrinkwrap</a></li>
+          
+            <li><a href="http://snowdrop.jboss.org/" class="dark-background">Snowdrop</a></li>
+          
+            <li><a href="https://switchyard.jboss.org/" class="dark-background">Switchyard</a></li>
+          
+            <li><a href="https://tattletale.jboss.org/" class="dark-background">Tattletale</a></li>
+          
+            <li><a href="http://teiid.jboss.org/" class="dark-background">Teiid</a></li>
+          
+            <li><a href="http://wildfly-swarm.io/" class="dark-background">WildFly Swarm</a></li>
+          
+            <li><a href="http://wise.jboss.org/" class="dark-background">Wise</a></li>
+          
+            <li><a href="https://xnio.jboss.org/" class="dark-background">XNIO</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" class="dark-background" target="_blank">CC by 3.0</a>
+    </span>
+    <span class="redhat">
+      a Red Hat sponsored project   
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/"><img src="/wildflysite/assets/img/RHLogo_white.svg"></a>
+    </span>
+  </div>
+</div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script type="text/javascript" src="/wildflysite/assets/javascript/mobile-nav.js"></script>
 </body>
 
 </html>

@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="">
+  <link rel="shortcut icon" type="image/png" href="/wildflysite/favicon.ico" >
+  <link rel="stylesheet" href="/wildflysite/assets/css/main.css" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+
+
+</head>
+
+<body class="LDAP Authentication Migration">
+  <div class="content">
+    <div class="header navigation">
+  <div class="logo-wrapper">
+    <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+  </div>
+  <div class="nav-container">
+    <nav>
+      <div class="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
+      <ul class="nav-list">
+        <li>
+          <a href="/wildflysite/" class="">Home</a>
+        </li>
+        <li>
+          <a href="/wildflysite/downloads/" class="">Downloads</a>
+        </li>
+        <li>
+          <a href="/wildflysite/blog/" class="">Blog</a>
+        </li>
+        <li>
+          <a href="/wildflysite/about/" class="">About</a>
+        </li>
+        <li>
+          <a href="/wildflysite/contribute/" class="">Contribute</a>
+        </li>
+        <li>
+          
+            <a href="/wildflysite/docs/14/" class="active">Docs</a>
+          
+        </li>
+        <li>
+          <a class="button-cta secondary" href="https://github.com/wildfly/wildfly/fork" target="_blank">Fork</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+
+    <div class="docs-page grid-wrapper">
+  <div class="grid__item width-12-12 docs-v-icons">
+    <a href="/wildflysite/docs/13/" ><img src="/wildflysite/assets/img/docs/wildfly_icons_docs-13-inactive.png"></a>
+    <a href="https://docs.wildfly.org/12/" target="_blank"><img src="/wildflysite/assets/img/docs/wildfly_icons_docs-12-inactive.png"></a>
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-11-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-10-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-09-coming.png">
+    <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-08-coming.png">
+  </div>
+  <div class="grid__item width-12-12"><h1 class="title">LDAP Authentication Migration</h1></div>
+  <div class="grid__item width-3-12 doc-toc"><ul class="inline_toc">
+  <li><a href="#legacy-security-realm-ldap">Legacy Security Realm</a></li>
+  <li><a href="#picketbox-ldapextloginmodule">PicketBox LdapExtLoginModule</a></li>
+  <li><a href="#migrated">Migrated</a></li>
+</ul></div>
+  <div class="grid__item width-9-12 doc-content"><div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>The section describing how to migrate from properties based
+authentication using either PicketBox or legacy security realms to
+Elytron also contained a lot of additional information regarding
+defining security domains, authentication factories, and how these are
+mapped to be used for authentication. This section will illustrate some
+equivalent LDAP configuration using legacy security realms and PicketBox
+security domains and show the equivalent configuration using Elytron but
+will not repeat the steps to wire it all together covered in the
+previous section.</p>
+</div>
+<div class="paragraph">
+<p>These configuration examples are developed against a test LDAP sever
+with user entries like: -</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>dn: uid=TestUserOne,ou=users,dc=group-to-principal,dc=wildfly,dc=org
+objectClass: top
+objectClass: inetOrgPerson
+objectClass: uidObject
+objectClass: person
+objectClass: organizationalPerson
+cn: Test User One
+sn: Test User One
+uid: TestUserOne
+userPassword: {SSHA}UG8ov2rnrnBKakcARVvraZHqTa7mFWJZlWt2HA==</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The group entries then look like: -</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>dn: uid=GroupOne,ou=groups,dc=group-to-principal,dc=wildfly,dc=org
+objectClass: top
+objectClass: groupOfUniqueNames
+objectClass: uidObject
+cn: Group One
+uid: GroupOne
+uniqueMember: uid=TestUserOne,ou=users,dc=group-to-principal,dc=wildfly,dc=org</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For authentication purposes the username will be matched against the
+'uid' attribute, also the resulting group name will be taken from the
+'uid' attribute of the group entry.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="legacy-security-realm-ldap">Legacy Security Realm</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A connection to the LDAP server and related security realm can be
+created with the following commands: -</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">batch
+./core-service=management/ldap-connection=MyLdapConnection:add(url="ldap://localhost:10389", search-dn="uid=admin,ou=system", search-credential="secret")
+ 
+./core-service=management/security-realm=LDAPRealm:add
+./core-service=management/security-realm=LDAPRealm/authentication=ldap:add(connection="MyLdapConnection", username-attribute=uid, base-dn="ou=users,dc=group-to-principal,dc=wildfly,dc=org")
+ 
+ 
+./core-service=management/security-realm=LDAPRealm/authorization=ldap:add(connection=MyLdapConnection)
+./core-service=management/security-realm=LDAPRealm/authorization=ldap/username-to-dn=username-filter:add(attribute=uid, base-dn="ou=users,dc=group-to-principal,dc=wildfly,dc=org")
+./core-service=management/security-realm=LDAPRealm/authorization=ldap/group-search=group-to-principal:add(base-dn="ou=groups,dc=group-to-principal,dc=wildfly,dc=org", iterative=true, prefer-original-connection=true, principal-attribute=uniqueMember, search-by=DISTINGUISHED_NAME, group-name=SIMPLE, group-name-attribute=uid)
+run-batch</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This results in the following configuration.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">  &lt;management&gt;
+    &lt;security-realms&gt;
+      ...
+      &lt;security-realm name="LDAPRealm"&gt;
+        &lt;authentication&gt;
+          &lt;ldap connection="MyLdapConnection" base-dn="ou=users,dc=group-to-principal,dc=wildfly,dc=org"&gt;
+            &lt;username-filter attribute="uid"/&gt;
+          &lt;/ldap&gt;
+        &lt;/authentication&gt;
+        &lt;authorization&gt;
+          &lt;ldap connection="MyLdapConnection"&gt;
+            &lt;username-to-dn&gt;
+              &lt;username-filter base-dn="ou=users,dc=group-to-principal,dc=wildfly,dc=org" attribute="uid"/&gt;
+            &lt;/username-to-dn&gt;
+            &lt;group-search group-name="SIMPLE" iterative="true" group-name-attribute="uid"&gt;
+              &lt;group-to-principal search-by="DISTINGUISHED_NAME" base-dn="ou=groups,dc=group-to-principal,dc=wildfly,dc=org" prefer-original-connection="true"&gt;
+                &lt;membership-filter principal-attribute="uniqueMember"/&gt;
+              &lt;/group-to-principal&gt;
+            &lt;/group-search&gt;
+          &lt;/ldap&gt;
+        &lt;/authorization&gt;
+      &lt;/security-realm&gt;
+    &lt;/security-realms&gt;
+    &lt;outbound-connections&gt;
+      &lt;ldap name="MyLdapConnection" url="ldap://localhost:10389" search-dn="uid=admin,ou=system" search-credential="secret"/&gt;
+    &lt;/outbound-connections&gt;
+    ...
+  &lt;/management&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="picketbox-ldapextloginmodule">PicketBox LdapExtLoginModule</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The following commands can create a PicketBox security domain configured
+to use the LdapExtLoginModule to verify a username and password.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">./subsystem=security/security-domain=application-security:add
+./subsystem=security/security-domain=application-security/authentication=classic:add(login-modules=[{code=LdapExtended, flag=Required, module-options={ \
+java.naming.factory.initial=com.sun.jndi.ldap.LdapCtxFactory, \
+java.naming.provider.url=ldap://localhost:10389, \
+java.naming.security.authentication=simple, \
+bindDN="uid=admin,ou=system", \
+bindCredential=secret, \
+baseCtxDN="ou=users,dc=group-to-principal,dc=wildfly,dc=org", \
+baseFilter="(uid={0})", \
+rolesCtxDN="ou=groups,dc=group-to-principal,dc=wildfly,dc=org",\
+roleFilter="(uniqueMember={1})", \
+roleAttributeID="uid" \
+}}])</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This results in the following configuration.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">  &lt;subsystem xmlns="urn:jboss:domain:security:2.0"&gt;
+    ...
+    &lt;security-domains&gt;
+      ...
+      &lt;security-domain name="application-security"&gt;
+        &lt;authentication&gt;
+          &lt;login-module code="LdapExtended" flag="required"&gt;
+            &lt;module-option name="java.naming.factory.initial" value="com.sun.jndi.ldap.LdapCtxFactory"/&gt;
+            &lt;module-option name="java.naming.provider.url" value="ldap://localhost:10389"/&gt;
+            &lt;module-option name="java.naming.security.authentication" value="simple"/&gt;
+            &lt;module-option name="bindDN" value="uid=admin,ou=system"/&gt;
+            &lt;module-option name="bindCredential" value="secret"/&gt;
+            &lt;module-option name="baseCtxDN" value="ou=users,dc=group-to-principal,dc=wildfly,dc=org"/&gt;
+            &lt;module-option name="baseFilter" value="(uid={0})"/&gt;
+            &lt;module-option name="rolesCtxDN" value="ou=groups,dc=group-to-principal,dc=wildfly,dc=org"/&gt;
+            &lt;module-option name="roleFilter" value="(uniqueMember={1})"/&gt;
+            &lt;module-option name="roleAttributeID" value="uid"/&gt;
+          &lt;/login-module&gt;
+        &lt;/authentication&gt;
+      &lt;/security-domain&gt;
+    &lt;/security-domains&gt;
+  &lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="migrated">Migrated</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Within the Elytron subsystem a directory context can be defined for the
+connection to LDAP: -</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">./subsystem=elytron/dir-context=ldap-connection:add(url=ldap://localhost:10389, principal="uid=admin,ou=system", credential-reference={clear-text=secret})</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then a security realm can be created to search LDAP and verify the
+supplied password: -</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ruby" data-lang="ruby">./subsystem=elytron/ldap-realm=ldap-realm:add(dir-context=ldap-connection, \
+direct-verification=true, \
+identity-mapping={search-base-dn="ou=users,dc=group-to-principal,dc=wildfly,dc=org", \
+rdn-identifier="uid", \
+attribute-mapping=[{filter-base-dn="ou=groups,dc=group-to-principal,dc=wildfly,dc=org",filter="(uniqueMember={1})",from="uid",to="Roles"}]})</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In the prior two examples information is loaded from LDAP to use
+directly as groups or roles, in the Elytron case information can be
+loaded from LDAP to associate with the identity as attributes - these
+can subsequently be mapped to roles but attributes can be loaded for
+other purposes as well.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+By default, if no <code>role-decoder</code> is defined for given <code>security-domain</code>,
+identity attribute " `Roles`" is mapped to the identity roles.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>This leads to the following configuration.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">  &lt;subsystem xmlns="urn:wildfly:elytron:1.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto"&gt;
+    ...
+    &lt;security-realms&gt;
+      ...
+      &lt;ldap-realm name="ldap-realm" dir-context="ldap-connection" direct-verification="true"&gt;
+        &lt;identity-mapping rdn-identifier="uid" search-base-dn="ou=users,dc=group-to-principal,dc=wildfly,dc=org"&gt;
+          &lt;attribute-mapping&gt;
+            &lt;attribute from="uid" to="Roles" filter="(uniqueMember={1})" filter-base-dn="ou=groups,dc=group-to-principal,dc=wildfly,dc=org"/&gt;
+          &lt;/attribute-mapping&gt;
+        &lt;/identity-mapping&gt;
+      &lt;/ldap-realm&gt;
+    &lt;/security-realms&gt;
+    ...
+    &lt;dir-contexts&gt;
+      &lt;dir-context name="ldap-connection" url="ldap://localhost:10389" principal="uid=admin,ou=system"&gt;
+        &lt;credential-reference clear-text="secret"/&gt;
+      &lt;/dir-context&gt;
+    &lt;/dir-contexts&gt;
+  &lt;/subsystem&gt;</code></pre>
+</div>
+</div>
+</div>
+</div></div>
+</div>
+
+
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/wildflysite/"><img class="wf-logo" src="/wildflysite/assets/img/wildfly_icons_one-color-logo.png"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">WildFly is open. All dependencies of this project are available under the <a href='https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html' class='dark-background' target='_blank'>LGPL 2.1</a> or compatible license.<br/><br/>This website was built with <a href='https://jekyllrb.com/' class='dark-background' target='_blank'>Jekyll</a> is hosted on <a href='https://pages.github.com/' class='dark-background' target='_blank'>Github Pages</a> and is completely open source. If you want to make it better, <a href='https://github.com/wildfly/wildfly.org/fork' class='dark-background' target='_blank'>fork it</a> and show us what you’ve got.</p>
+
+    
+      <div class="width-1-12 project-links">
+        <strong>Navigation</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="/wildflysite/downloads" class="dark-background">Downloads</a></li>
+          
+            <li><a href="/wildflysitef/docs" class="dark-background">Docs</a></li>
+          
+            <li><a href="https://github.com/wildfly/wildfly" class="dark-background">Github</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <strong>Contribute</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="https://issues.jboss.org/browse/WFLY" class="dark-background">Submit a bug</a></li>
+          
+            <li><a href="https://community.jboss.org/en/wildfly?view=discussion" class="dark-background">Join the forum</a></li>
+          
+            <li><a href="https://github.com/wildfly/wildfly/fork" class="dark-background">Fork WildFly</a></li>
+          
+            <li><a href="https://twitter.com/WildFlyAS" class="dark-background">Follow us</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <strong>Get Help</strong>
+        <ul class="footer-links width-1-12">
+          
+            <li><a href="https://community.jboss.org/en/wildfly?view=discussion" class="dark-background">Join the forum</a></li>
+          
+            <li><a href="https://www.hipchat.com/gFOhnVQke" class="dark-background">Join HipChat</a></li>
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-6-12 more-links">
+        <strong>Find more Red Hat Middleware Community Projects</strong>
+        <ul class="footer-links">
+          
+            <li><a href="https://www.apiman.io/" class="dark-background">APIMan</a></li>
+          
+            <li><a href="http://arquillian.org" class="dark-background">Arquillian</a></li>
+          
+            <li><a href="http://byteman.jboss.org/" class="dark-background">Byteman</a></li>
+          
+            <li><a href="http://capedwarf.org/" class="dark-background">CapeDwarf</a></li>
+          
+            <li><a href="https://github.com/alechenninger/chronicler" class="dark-background">Chronicler</a></li>
+          
+            <li><a href="https://github.com/darcy-framework" class="dark-background">Darcy</a></li>
+          
+            <li><a href="http://debezium.io/" class="dark-background">Debezium</a></li>
+          
+            <li><a href="https://www.drools.org/" class="dark-background">Drools</a></li>
+          
+            <li><a href="http://gatein.jboss.org/" class="dark-background">GateIn</a></li>
+          
+            <li><a href="http://www.hawkular.org/" class="dark-background">Hawkular</a></li>
+          
+            <li><a href="http://hawt.io/" class="dark-background">Hawtio</a></li>
+          
+            <li><a href="http://hibernate.org/" class="dark-background">Hibernate</a></li>
+          
+            <li><a href="http://www.infinispan.org/" class="dark-background">Infinispan</a></li>
+          
+            <li><a href="https://devstudio.jboss.com/" class="dark-background">JBoss DevStudio</a></li>
+          
+            <li><a href="http://forge.jboss.org/" class="dark-background">JBoss Forge</a></li>
+          
+            <li><a href="https://github.com/jboss-logging" class="dark-background">JBoss Logging</a></li>
+          
+            <li><a href="http://jbossremoting.jboss.org/" class="dark-background">JBoss Remoting</a></li>
+          
+            <li><a href="https://www.jbpm.org/" class="dark-background">jBPM</a></li>
+          
+            <li><a href="https://jsfunit.jboss.org/" class="dark-background">JSFUnit</a></li>
+          
+            <li><a href="https://www.keycloak.org/" class="dark-background">Keycloak</a></li>
+          
+            <li><a href="http://modcluster.io/" class="dark-background">Mod Cluster</a></li>
+          
+            <li><a href="http://modeshape.jboss.org/" class="dark-background">ModeShape</a></li>
+          
+            <li><a href="https://www.optaplanner.org/" class="dark-background">OptaPlanner</a></li>
+          
+            <li><a href="https://picketbox.jboss.org/" class="dark-background">Picketbox</a></li>
+          
+            <li><a href="http://resteasy.jboss.org/" class="dark-background">RESTEasy</a></li>
+          
+            <li><a href="https://riftsaw.jboss.org/" class="dark-background">Riftsaw</a></li>
+          
+            <li><a href="http://savara.jboss.org/" class="dark-background">Savara</a></li>
+          
+            <li><a href="http://seamframework.org/" class="dark-background">Seam</a></li>
+          
+            <li><a href="http://arquillian.org/" class="dark-background">Shrinkwrap</a></li>
+          
+            <li><a href="http://snowdrop.jboss.org/" class="dark-background">Snowdrop</a></li>
+          
+            <li><a href="https://switchyard.jboss.org/" class="dark-background">Switchyard</a></li>
+          
+            <li><a href="https://tattletale.jboss.org/" class="dark-background">Tattletale</a></li>
+          
+            <li><a href="http://teiid.jboss.org/" class="dark-background">Teiid</a></li>
+          
+            <li><a href="http://wildfly-swarm.io/" class="dark-background">WildFly Swarm</a></li>
+          
+            <li><a href="http://wise.jboss.org/" class="dark-background">Wise</a></li>
+          
+            <li><a href="https://xnio.jboss.org/" class="dark-background">XNIO</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" class="dark-background" target="_blank">CC by 3.0</a>
+    </span>
+    <span class="redhat">
+      a Red Hat sponsored project   
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/"><img src="/wildflysite/assets/img/RHLogo_white.svg"></a>
+    </span>
+  </div>
+</div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script type="text/javascript" src="/wildflysite/assets/javascript/mobile-nav.js"></script>
+</body>
+
+</html>
