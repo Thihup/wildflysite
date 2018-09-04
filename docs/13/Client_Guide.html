@@ -3,6 +3,7 @@
 
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="">
   <link rel="shortcut icon" type="image/png" href="/wildflysite/favicon.ico" >
   <link rel="stylesheet" href="/wildflysite/assets/css/main.css" />
@@ -11,7 +12,11 @@
 
 </head>
 
-<body class="WildFly Client Configuration">
+<body class="Wild<strong>Fly</strong> Client Configuration">
+  <div class="header-banner">
+  <p>This site is in beta. Please share feedback by creating an <a href="https://github.com/jbossorg/wildflysite/issues/new" target="_blank">issue ticket</a>.</p>
+</div>
+
   <div class="content">
     <div class="header navigation">
   <div class="logo-wrapper">
@@ -59,7 +64,7 @@
     <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-09-coming.png">
     <img src="/wildflysite/assets/img/docs/wildfly_icons_docs-08-coming.png">
   </div>
-  <div class="grid__item width-12-12"><h1 class="title">WildFly Client Configuration</h1></div>
+  <div class="grid__item width-12-12"><h1 class="title">Wild<strong>Fly</strong> Client Configuration</h1></div>
   <div class="grid__item width-3-12 doc-toc"><ul class="inline_toc">
   <li><a href="#introduction">1. Introduction</a></li>
   <li><a href="#wildfly-config-xml-discovery">2. wildfly-config.xml Discovery</a></li>
@@ -131,7 +136,7 @@
 <h2 id="introduction">1. Introduction</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>As of WildFly 11 a common configuration framework has been introduced for use by the client libraries to define configuration, this allows for the configuration to be shared across multiple clients rather than relying on their own configuration files.  As an example the configuration used by an EJB client can be shared with the JBoss CLI, if both of these required SSL configuration this can now be defined once and re-used.</p>
+<p>As of Wild<strong>Fly</strong> 11 a common configuration framework has been introduced for use by the client libraries to define configuration, this allows for the configuration to be shared across multiple clients rather than relying on their own configuration files.  As an example the configuration used by an EJB client can be shared with the JBoss CLI, if both of these required SSL configuration this can now be defined once and re-used.</p>
 </div>
 <div class="paragraph">
 <p>Programmatic APIs are also available for many of the options however this document is focusing on the configuration available within the common <code>wildfly-config.xml</code> configuration file.</p>

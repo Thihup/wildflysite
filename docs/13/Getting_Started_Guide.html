@@ -3,6 +3,7 @@
 
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="">
   <link rel="shortcut icon" type="image/png" href="/wildflysite/favicon.ico" >
   <link rel="stylesheet" href="/wildflysite/assets/css/main.css" />
@@ -12,6 +13,10 @@
 </head>
 
 <body class="Getting Started Guide">
+  <div class="header-banner">
+  <p>This site is in beta. Please share feedback by creating an <a href="https://github.com/jbossorg/wildflysite/issues/new" target="_blank">issue ticket</a>.</p>
+</div>
+
   <div class="content">
     <div class="header navigation">
   <div class="logo-wrapper">
@@ -61,32 +66,32 @@
   </div>
   <div class="grid__item width-12-12"><h1 class="title">Getting Started Guide</h1></div>
   <div class="grid__item width-3-12 doc-toc"><ul class="inline_toc">
-  <li><a href="#getting-started-with-wildfly">1. Getting Started with WildFly 13</a>
+  <li><a href="#getting-started-with-wildfly">1. Getting Started with Wild<strong>Fly</strong> 13</a>
     <ul>
       <li><a href="#download">1.1. Download</a></li>
       <li><a href="#requirements">1.2. Requirements</a></li>
       <li><a href="#installation">1.3. Installation</a></li>
-      <li><a href="#wildfly---a-quick-tour">1.4. WildFly - A Quick Tour</a>
+      <li><a href="#wildfly---a-quick-tour">1.4. Wild<strong>Fly</strong> - A Quick Tour</a>
         <ul>
-          <li><a href="#wildfly-directory-structure">WildFly Directory Structure</a>
+          <li><a href="#wildfly-directory-structure">Wild<strong>Fly</strong> Directory Structure</a>
             <ul>
               <li><a href="#standalone-directory-structure">Standalone Directory Structure</a></li>
               <li><a href="#domain-directory-structure">Domain Directory Structure</a></li>
             </ul>
           </li>
-          <li><a href="#wildfly-10-configurations">WildFly 13 Configurations</a>
+          <li><a href="#wildfly-10-configurations">Wild<strong>Fly</strong> 13 Configurations</a>
             <ul>
               <li><a href="#standalone-server-configurations">Standalone Server Configurations</a></li>
               <li><a href="#domain-server-configurations">Domain Server Configurations</a></li>
             </ul>
           </li>
-          <li><a href="#starting-wildfly-10">Starting WildFly 13</a></li>
-          <li><a href="#starting-wildfly-with-an-alternate-configuration">Starting WildFly with an Alternate Configuration</a>
+          <li><a href="#starting-wildfly-10">Starting Wild<strong>Fly</strong> 13</a></li>
+          <li><a href="#starting-wildfly-with-an-alternate-configuration">Starting Wild<strong>Fly</strong> with an Alternate Configuration</a>
             <ul>
               <li><a href="#test-your-installation">Test Your Installation</a></li>
             </ul>
           </li>
-          <li><a href="#managing-your-wildfly-10">Managing your WildFly 13</a>
+          <li><a href="#managing-your-wildfly-10">Managing your Wild<strong>Fly</strong> 13</a>
             <ul>
               <li><a href="#authentication">Authentication</a></li>
               <li><a href="#administration-console">Administration Console</a></li>
@@ -111,15 +116,15 @@
 </div>
 </div>
 <div class="sect2">
-<h3 id="getting-started-with-wildfly">1. Getting Started with WildFly 13</h3>
+<h3 id="getting-started-with-wildfly">1. Getting Started with Wild<strong>Fly</strong> 13</h3>
 <div class="paragraph">
-<p>WildFly 13 is the latest release in a series of JBoss open-source
-application server offerings. WildFly 13 is an exceptionally fast,
+<p>Wild<strong>Fly</strong> 13 is the latest release in a series of JBoss open-source
+application server offerings. Wild<strong>Fly</strong> 13 is an exceptionally fast,
 lightweight and powerful implementation of the Java Enterprise Edition 7
 Platform specifications. The state-of-the-art architecture built on the
 Modular Service Container enables services on-demand when your
 application requires them. The table below lists the Java Enterprise
-Edition 7 technologies and the technologies available in WildFly 13
+Edition 7 technologies and the technologies available in Wild<strong>Fly</strong> 13
 server configuration profiles.</p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
@@ -400,7 +405,7 @@ Profile</th>
 <i class="fa icon-warning" title="Warning"></i>
 </td>
 <td class="content">
-The WildFly Web Profile doesn&#8217;t include JMS (provided by HornetQ) by
+The Wild<strong>Fly</strong> Web Profile doesn&#8217;t include JMS (provided by HornetQ) by
 default. If you want to use messaging, make sure you start the server
 using the "Full Profile" configuration.
 </td>
@@ -409,8 +414,8 @@ using the "Full Profile" configuration.
 </div>
 <div class="paragraph">
 <p>This document provides a quick overview on how to download and get
-started using WildFly 13 for your application development. For in-depth
-content on administrative features, refer to the WildFly 13 Admin Guide.</p>
+started using Wild<strong>Fly</strong> 13 for your application development. For in-depth
+content on administrative features, refer to the Wild<strong>Fly</strong> 13 Admin Guide.</p>
 </div>
 <div class="sect3">
 <h4 id="download">1.1. Download</h4>
@@ -450,22 +455,22 @@ available)</p>
 <h4 id="installation">1.3. Installation</h4>
 <div class="paragraph">
 <p>Simply extract your chosen download to the directory of your choice. You
-can install WildFly 13 on any operating system that supports the zip or
+can install Wild<strong>Fly</strong> 13 on any operating system that supports the zip or
 tar formats. Refer to the Release Notes for additional information
 related to the release.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="wildfly---a-quick-tour">1.4. WildFly - A Quick Tour</h4>
+<h4 id="wildfly---a-quick-tour">1.4. Wild<strong>Fly</strong> - A Quick Tour</h4>
 <div class="paragraph">
-<p>Now that you&#8217;ve downloaded WildFly 13, the next thing to discuss is the
+<p>Now that you&#8217;ve downloaded Wild<strong>Fly</strong> 13, the next thing to discuss is the
 layout of the distribution and explore the server directory structure,
 key configuration files, log files, user deployments and so on. It&#8217;s
 worth familiarizing yourself with the layout so that you&#8217;ll be able to
 find your way around when it comes to deploying your own applications.</p>
 </div>
 <div class="sect4">
-<h5 id="wildfly-directory-structure">WildFly Directory Structure</h5>
+<h5 id="wildfly-directory-structure">Wild<strong>Fly</strong> Directory Structure</h5>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 50%;">
@@ -526,10 +531,10 @@ used by the single standalone server run from this installation.</p></td>
 <div class="sect5">
 <h6 id="standalone-directory-structure">Standalone Directory Structure</h6>
 <div class="paragraph">
-<p>In " <strong><em>standalone</em></strong> " mode each WildFly 13 server instance is an
+<p>In " <strong><em>standalone</em></strong> " mode each Wild<strong>Fly</strong> 13 server instance is an
 independent process (similar to previous JBoss AS versions; e.g., 3, 4,
 5, or 6). The configuration files, deployment content and writable areas
-used by the single standalone server run from a WildFly installation are
+used by the single standalone server run from a Wild<strong>Fly</strong> installation are
 found in the following subdirectories under the top level "standalone"
 directory:</p>
 </div>
@@ -590,15 +595,15 @@ process.</p></td>
 <div class="sect5">
 <h6 id="domain-directory-structure">Domain Directory Structure</h6>
 <div class="paragraph">
-<p>A key feature of WildFly 13 is the managing multiple servers from a
+<p>A key feature of Wild<strong>Fly</strong> 13 is the managing multiple servers from a
 single control point. A collection of multiple servers are referred to
 as a " <strong><em>domain</em></strong> ". Domains can span multiple physical (or virtual)
-machines with all WildFly instances on a given host under the control of
+machines with all Wild<strong>Fly</strong> instances on a given host under the control of
 a Host Controller process. The Host Controllers interact with the Domain
-Controller to control the lifecycle of the WildFly instances running on
+Controller to control the lifecycle of the Wild<strong>Fly</strong> instances running on
 that host and to assist the Domain Controller in managing them. The
 configuration files, deployment content and writeable areas used by
-domain mode processes run from a WildFly installation are found in the
+domain mode processes run from a Wild<strong>Fly</strong> installation are found in the
 following subdirectories under the top level "domain" directory:</p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
@@ -664,7 +669,7 @@ process.</p></td>
 </div>
 </div>
 <div class="sect4">
-<h5 id="wildfly-10-configurations">WildFly 13 Configurations</h5>
+<h5 id="wildfly-10-configurations">Wild<strong>Fly</strong> 13 Configurations</h5>
 <div class="sect5">
 <h6 id="standalone-server-configurations">Standalone Server Configurations</h6>
 <div class="ulist">
@@ -741,9 +746,9 @@ provide.</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="starting-wildfly-10">Starting WildFly 13</h5>
+<h5 id="starting-wildfly-10">Starting Wild<strong>Fly</strong> 13</h5>
 <div class="paragraph">
-<p>To start WildFly 13 using the default web profile configuration in "
+<p>To start Wild<strong>Fly</strong> 13 using the default web profile configuration in "
 <em>standalone</em>" mode, change directory to $JBOSS_HOME/bin.</p>
 </div>
 <div class="listingblock">
@@ -762,7 +767,7 @@ capabilities,</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="starting-wildfly-with-an-alternate-configuration">Starting WildFly with an Alternate Configuration</h5>
+<h5 id="starting-wildfly-with-an-alternate-configuration">Starting Wild<strong>Fly</strong> with an Alternate Configuration</h5>
 <div class="paragraph">
 <p>If you choose to start your server with one of the other provided
 configurations, they can be accessed by passing the --server-config
@@ -817,7 +822,7 @@ to what&#8217;s shown below.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>As with previous WildFly releases, you can point your browser to
+<p>As with previous Wild<strong>Fly</strong> releases, you can point your browser to
 <strong><em><a href="http://localhost:8080" class="bare">http://localhost:8080</a></em></strong> (if using the default configured http port)
 which brings you to the Welcome Screen:</p>
 </div>
@@ -825,20 +830,20 @@ which brings you to the Welcome Screen:</p>
 <p><span class="image"><img src="images/wildfly.png" alt="wildfly.png"></span></p>
 </div>
 <div class="paragraph">
-<p>From here you can access links to the WildFly community documentation
+<p>From here you can access links to the Wild<strong>Fly</strong> community documentation
 set, stay up-to-date on the latest project information, have a
 discussion in the user forum and access the enhanced web-based
-Administration Console. Or, if you uncover a defect while using WildFly,
+Administration Console. Or, if you uncover a defect while using Wild<strong>Fly</strong>,
 report an issue to inform us (attached patches will be reviewed). This
 landing page is recommended for convenient access to information about
-WildFly 13 but can easily be replaced with your own if desired.</p>
+Wild<strong>Fly</strong> 13 but can easily be replaced with your own if desired.</p>
 </div>
 </div>
 </div>
 <div class="sect4">
-<h5 id="managing-your-wildfly-10">Managing your WildFly 13</h5>
+<h5 id="managing-your-wildfly-10">Managing your Wild<strong>Fly</strong> 13</h5>
 <div class="paragraph">
-<p>WildFly 13 offers two administrative mechanisms for managing your
+<p>Wild<strong>Fly</strong> 13 offers two administrative mechanisms for managing your
 running instance:</p>
 </div>
 <div class="ulist">
@@ -854,7 +859,7 @@ running instance:</p>
 <div class="sect5">
 <h6 id="authentication">Authentication</h6>
 <div class="paragraph">
-<p>By default WildFly 13 is now distributed with security enabled for the
+<p>By default Wild<strong>Fly</strong> 13 is now distributed with security enabled for the
 management interfaces, this means that before you connect using the
 administration console or remotely using the CLI you will need to add a
 new user, this can be achieved simply by using the <em>add-user.sh</em> script
@@ -974,7 +979,7 @@ Connected to standalone controller at localhost:9990</code></pre>
 localhost:9990.</p>
 </div>
 <div class="paragraph">
-<p>When running locally to the WildFly process the CLI will silently
+<p>When running locally to the Wild<strong>Fly</strong> process the CLI will silently
 authenticate against the server by exchanging tokens on the file system,
 the purpose of this exchange is to verify that the client does have
 access to the local file system. If the CLI is connecting to a remote

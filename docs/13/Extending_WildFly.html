@@ -3,6 +3,7 @@
 
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="">
   <link rel="shortcut icon" type="image/png" href="/wildflysite/favicon.ico" >
   <link rel="stylesheet" href="/wildflysite/assets/css/main.css" />
@@ -12,6 +13,10 @@
 </head>
 
 <body class="Extending WildFly">
+  <div class="header-banner">
+  <p>This site is in beta. Please share feedback by creating an <a href="https://github.com/jbossorg/wildflysite/issues/new" target="_blank">issue ticket</a>.</p>
+</div>
+
   <div class="content">
     <div class="header navigation">
   <div class="logo-wrapper">
@@ -337,10 +342,10 @@
 <div class="sectionbody">
 <div class="paragraph">
 <p>In this document we provide an example of how to extend the kernel
-functionality of WildFly via an extension and the subsystem it installs.
-The WildFly kernel is very simple and lightweight; most of the
+functionality of Wild<strong>Fly</strong> via an extension and the subsystem it installs.
+The Wild<strong>Fly</strong> kernel is very simple and lightweight; most of the
 capabilities people associate with an application server are provided
-via extensions and their subsystems. The WildFly distribution includes
+via extensions and their subsystems. The Wild<strong>Fly</strong> distribution includes
 many extensions and subsystems; the webserver integration is via a
 subsystem; the transaction manager integration is via a subsystem, the
 EJB container integration is via a subsystem, etc.</p>
@@ -365,7 +370,7 @@ and forth between the sections is also a good strategy.</p>
 <div class="sect2">
 <h3 id="prerequisites">1.1. Prerequisites</h3>
 <div class="paragraph">
-<p>You should know how to download, install and run WildFly. If not please
+<p>You should know how to download, install and run Wild<strong>Fly</strong>. If not please
 consult the <a href="Getting_Started_Guide.html">Getting Started Guide</a>. You
 should also be familiar with the management concepts from the
 <a href="Admin_Guide.html">Admin Guide</a>, particularly the
