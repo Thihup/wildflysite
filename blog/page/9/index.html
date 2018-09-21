@@ -97,7 +97,9 @@
 </div>
 </div>
         <div class="grid__item width-12-12">
-          <p>WildFly Swarm Initial Release bobmcwhirter 2015-05-05 Happy Cinco De Mayo! Crack open a cold adult beverage and start retooling your JavaEE skills towards microservices. What is WildFly Swarm? WildFly Swarm [1] is a new sidecar project supporting WildFly 9.x to enable deconstructing the WildFly AS and pasting just enough of it back together with your application to create a self-contained executable jar. JAX-RS is a microservice? In the simplest case, you make small adjustments to your existing Maven pom.xml that generates a WAR file and you&#8217;ll get another artifact with a name akin to myproject-1.0-swarm.jar. Simply add the wildfly-swarm-plugin to your pom.xml: &lt;plugin&gt; &lt;groupId&gt;org.wildfly.swarm&lt;/groupId&gt; &lt;artifactId&gt;wildfly-swarm-plugin&lt;/artifactId&gt; &lt;version&gt;${version.wildfly-swarm}&lt;/version&gt; &lt;executions&gt; &lt;execution&gt; &lt;phase&gt;package&lt;/phase&gt; &lt;goals&gt; &lt;goal&gt;create&lt;/goal&gt; &lt;/goals&gt; &lt;/execution&gt; &lt;/executions&gt; &lt;/plugin&gt; Add a &lt;dependency&gt; block or two: &lt;dependency&gt; &lt;groupId&gt;org.wildfly.swarm&lt;/groupId&gt; &lt;artifactId&gt;wildfly-swarm-jaxrs&lt;/artifactId&gt; &lt;version&gt;${version.wildfly-swarm}&lt;/version&gt; &lt;scope&gt;provided&lt;/scope&gt; &lt;/dependency&gt; Build your project: mvn package And run that sucker: java -jar ./target/myproject-1.0-swarm.jar Can I get fancier? You betcha! Since WildFly Swarm is based...</p>
+          
+            <p>WildFly Swarm Initial Release bobmcwhirter 2015-05-05 Happy Cinco De Mayo! Crack open a cold adult beverage and start retooling your JavaEE skills towards microservices. What is WildFly Swarm? WildFly Swarm [1] is a new sidecar project supporting WildFly 9.x to enable deconstructing the WildFly AS and pasting just enough of it back together with your application to create a self-contained executable jar. JAX-RS is a microservice? In the simplest case, you make small adjustments to...</p>
+          
         </div>
         <div class="grid__item width-12-12"><a href="/wildflysite/blog/2015/05/05/WildFly-Swarm-Released/">Read More ></a></div>
       </div>
@@ -129,24 +131,9 @@
 </div>
 </div>
         <div class="grid__item width-12-12">
-          <p>
-WildFly 9 CR1 is released!
-
-
-jgreene
-2015-05-01
-
-
-I&#8217;m happy to announce WildFly 9.0.0.CR1! WildFly 9 builds off of WildFly 8&#8217;s Java EE7 support, and adds many new capabilities, including intelligent load balancing, HTTP/2 support, a new offline CLI mode, graceful single node shutdown, and a new Servlet-only distribution. For more details, check out the full release notes.
-
-
-Provided no major issues are discovered, we plan to move to Final fairly quickly, sometime in May.
-
-
-Enjoy!
-
-
-</p>
+          
+            <p>WildFly 9 CR1 is released! jgreene 2015-05-01 I&#8217;m happy to announce WildFly 9.0.0.CR1! WildFly 9 builds off of WildFly 8&#8217;s Java EE7 support, and adds many new capabilities, including intelligent load balancing, HTTP/2 support, a new offline CLI mode, graceful single node shutdown, and a new Servlet-only distribution. For more details, check out the full release notes. Provided no major issues are discovered, we plan to move to Final fairly quickly, sometime in May. Enjoy!...</p>
+          
         </div>
         <div class="grid__item width-12-12"><a href="/wildflysite/blog/2015/05/01/WildFly9-CR1-Released/">Read More ></a></div>
       </div>
@@ -178,24 +165,9 @@ Enjoy!
 </div>
 </div>
         <div class="grid__item width-12-12">
-          <p>
-WildFly 9 Beta is released!
-
-
-jgreene
-2015-03-26
-
-
-I&#8217;m happy to announce the beta release of WildFly 9! WildFly 9 builds off of WildFly 8&#8217;s Java EE7 support, and adds many new capabilities, including intelligent load balancing, HTTP/2 support, a new offline CLI mode, graceful single node shutdown, and a new Servlet-only distribution. For more details, check out the full release notes.
-
-
-Provided no major issues are discovered, we plan to move to CR fairly quickly, sometime in April.
-
-
-Enjoy!
-
-
-</p>
+          
+            <p>WildFly 9 Beta is released! jgreene 2015-03-26 I&#8217;m happy to announce the beta release of WildFly 9! WildFly 9 builds off of WildFly 8&#8217;s Java EE7 support, and adds many new capabilities, including intelligent load balancing, HTTP/2 support, a new offline CLI mode, graceful single node shutdown, and a new Servlet-only distribution. For more details, check out the full release notes. Provided no major issues are discovered, we plan to move to CR fairly quickly,...</p>
+          
         </div>
         <div class="grid__item width-12-12"><a href="/wildflysite/blog/2015/03/27/WildFly9-Beta-Released/">Read More ></a></div>
       </div>
@@ -227,7 +199,9 @@ Enjoy!
 </div>
 </div>
         <div class="grid__item width-12-12">
-          <p>Running an Embedded WildFly 9 Server in the CLI bstansberry 2015-03-13 In WildFly 9 Beta1 we are introducing a new capability to our Command Line Interface (CLI) tool: the ability to embed a WildFly standalone server process inside the CLI process, with the CLI interacting with the embedded server in a manner consistent with how it interacts with a remote WildFly server. All of the standard CLI commands that you can use to administer a remote server are available. The immediate goal is to support direct local administration of a WildFly installation via the CLI without requiring a socket-based connection. The general use case is initial setup type activities where the user doesn&#8217;t want to have to launch a WildFly server and have it be visible on the network. RBAC configuration and other management security configuration is one use case; another is a desire users have expressed to be able...</p>
+          
+            <p>Running an Embedded WildFly 9 Server in the CLI bstansberry 2015-03-13 In WildFly 9 Beta1 we are introducing a new capability to our Command Line Interface (CLI) tool: the ability to embed a WildFly standalone server process inside the CLI process, with the CLI interacting with the embedded server in a manner consistent with how it interacts with a remote WildFly server. All of the standard CLI commands that you can use to administer a...</p>
+          
         </div>
         <div class="grid__item width-12-12"><a href="/wildflysite/blog/2015/03/14/Offline-CLI/">Read More ></a></div>
       </div>

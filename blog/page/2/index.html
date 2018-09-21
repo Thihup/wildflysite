@@ -97,7 +97,9 @@
 </div>
 </div>
         <div class="grid__item width-12-12">
-          <p>WildFly 11 Final is now available! jgreene 2017-10-23 WildFly 11 Final is now available for download! The highlights of WildFly 11 are as follows: Elytron - New Security Infrastructure The biggest change in WildFly 11 is unification on a new common security framework across the full application server. Previously we had two separate security infrastructures (picketbox and security-realms), each covering separate use cases, and largely operating independent of the other. In addition to unification, Elytron brings a number of advanced capabilities such as privilege propagation across multiple service invocations, identity switching, pre-request TLS verification, and rich security policies. Finally, it improves the overall extensibility of the system allowing for tight integration with SSO / IDP systems such as KeyCloak. While WildFly 11 introduces a new security infrastructure, the existing security-domain and security-realm configurations and APIs are all present and internally mapped to Elytron. To further ease the impact of this...</p>
+          
+            <p>WildFly 11 Final is now available! jgreene 2017-10-23 WildFly 11 Final is now available for download! The highlights of WildFly 11 are as follows: Elytron - New Security Infrastructure The biggest change in WildFly 11 is unification on a new common security framework across the full application server. Previously we had two separate security infrastructures (picketbox and security-realms), each covering separate use cases, and largely operating independent of the other. In addition to unification, Elytron...</p>
+          
         </div>
         <div class="grid__item width-12-12"><a href="/wildflysite/blog/2017/10/24/WildFly11-Final-Released/">Read More ></a></div>
       </div>
@@ -129,7 +131,9 @@
 </div>
 </div>
         <div class="grid__item width-12-12">
-          <p>Running an Embedded WildFly Host Controller in the CLI kwills 2017-10-09 WildFly supports running a standalone server in Offline mode as an embedded server. An analogous capability has been added for domain mode in the form of running an offline host controller. This article discusses some of the details and possible applications of this feature. Introduction For those not familiar with the existing embedded standalone server, see: Offline mode Running an Embedded WildFly 9 Server in the CLI · WildFly. One of the major use cases of this feature was to allow local administration of a WIldFly / JBoss EAP instance without requiring a socket based connection, or opening any local ports but still enabling configuration and administration operations. The embedded approach also allows for a fast boot that will allow multiple concurrent running instances to co-exist without configuring any additional socket offsets or interfaces to avoid port conflicts etc....</p>
+          
+            <p>Running an Embedded WildFly Host Controller in the CLI kwills 2017-10-09 WildFly supports running a standalone server in Offline mode as an embedded server. An analogous capability has been added for domain mode in the form of running an offline host controller. This article discusses some of the details and possible applications of this feature. Introduction For those not familiar with the existing embedded standalone server, see: Offline mode Running an Embedded WildFly 9 Server...</p>
+          
         </div>
         <div class="grid__item width-12-12"><a href="/wildflysite/blog/2017/10/10/Embedded-Host-Controller/">Read More ></a></div>
       </div>
@@ -161,7 +165,9 @@
 </div>
 </div>
         <div class="grid__item width-12-12">
-          <p>OpenSSL support with WildFly sdouglas 2017-10-06 The upcoming WildFly 11 release includes support for OpenSSL. This provides two main advantages over JSSE: Support for ALPN on all JDK&#8217;s Significantly improved performance compared to JSSE Setting up OpenSSL In general for Linux based systems all that is required is to install a recent version of OpenSSL using your systems package manager. The OpenSSL support will search the library path, and use whatever version of OpenSSL it finds. The same applies to MacOS when OpenSSL has been installed using brew (the system default OpenSSL installation is too old). For windows and for custom OpenSSL locations you need to specify the location via a system property, org.wildfly.openssl.path. If this is set then Wildfly will search for OpenSSL in the directory specified. If you have multiple versions of OpenSSL in the same directory and need to specify the precise file to use you can...</p>
+          
+            <p>OpenSSL support with WildFly sdouglas 2017-10-06 The upcoming WildFly 11 release includes support for OpenSSL. This provides two main advantages over JSSE: Support for ALPN on all JDK&#8217;s Significantly improved performance compared to JSSE Setting up OpenSSL In general for Linux based systems all that is required is to install a recent version of OpenSSL using your systems package manager. The OpenSSL support will search the library path, and use whatever version of OpenSSL it...</p>
+          
         </div>
         <div class="grid__item width-12-12"><a href="/wildflysite/blog/2017/10/06/OpenSSL-Support-In-Wildfly/">Read More ></a></div>
       </div>
@@ -193,7 +199,9 @@
 </div>
 </div>
         <div class="grid__item width-12-12">
-          <p>Messaging features in WildFly 11 jmesnil 2017-10-03 WildFly 11 is integrating Apache ActiveMQ Artemis 1.5 to provides its messaging features. New features With the integration of Artemis 1.5, WildFly has udpated its messaging-activemq subsystem to provides new Artemis features through WildFly management model. The two new main features are the JDBC Store and the configuration for ActiveMQ client thread pools. JDBC Store The JDBC store is an alternative to Artemis File journal that uses a SQL database to store broker state (messages, addresses and other application state) instead of files. It relies on a data-source resource configured in the datasources subsystem to connect to the database. To use a JDBC store in WildFly, you need to configure the journal-datasource attribute on its server resource that corresponds to a JDBC DataSource configured in the datasources subsystem: [standalone@localhost:9990 /] /subsystem=messaging-activemq/server=default:write-attribute(name=journal-datasource, value=ExampleDS) Configuration of ActiveMQ client thread pools Artemis uses thread pools for...</p>
+          
+            <p>Messaging features in WildFly 11 jmesnil 2017-10-03 WildFly 11 is integrating Apache ActiveMQ Artemis 1.5 to provides its messaging features. New features With the integration of Artemis 1.5, WildFly has udpated its messaging-activemq subsystem to provides new Artemis features through WildFly management model. The two new main features are the JDBC Store and the configuration for ActiveMQ client thread pools. JDBC Store The JDBC store is an alternative to Artemis File journal that uses a...</p>
+          
         </div>
         <div class="grid__item width-12-12"><a href="/wildflysite/blog/2017/10/03/Messaging-features/">Read More ></a></div>
       </div>

@@ -97,7 +97,9 @@
 </div>
 </div>
         <div class="grid__item width-12-12">
-          <p>WildFly 9 Final is released! jgreene 2015-07-02 The WildFly 9 Final release is now available for download! Java EE7 As with WildFly 8, WildFly 9 is a certified implemenation of both the Java EE7 full and web profile specifications. HTTP/2 Support Undertow, the web server in WildFly, has added support for the new HTTP/2 standard. HTTP/2 reduces latency by compressing headers and multiplexing many streams over the same TCP connection. It also supports the ability for a server to push resources to the client before it has requested them, leading to faster page loads. We also included support for SPDY, the predecessor to HTTP/2, in order to support clients that have not yet updated to the new specification. Although, currently, recent versions of Chrome and Firefox provide support for the standard out of the box. Note that using HTTP/2 requires using Java 8 with a specialized setup procedure. This is...</p>
+          
+            <p>WildFly 9 Final is released! jgreene 2015-07-02 The WildFly 9 Final release is now available for download! Java EE7 As with WildFly 8, WildFly 9 is a certified implemenation of both the Java EE7 full and web profile specifications. HTTP/2 Support Undertow, the web server in WildFly, has added support for the new HTTP/2 standard. HTTP/2 reduces latency by compressing headers and multiplexing many streams over the same TCP connection. It also supports the ability...</p>
+          
         </div>
         <div class="grid__item width-12-12"><a href="/wildflysite/blog/2015/07/02/WildFly9-Final-Released/">Read More ></a></div>
       </div>
@@ -129,7 +131,9 @@
 </div>
 </div>
         <div class="grid__item width-12-12">
-          <p>WildFly Swarm 1.0.0.Alpha3 Released! bobmcwhirter 2015-06-18 Once again, we&#8217;re delighted and enthralled to announce a release of WildFly Swarm. This time, it&#8217;s 1.0.0.Alpha3! Since this follows quickly on the heels of the last release, there&#8217;s not a whole lot of major changes. Rather, we&#8217;ve fixed some things, enhanced others, written some tests, and generally knocked it together a little sturdier. Changes Based on WildFly 9.0.0.CR2. You can now stop() the container. Better classloading for javax.* stuff. JPA improvements: Default datasources are now available. JPA is usable from within a normal WAR. WebSocket API included in the Undertow fraction. More configuration through the wildfly-swarm-maven-plugin. Serve static content (with or without a WAR/JAX-RS deployment). Magical favicon.ico support for JAX-RS deployments, mostly to avoid ugly stack-traces in the console. Documentation We&#8217;ve started writing some documentation, which you can contribute to: http://wildfly.org/swarm/ Examples? Yes indeed! We have a bunch of buildable and runnable examples...</p>
+          
+            <p>WildFly Swarm 1.0.0.Alpha3 Released! bobmcwhirter 2015-06-18 Once again, we&#8217;re delighted and enthralled to announce a release of WildFly Swarm. This time, it&#8217;s 1.0.0.Alpha3! Since this follows quickly on the heels of the last release, there&#8217;s not a whole lot of major changes. Rather, we&#8217;ve fixed some things, enhanced others, written some tests, and generally knocked it together a little sturdier. Changes Based on WildFly 9.0.0.CR2. You can now stop() the container. Better classloading for javax.*...</p>
+          
         </div>
         <div class="grid__item width-12-12"><a href="/wildflysite/blog/2015/06/18/WildFly-Swarm-Alpha3-Released/">Read More ></a></div>
       </div>
@@ -161,28 +165,9 @@
 </div>
 </div>
         <div class="grid__item width-12-12">
-          <p>
-WildFly 9 CR2 is released!
-
-
-jgreene
-2015-06-10
-
-
-I&#8217;m happy to announce the WildFly 9.0.0.CR2 release! This release addresses a number issues discovered during the CR1 cycle, and also includes a major UX
-update to the console.
-
-
-For those new to WildFly 9, it builds off of WildFly 8&#8217;s Java EE7 support, and adds many new capabilities, including intelligent load balancing, HTTP/2 support, a new offline CLI mode, graceful single node shutdown, and a new Servlet-only distribution.
-
-
-Provided no major issues are discovered, we hope to release Final within the next couple of weeks.
-
-
-Enjoy!
-
-
-</p>
+          
+            <p>WildFly 9 CR2 is released! jgreene 2015-06-10 I&#8217;m happy to announce the WildFly 9.0.0.CR2 release! This release addresses a number issues discovered during the CR1 cycle, and also includes a major UX update to the console. For those new to WildFly 9, it builds off of WildFly 8&#8217;s Java EE7 support, and adds many new capabilities, including intelligent load balancing, HTTP/2 support, a new offline CLI mode, graceful single node shutdown, and a new Servlet-only...</p>
+          
         </div>
         <div class="grid__item width-12-12"><a href="/wildflysite/blog/2015/06/11/WildFly9-CR2-Released/">Read More ></a></div>
       </div>
@@ -214,7 +199,9 @@ Enjoy!
 </div>
 </div>
         <div class="grid__item width-12-12">
-          <p>WildFly Swarm Alpha2 kenfinnigan 2015-06-05 We&#8217;ve been churning through the improvements and fixes for Alpha2! Windows All the Windows issues are now resolved. You can enjoy the benefits of WildFly Swarm on your operating system of choice. Modify your Application from Alpha1 We&#8217;ve made a few changes to how the plugin works which means that you will need to update any applications that are already utilizing Alpha1: Remove the execution phase from the wildfly-swarm-plugin Change the goal of the wildfly-swarm-plugin from create to package Remove the provided scope from all WildFly Swarm dependencies in your pom.xml Weld and JAX-RS There were some WildFly modules missing when you wanted to use Weld with JAX-RS, so we&#8217;ve created a new fraction to cater for this combination. Simply add the following dependency: &lt;dependency&gt; &lt;groupId&gt;org.wildfly.swarm&lt;/groupId&gt; &lt;artifactId&gt;wildfly-swarm-weld-jaxrs&lt;/artifactId&gt; &lt;version&gt;${version.wildfly-swarm}&lt;/version&gt; &lt;/dependency&gt; JPA This release brings initial support for JPA projects. There are improvements planned for Alpha3 to...</p>
+          
+            <p>WildFly Swarm Alpha2 kenfinnigan 2015-06-05 We&#8217;ve been churning through the improvements and fixes for Alpha2! Windows All the Windows issues are now resolved. You can enjoy the benefits of WildFly Swarm on your operating system of choice. Modify your Application from Alpha1 We&#8217;ve made a few changes to how the plugin works which means that you will need to update any applications that are already utilizing Alpha1: Remove the execution phase from the wildfly-swarm-plugin Change...</p>
+          
         </div>
         <div class="grid__item width-12-12"><a href="/wildflysite/blog/2015/06/05/WildFly-Swarm-Alpha2/">Read More ></a></div>
       </div>

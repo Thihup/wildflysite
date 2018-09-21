@@ -97,7 +97,9 @@
 </div>
 </div>
         <div class="grid__item width-12-12">
-          <p>Management Model Referential Integrity and Suggestions bstansberry 2017-09-29 A significant improvement in WildFly 11 is much better support for referential integrity when one resource in your configuration refers to another resource. Going beyond just checking that your references are correct, the server provides reference information that our CLI and the HAL web console are able to use to suggest valid values to you as you set up your configuration. Configuration references When you are configuring a WildFly server, a common thing you need to do is configure attributes whose value refers to the name of some other resource. A common example of this is a resource that includes a socket-binding attribute: [standalone@localhost:9999 /] /subsystem=undertow/server=default-server/ajp-listener=ajp:add(socket-binding=ajp) When you do this, it&#8217;s because the services managed by the resource you are configuring need some capabilities provided by another resource. What you&#8217;re doing is configuring which one to use. But what kind of resource...</p>
+          
+            <p>Management Model Referential Integrity and Suggestions bstansberry 2017-09-29 A significant improvement in WildFly 11 is much better support for referential integrity when one resource in your configuration refers to another resource. Going beyond just checking that your references are correct, the server provides reference information that our CLI and the HAL web console are able to use to suggest valid values to you as you set up your configuration. Configuration references When you are configuring...</p>
+          
         </div>
         <div class="grid__item width-12-12"><a href="/wildflysite/blog/2017/09/29/Management-model-referential-integrity/">Read More ></a></div>
       </div>
@@ -129,7 +131,9 @@
 </div>
 </div>
         <div class="grid__item width-12-12">
-          <p>Using exploded deployments and CLI attachments ehsavoie 2017-09-08 In WildFly there used to be two worlds : one for developers with exploded deployments using a scanner and one for production where artifacts (wars/ears/jars) were deployed. Now those two worlds have collided and you can have exploded deployments without a scanner. And since this is using the management API you get remote access to the content for "free" and of course it works in domain mode. While this new feature is really usefull for tools developers (JBoss Developer Studio will use this in a tech preview, and NetBeans should use it also), YOU can also take advantage of it. Creating exploded deployments There are two ways to create an exploded deployment: Create an empty deployment and add content to it. Deploy an artifact and explode it. Creating an exploded deployment from scratch Let&#8217;s create a from_scratch.war deployment: [standalone@localhost:9990 /] /deployment=from_scratch.war:add(content=[{empty=true}]) [standalone@localhost:9990...</p>
+          
+            <p>Using exploded deployments and CLI attachments ehsavoie 2017-09-08 In WildFly there used to be two worlds : one for developers with exploded deployments using a scanner and one for production where artifacts (wars/ears/jars) were deployed. Now those two worlds have collided and you can have exploded deployments without a scanner. And since this is using the management API you get remote access to the content for "free" and of course it works in domain mode....</p>
+          
         </div>
         <div class="grid__item width-12-12"><a href="/wildflysite/blog/2017/09/08/Exploded-deployments/">Read More ></a></div>
       </div>
@@ -161,7 +165,9 @@
 </div>
 </div>
         <div class="grid__item width-12-12">
-          <p>WildFly 11 CR1 is now available! jgreene 2017-08-25 WildFly 11 CR1 is now available for download! Since the Beta, 66 issues have been resolved. You can find the full list below. Provided that no major issues are found, we hope to release the final very soon. The highlights of WildFly 11 are as follows: Elytron - New Security Infrastructure The biggest change in WildFly 11 is unification on a new common security framework across the full application server. Previously we had two separate security infrastructures (picketbox and security-realms), each covering separate use cases, and largely operating independent of the other. In addition to unification, Elytron brings a number of advanced capabilities such as privilege propagation across multiple service invocations, identity switching, pre-request TLS verification, and rich security policies. Finally it improves the overall extensibility of the system allowing for tight integration with SSO / IDP systems such as KeyCloak. While...</p>
+          
+            <p>WildFly 11 CR1 is now available! jgreene 2017-08-25 WildFly 11 CR1 is now available for download! Since the Beta, 66 issues have been resolved. You can find the full list below. Provided that no major issues are found, we hope to release the final very soon. The highlights of WildFly 11 are as follows: Elytron - New Security Infrastructure The biggest change in WildFly 11 is unification on a new common security framework across the...</p>
+          
         </div>
         <div class="grid__item width-12-12"><a href="/wildflysite/blog/2017/08/26/WildFly11-CR1-Released/">Read More ></a></div>
       </div>
@@ -193,7 +199,9 @@
 </div>
 </div>
         <div class="grid__item width-12-12">
-          <p>WildFly 11 Beta1 is now available! jgreene 2017-08-03 WildFly 11 is now feature complete and the beta is now available for download! This release includes a significant amount of change, with 459 issues completed since the Alpha, and includes a number of major changes, including architectural changes around a new richer security layer. Since WildFly 11 is feature complete, and appears stable in our local testing, we aim to move to CR quickly. The highlights of this release are as follows: Elytron - New Security Infrastructure The biggest change in WildFly 11 is unification on a new common security framework across the full application server. Previously we had two separate security infrastructures (picketbox and security-realms), each covering separate use cases, and largely operating independent of the other. In addition to unification, Elytron brings a number of advanced capabilities such as privilege propagation across multiple service invocations, identity switching, pre-request TLS...</p>
+          
+            <p>WildFly 11 Beta1 is now available! jgreene 2017-08-03 WildFly 11 is now feature complete and the beta is now available for download! This release includes a significant amount of change, with 459 issues completed since the Alpha, and includes a number of major changes, including architectural changes around a new richer security layer. Since WildFly 11 is feature complete, and appears stable in our local testing, we aim to move to CR quickly. The highlights...</p>
+          
         </div>
         <div class="grid__item width-12-12"><a href="/wildflysite/blog/2017/08/04/WildFly11-Beta-Released/">Read More ></a></div>
       </div>
