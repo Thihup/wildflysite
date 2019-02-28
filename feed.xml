@@ -1,4 +1,157 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.4">Jekyll</generator><link href="https://jbossorg.github.io/wildflysite/feed.xml" rel="self" type="application/atom+xml" /><link href="https://jbossorg.github.io/wildflysite/" rel="alternate" type="text/html" /><updated>2019-02-20T19:21:49+00:00</updated><id>https://jbossorg.github.io/wildflysite/</id><title type="html">Wildfly</title><entry><title type="html">New WildFly Project Lead</title><link href="https://jbossorg.github.io/wildflysite/blog/2019/01/07/New-Project-Lead/" rel="alternate" type="text/html" title="New WildFly Project Lead" /><published>2019-01-07T18:00:00+00:00</published><updated>2019-01-07T18:00:00+00:00</updated><id>https://jbossorg.github.io/wildflysite/blog/2019/01/07/New-Project-Lead</id><content type="html" xml:base="https://jbossorg.github.io/wildflysite/blog/2019/01/07/New-Project-Lead/">&lt;div class=&quot;paragraph&quot;&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.4">Jekyll</generator><link href="https://jbossorg.github.io/wildflysite/feed.xml" rel="self" type="application/atom+xml" /><link href="https://jbossorg.github.io/wildflysite/" rel="alternate" type="text/html" /><updated>2019-02-28T17:34:45+00:00</updated><id>https://jbossorg.github.io/wildflysite/</id><title type="html">Wildfly</title><entry><title type="html">WildFly 16 is released!</title><link href="https://jbossorg.github.io/wildflysite/blog/2019/02/27/WildFly16-Final-Released/" rel="alternate" type="text/html" title="WildFly 16 is released!" /><published>2019-02-27T21:00:00+00:00</published><updated>2019-02-27T21:00:00+00:00</updated><id>https://jbossorg.github.io/wildflysite/blog/2019/02/27/WildFly16-Final-Released</id><content type="html" xml:base="https://jbossorg.github.io/wildflysite/blog/2019/02/27/WildFly16-Final-Released/">&lt;div id=&quot;preamble&quot;&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;WildFly 16 Final is now available &lt;a href=&quot;{base_url}/downloads&quot;&gt;for download&lt;/a&gt;!&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;provisioning-wildfly-with-galleon&quot;&gt;Provisioning WildFly with Galleon&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;As we continue with our &lt;a href=&quot;http://lists.jboss.org/pipermail/wildfly-dev/2017-December/006250.html&quot;&gt;quarterly delivery model&lt;/a&gt;, a major focus over the next few quarters will be on making WildFly as easy and productive as possible to use on the cloud, particularly on Kubernetes and OpenShift.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;An important requirement for the cloud is to be able to reduce the footprint of your server to what you need to run your application, eliminating unneeded runtime memory overhead, cutting down image size and reducing the possibility for security vulnerabilities. So, I&amp;#8217;m very excited to announce Tech Preview support for use of the Galleon provisioning tool to allow you to easily provision a slimmed down server tailored toward REST applications. By easily, I mean a simple command that provisions a server that provides the technologies you want, with a correct configuration, and with unneeded libraries not present on disk. Being able to do this is an important piece of foundational technology that we&amp;#8217;ll be building upon over the course of 2019, particularly with tooling and best practices aimed at taking advantage of Galleon when creating cloud images.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Galleon provisioning isn&amp;#8217;t just useful in cloud; users running on bare metal or virtualized environments can get the same benefits. Easy server slimming has been a goal for as long as I&amp;#8217;ve been involved with JBoss AS!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;To use Galleon, &lt;a href=&quot;https://github.com/wildfly/galleon/releases&quot;&gt;download and unzip the Galleon tool&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;To install the latest final version of WildFly into the directory &lt;em&gt;my-wildfly-server&lt;/em&gt; call:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;CodeRay highlight nowrap&quot;&gt;&lt;code&gt;galleon.sh install wildfly:current --dir=my-wildfly-server&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;That&amp;#8217;s not so interesting as the result is equivalent to unzipping the standard download zip.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;admonitionblock note&quot;&gt;
+&lt;table&gt;
+&lt;tr&gt;
+&lt;td class=&quot;icon&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;Note&lt;/div&gt;
+&lt;/td&gt;
+&lt;td class=&quot;content&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;WildFly still provides the usual zip / tar.gz. Using Galleon is not required to use WildFly.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The real power comes when using the &lt;a href=&quot;https://docs.wildfly.org/galleon/#_layers&quot;&gt;Galleon layers&lt;/a&gt; that WildFly provides to limit your installation to just the technologies you need. For example, if all you want is jaxrs and cdi:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;CodeRay highlight nowrap&quot;&gt;&lt;code&gt;galleon.sh install wildfly:current --dir=my-wildfly-server --layers=cdi,jaxrs&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The result is an installation that doesn&amp;#8217;t include unnecessary modules, has a correct configuration and has less than a third of the disk footprint of the standard WildFly distribution. And you don&amp;#8217;t have to worry about knowing and specifying technologies required by the ones you know you want (e.g. the servlet support that jaxrs needs). Galleon handles that for you.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;If you&amp;#8217;re ok with a slightly bigger footprint in order to have common WildFly Core management functionality, add the &lt;em&gt;core-server&lt;/em&gt; and &lt;em&gt;core-tools&lt;/em&gt; layers:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;CodeRay highlight nowrap&quot;&gt;&lt;code&gt;galleon.sh install wildfly:current --dir=my-wildfly-server --layers=cdi,jaxrs,core-server,core-tools&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;WildFly 16 provides a rich set of layers oriented toward letting optimize your server for running HTTP applications. For further details, see the &lt;a href=&quot;http://docs.wildfly.org/16/Admin_Guide.html#Galleon_Provisioning&quot;&gt;WildFly Admin Guide&lt;/a&gt; and the &lt;a href=&quot;https://docs.wildfly.org/galleon&quot;&gt;Galleon documentation&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Please give Galleon provisioning a try and give us feedback! We&amp;#8217;d love to hear about your use cases and how Galleon can be improved to meet them. We&amp;#8217;ll be doing more articles and blog posts explaining how to take advantage of this technology.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;jdk-12&quot;&gt;JDK 12&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;While the GA version of JDK 12 has not been released yet (it is in the Release Candidate phase), we are pleased to report that WildFly 16 should run well on JDK 12 once it is GA. I&amp;#8217;d like to especially thank Richard Opalka and Matej Novotny for their efforts in making this happen.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Our goal with WildFly is to have our releases run well for most use cases on the most recent GA JDK version available on the WildFly final release date. If practical we&amp;#8217;ll try and run well on release candidates for upcoming JDK versions as well, which we&amp;#8217;ve achieved with WildFly 16. By run well, I mean our main testsuite runs with no more than a few failures in areas not expected to be commonly used. (In the JDK 12 case we have no failures.) We want developers who are trying to evaluate what the latest JVM means for their applications to be able to look to WildFly as their development platform. It may not always be possible to attain this goal, but it&amp;#8217;s one we take seriously.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;While we do want to run well on the most recent JDK, our recommendation is that you run WildFly on the most recent long-term support release, i.e. on JDK 11 for WildFly 16.  We do considerably more testing on the LTS JDKs.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;WildFly 16 also is heavily tested and runs well on Java 8. We plan to continue to support Java 8 at least through WildFly 18.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Please note that WildFly runs on Java 11 and 12 in classpath mode.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;messaging-improvements&quot;&gt;Messaging Improvements&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;MDBs can be configured to belong to multiple delivery groups, with delivery only enabled only when all the delivery groups are active.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Users can use standard Java EE 8 resource definitions (annotations or xml) to define JMS resources that connect to a remote Artemis-based broker (including AMQ-7 instances).&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Users can configure the maximum amount of memory that the embedded messaging broker can use to store messages for its addresses before they are considered &quot;full&quot; and
+their &lt;code&gt;address-full-policy&lt;/code&gt; starts to apply (e.g. to drop messages, block producers, etc.)&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;clustering-improvements&quot;&gt;Clustering Improvements&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;When WildFly servers behind a mod_cluster load balancer start they will instruct the load balancer to gracefully ramp up their load over the first minute or so of operation, instead of having the balancer send the maximum possible amount of traffic, possibly overwhelming the server.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Users running a cluster with HA Singleton deployments or services can connect with the CLI to any cluster member and  determine which node is the primary provider of a given deployment or service.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;other-notable-items&quot;&gt;Other Notable Items&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;You can use the CLI to list which modules are visible to a deployment. This is helpful in analyzing classloading issues.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;In a WildFly managed domain, you can suspend and resume all of the servers managed by a particular Host Controller. Previously suspending or resuming multiple servers was limited to all servers in the domain or those in a particular server group.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;When using Elytron, HTTP Basic authentication mechanism can be configured to only operate in 'silent mode', only sending a challenge if the request contained an authorization header.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;jira-release-notes&quot;&gt;Jira Release Notes&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The full list of issues resolved is available &lt;a href=&quot;https://issues.jboss.org/secure/ReleaseNote.jspa?projectId=12313721&amp;amp;version=12340370&quot;&gt;here&lt;/a&gt;. Issues resolved in the WildFly Core 8 release included with WildFly 16 are available &lt;a href=&quot;https://issues.jboss.org/secure/ReleaseNote.jspa?projectId=12315422&amp;amp;version=12340978&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</content><author><name>Brian Stansberry</name></author></entry><entry><title type="html">New WildFly Project Lead</title><link href="https://jbossorg.github.io/wildflysite/blog/2019/01/07/New-Project-Lead/" rel="alternate" type="text/html" title="New WildFly Project Lead" /><published>2019-01-07T18:00:00+00:00</published><updated>2019-01-07T18:00:00+00:00</updated><id>https://jbossorg.github.io/wildflysite/blog/2019/01/07/New-Project-Lead</id><content type="html" xml:base="https://jbossorg.github.io/wildflysite/blog/2019/01/07/New-Project-Lead/">&lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;I am very excited to announce that &lt;a href=&quot;https://developer.jboss.org/people/brian.stansberry&quot;&gt;Brian Stansberry&lt;/a&gt; (&lt;a href=&quot;https://twitter.com/bestansberry&quot;&gt;@bestansberry&lt;/a&gt;) will be taking on the role of WildFly project lead. Brian has been a major contributor to the project for almost 15 years now. During this time, he led a number of critical and complex subsystems including Clustering, Management, and most recently the cross-cutting cloud integration work. He is also one of our most active reviewers, and has helped many contributors navigate deep WildFly internals. Congratulations Brian!&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
@@ -1494,116 +1647,4 @@ $ ./bin/jboss-cli.sh --file=commands.cli
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;/div&gt;</content><author><name>Ken Wills</name></author><category term="wildfly11" /><category term="management" /><category term="CLI" /><category term="embedded" /><category term="domain" /><summary type="html">Running an Embedded WildFly Host Controller in the CLI kwills 2017-10-09</summary></entry><entry><title type="html">OpenSSL support with WildFly</title><link href="https://jbossorg.github.io/wildflysite/blog/2017/10/06/OpenSSL-Support-In-Wildfly/" rel="alternate" type="text/html" title="OpenSSL support with WildFly" /><published>2017-10-06T01:00:00+00:00</published><updated>2017-10-06T01:00:00+00:00</updated><id>https://jbossorg.github.io/wildflysite/blog/2017/10/06/OpenSSL-Support-In-Wildfly</id><content type="html" xml:base="https://jbossorg.github.io/wildflysite/blog/2017/10/06/OpenSSL-Support-In-Wildfly/">&lt;div class=&quot;sect1&quot;&gt;
-&lt;h2 id=&quot;openssl-support-with-wildfly&quot;&gt;OpenSSL support with WildFly&lt;/h2&gt;
-&lt;div class=&quot;sectionbody&quot;&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;sdouglas
-2017-10-06&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;The upcoming WildFly 11 release includes support for OpenSSL. This provides two main advantages over JSSE:&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;ulist&quot;&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;Support for ALPN on all JDK&amp;#8217;s&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Significantly improved performance compared to JSSE&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect1&quot;&gt;
-&lt;h2 id=&quot;setting-up-openssl&quot;&gt;Setting up OpenSSL&lt;/h2&gt;
-&lt;div class=&quot;sectionbody&quot;&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;In general for Linux based systems all that is required is to install a recent version of OpenSSL using your systems
-package manager. The OpenSSL support will search the library path, and use whatever version of OpenSSL it finds. The
-same applies to MacOS when OpenSSL has been installed using brew (the system default OpenSSL installation is too old).&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;For windows and for custom OpenSSL locations you need to specify the location via a system property,
-&lt;code&gt;org.wildfly.openssl.path&lt;/code&gt;. If this is set then Wildfly will search for OpenSSL in the directory specified. If you have
-multiple versions of OpenSSL in the same directory and need to specify the precise file to use you can instead use
-&lt;code&gt;org.wildfly.openssl.path.ssl&lt;/code&gt; and &lt;code&gt;org.wildfly.openssl.path.crypto&lt;/code&gt; to specify the path to libssl and libcrypto
-respectively.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;As Wildfly uses dynamic linking this should work with any OpenSSL version from 1.0.1 onwards (however for security
-reasons it is recommended to always use the most up to date 1.1.x or 1.0.x version that is available, as older versions
-may have unpatched vulnerabilities).&lt;/p&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect1&quot;&gt;
-&lt;h2 id=&quot;setting-up-wildfly-with-security-realms&quot;&gt;Setting up Wildfly with Security Realms&lt;/h2&gt;
-&lt;div class=&quot;sectionbody&quot;&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;As Wildfly supports SSL out of the box with dynamically generated self signed certificates all that is required is to
-change the protocol in use. Doing this is as simple as running a single command in the CLI:&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre&gt;/core-service=management/security-realm=ApplicationRealm/server-identity=ssl:write-attribute(name=protocol, value=openssl.TLS)&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Other valid values are &lt;code&gt;openssl.TLSv1.1&lt;/code&gt; and &lt;code&gt;openssl.TLSv1.2&lt;/code&gt;, which limit the minimum TLS version to 1.1 and 1.2
-respectively.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Once this is done you can use OpenSSL by simply pointing your browser to &lt;a href=&quot;https://localhost:8443&quot;&gt;https://localhost:8443&lt;/a&gt;.
-You should see the following message in the log that tells you that OpenSSL is in use:&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre&gt;09:01:04,150 INFO  [org.wildfly.openssl.SSL] (MSC service thread 1-6) WFOPENSSL0002 OpenSSL Version OpenSSL 1.0.2l  25 May 2017&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect1&quot;&gt;
-&lt;h2 id=&quot;setting-up-wildfly-with-elytron&quot;&gt;Setting up Wildfly with Elytron&lt;/h2&gt;
-&lt;div class=&quot;sectionbody&quot;&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;As Elytron is not used by default there is a little bit more work involved in setting it up. Elytron does not support
-auto generation of SSL certificates, so for the sake of this example I am going to assume that the keystore is
-located at &lt;code&gt;standalone/configuration/application.keystore&lt;/code&gt; (the same location that the auto generated keystore is placed,
-if you just want a self signed certificate for testing purposes you can simply connect to
-&lt;a href=&quot;https://localhost:8443&quot;&gt;https://localhost:8443&lt;/a&gt; with the default configuration and one will be generated for you).&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;In order to set up SSL using Elytron run the following commands (note that this is just to use JSSE, the OpenSSL config
-will come later).&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre&gt;/subsystem=elytron/key-store=server:add(path=application.keystore, relative-to=jboss.server.config.dir, credential-reference={clear-text=password}, type=jks)
-/subsystem=elytron/key-manager=server:add(key-store=server, credential-reference={clear-text=password}, algorithm=SunX509)
-/subsystem=elytron/server-ssl-context=server:add(key-manager=server, protocols=[TLSv1.2])
-batch
-/subsystem=undertow/server=default-server/https-listener=https:undefine-attribute(name=security-realm)
-/subsystem=undertow/server=default-server/https-listener=https:write-attribute(name=ssl-context, value=server)
-run-batch
-:reload&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;If you point your browser at &lt;a href=&quot;https://localhost:8443&quot;&gt;https://localhost:8443&lt;/a&gt; you should now have a working Elytron based
-SSL config. Once you have verified that this has worked we now need to change it to use OpenSSL. To do this we change
-the ordering of the providers in the elytron combined-providers, which means that OpenSSL will now take precedence:&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre&gt;/subsystem=elytron/aggregate-providers=combined-providers:list-add(index=0, name=providers, value=openssl)
-/subsystem=elytron/aggregate-providers=combined-providers:list-remove(index=2, name=providers)&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;You should now have OpenSSL working with Elytron.&lt;/p&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;</content><author><name>Stuart Douglas</name></author><category term="wildfly" /><category term="openssl" /><summary type="html">OpenSSL support with WildFly sdouglas 2017-10-06</summary></entry></feed>
+&lt;/div&gt;</content><author><name>Ken Wills</name></author><category term="wildfly11" /><category term="management" /><category term="CLI" /><category term="embedded" /><category term="domain" /><summary type="html">Running an Embedded WildFly Host Controller in the CLI kwills 2017-10-09</summary></entry></feed>
