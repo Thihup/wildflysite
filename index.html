@@ -43,7 +43,7 @@
           <a href="/wildflysite/downloads/" class="">Downloads</a>
         </li>
         <li>
-          <a href="/wildflysite/blog/" class="">Blog</a>
+          <a href="/wildflysite/news/" class="">News</a>
         </li>
         <li>
           <a href="/wildflysite/about/" class="">About</a>
@@ -66,12 +66,12 @@
 <div class="grid-wrapper">
   <div class="grid__item width-12-12 home-section">
     
-      <h1>Wild<strong>Fly</strong> 17 is now available</h1>
+      <h1>Wild<strong>Fly</strong> 20 is now available</h1>
       <div class="home-ctas">
         
-          <a href="https://download.jboss.org/wildfly/17.0.0.Final/wildfly-17.0.0.Final.zip" class="button-cta">Download the zip</a>
+          <a href="https://download.jboss.org/wildfly/20.0.0.Beta1/wildfly-20.0.0.Beta1.zip" class="button-cta">Download the zip</a>
         
-          <a href="https://download.jboss.org/wildfly/17.0.0.Final/wildfly-17.0.0.Final.tar.gz" class="button-cta">Download the tgz</a>
+          <a href="https://download.jboss.org/wildfly/20.0.0.Beta1/wildfly-20.0.0.Beta1.tar.gz" class="button-cta">Download the tgz</a>
          
         <a href="/wildflysite/downloads/" class="button-cta secondary">Other Versions</a>
       </div>
@@ -82,7 +82,7 @@
     <div class="home-icons">
       <a href="https://github.com/wildfly/wildfly" class="github" target="_blank">Github</a>
       <a target="_blank" href="https://docs.wildfly.org" class="docs">Documentation</a>
-      <a href="https://community.jboss.org/en/wildfly?view=discussion" class="forums" target="_blank">Forums</a>
+      <a href="https://groups.google.com/forum/#!forum/wildfly" class="forums" target="_blank">Forums</a>
     </div>
   </div>
 
@@ -107,118 +107,166 @@ build amazing applications.</h2>
     </div>
   </div>
   <div class="grid__item width-12-12 home-section">
-    <div class="grid-wrapper blog-list-blocks">
+    <div class="grid-wrapper news-list-blocks">
   
     
     
-      <div class="blog-block-item grid__item width-3-12 width-6-12-m">
+      <div class="news-block-item grid__item width-3-12 width-6-12-m">
         <div class="post-title grid__item">
-          <h4><a href="/wildflysite/blog/2019/02/27/WildFly16-Final-Released/">WildFly 16 is released!</a></h4>
+          <h4><a href="/wildflysite/news/2020/05/11/Using-Qpid-with-WildFly/">Pluging Apache Qpid into WildFly</a></h4>
         </div>
-        <p class="byline">By Brian Stansberry | February 27, 2019</p>
+        <p class="byline">By Emmanuel Hugonnet | May 11, 2020</p>
         
-          <p>WildFly 16 Final is now available for download! Provisioning WildFly with Galleon As we continue with our quarterly delivery model, a major focus over the next few quarters will be on making WildFly as easy and productive as possible to use on the cloud, particularly on Kubernetes and OpenShift. An important requirement for the cloud is to be able to reduce the footprint of your server to what you need to run your application, eliminating...</p>
+          <p>Using JBoss Generic JMS Resource Adapter you can use a JMS compatible client to connect WildFly to any broker. This article will describe how to do this with Apache Qpid and thus use JMS over AMQP. Installing Apache Qpid You need to download and untar Apache Qpid Broker-J 8.0.0 from https://qpid.apache.org/download.html. You need to allow for anonymous access. Please use the initial-config.json configuration file. Note that we will start Apache Qpid HTTP server on 9080...</p>
         
-        <a href="/wildflysite/blog/2019/02/27/WildFly16-Final-Released/">Read More ></a>
+        <a href="/wildflysite/news/2020/05/11/Using-Qpid-with-WildFly/">Read More ></a>
       </div>
     
   
     
     
-      <div class="blog-block-item grid__item width-3-12 width-6-12-m">
+      <div class="news-block-item grid__item width-3-12 width-6-12-m">
         <div class="post-title grid__item">
-          <h4><a href="/wildflysite/blog/2019/01/07/New-Project-Lead/">New WildFly Project Lead</a></h4>
+          <h4><a href="/wildflysite/news/2020/05/04/WildFly-1910-Released/">WildFly 19.1.0 is released!</a></h4>
         </div>
-        <p class="byline">By Jason Greene | January 07, 2019</p>
+        <p class="byline">By Brian Stansberry | May 04, 2020</p>
         
-          <p>I am very excited to announce that Brian Stansberry (@bestansberry) will be taking on the role of WildFly project lead. Brian has been a major contributor to the project for almost 15 years now. During this time, he led a number of critical and complex subsystems including Clustering, Management, and most recently the cross-cutting cloud integration work. He is also one of our most active reviewers, and has helped many contributors navigate deep WildFly internals....</p>
+          <p>WildFly 19.1.0 Final is now available for download. As we usually do between WildFly majors, we&#8217;ve done an update release to provide the WildFly community with important bug fixes and component upgrades that have become available. Typically these are micro releases, but this time we had one feature that we wanted to make available, so we changed the version to 19.1.0 and released a minor. The feature is related to handling of SameSite cookie attributes....</p>
         
-        <a href="/wildflysite/blog/2019/01/07/New-Project-Lead/">Read More ></a>
+        <a href="/wildflysite/news/2020/05/04/WildFly-1910-Released/">Read More ></a>
       </div>
     
   
     
     
-      <div class="blog-block-item grid__item width-3-12 width-6-12-m">
+      <div class="news-block-item grid__item width-3-12 width-6-12-m">
         <div class="post-title grid__item">
-          <h4><a href="/wildflysite/blog/2018/12/13/WildFly15-Final-Released/">WildFly 15 is released!</a></h4>
+          <h4><a href="/wildflysite/news/2020/04/13/How-to-configure-wildfly-s2i-by-cli-operations/">Configuring WildFly S2I image by using CLI Management Operations</a></h4>
         </div>
-        <p class="byline">By Jason Greene | December 13, 2018</p>
+        <p class="byline">By Yeray Borges | April 13, 2020</p>
         
-          <p>WildFly 15 Final is now available for download! This is our fourth release following our quarterly delivery model. The major objective of this year’s release plan was to deliver EE8 functionality in incremental chunks over the first three quarters, and then to ensure WildFly ran well on the latest long term support version of Java. Accordingly, in this fourth release our focus was less on new features and more on polishing our support for JDK...</p>
+          <p>Introduction The standard and recommended way to configure the WildFly cloud images is by using environment variables. However, you could find it useful for your use case to configure the server by using a custom CLI management operations script. The following post describes how you can apply management operations to configure the WildFly server image. We will show you how you can execute CLI scripts at the Source-to-Image (S2I) phase and how to use the...</p>
         
-        <a href="/wildflysite/blog/2018/12/13/WildFly15-Final-Released/">Read More ></a>
+        <a href="/wildflysite/news/2020/04/13/How-to-configure-wildfly-s2i-by-cli-operations/">Read More ></a>
       </div>
     
   
     
     
-      <div class="blog-block-item grid__item width-3-12 width-6-12-m">
+      <div class="news-block-item grid__item width-3-12 width-6-12-m">
         <div class="post-title grid__item">
-          <h4><a href="/wildflysite/blog/2018/09/28/Git-History/">Using Git for configuration history</a></h4>
+          <h4><a href="/wildflysite/news/2020/03/19/Micro_Profile_OpenTracing_Comes_To_WildFly/">Eclipse MicroProfile OpenTracing comes to WildFly</a></h4>
         </div>
-        <p class="byline">By Emmanuel Hugonnet | September 28, 2018</p>
+        <p class="byline">By Emmanuel Hugonnet | March 19, 2020</p>
         
-          <p>Until now the history of configuration in WildFly was using the folder + filename pattern. Now we have moved to a proper SCM integrating Git to manage history. You can now take advantage of a full Git support for your configuration history: every change in your configuration is now a commit. you can use branches to develop in parallel. you can create tags for stable points in your configuration. pull configuration from a remote repository....</p>
+          <p>Until WildFly 19 you could use Eclipse MicroProfile OpenTracing (MPOT) to trace your application using environment variables relying on the SmallRye OpenTracing implementation. With WildFly 19 you can now configure several Jaeger Tracers to be used in your applications. Installing Jaeger Let&#8217;s start a jaeger instance using docker : docker run -d --name jaeger \ -p 6831:6831/udp \ -p 5778:5778 \ -p 14268:14268 \ -p 16686:16686 \ jaegertracing/all-in-one:1.16 Now, you can navigate to http://localhost:16686 to...</p>
         
-        <a href="/wildflysite/blog/2018/09/28/Git-History/">Read More ></a>
+        <a href="/wildflysite/news/2020/03/19/Micro_Profile_OpenTracing_Comes_To_WildFly/">Read More ></a>
       </div>
     
   
     
     
-      <div class="blog-block-item grid__item width-3-12 width-6-12-m">
+      <div class="news-block-item grid__item width-3-12 width-6-12-m">
         <div class="post-title grid__item">
-          <h4><a href="/wildflysite/blog/2018/08/30/WildFly14-Final-Released/">WildFly 14 is released!</a></h4>
+          <h4><a href="/wildflysite/news/2019/12/17/Ship-your-WildFly-additions-via-Galleon-feature-packs/">Ship Your WildFly Additions via Galleon Feature Packs</a></h4>
         </div>
-        <p class="byline">By Jason Greene | August 30, 2018</p>
+        <p class="byline">By Kabir Khan | December 17, 2019</p>
         
-          <p>I am happy to announce that the WildFly 14 release is Java EE8 Certified! Since WildFly is now certified, the default EE7 mode and EE8 preview option have been dropped.</p>
+          <p>Galleon is a tool for provisioning Java runtimes. It comes with plugins for provisioning WildFly server instances. We have been using it internally in WildFly to build and configure the server the past few releases, and we recently introduced it into our OpenShift cloud image to be able to create a server with a smaller footprint than the default. This post will give an overview of how to use Galleon to provide your additions to...</p>
         
-        <a href="/wildflysite/blog/2018/08/30/WildFly14-Final-Released/">Read More ></a>
+        <a href="/wildflysite/news/2019/12/17/Ship-your-WildFly-additions-via-Galleon-feature-packs/">Read More ></a>
       </div>
     
   
     
     
-      <div class="blog-block-item grid__item width-3-12 width-6-12-m">
+      <div class="news-block-item grid__item width-3-12 width-6-12-m">
         <div class="post-title grid__item">
-          <h4><a href="/wildflysite/blog/2018/06/01/Whats-New-In-HAL/">Whats New In Hal</a></h4>
+          <h4><a href="/wildflysite/news/2019/11/14/WildFly-1801-Released/">WildFly 18.0.1 is released!</a></h4>
         </div>
-        <p class="byline">By Harald Pehl | June 01, 2018</p>
+        <p class="byline">By Brian Stansberry | November 14, 2019</p>
         
-          <p>What&#8217;s New in WildFly Management Console hpehl 2018-06-01 WildFly 13 comes with a management console (HAL) which has been rewritten from scratch. HAL still uses a similar technical stack (GWT) and user experience, but now fully adopts PatternFly. More important we enhanced the existing features and added support for many new subsystems and attributes. The following sections show some highlights of the latest version. For more details about the new features see the release notes...</p>
+          <p>WildFly 18.0.1.Final is now available for download!</p>
         
-        <a href="/wildflysite/blog/2018/06/01/Whats-New-In-HAL/">Read More ></a>
+        <a href="/wildflysite/news/2019/11/14/WildFly-1801-Released/">Read More ></a>
       </div>
     
   
     
     
-      <div class="blog-block-item grid__item width-3-12 width-6-12-m">
+      <div class="news-block-item grid__item width-3-12 width-6-12-m">
         <div class="post-title grid__item">
-          <h4><a href="/wildflysite/blog/2018/05/31/WildFly13-Final-Released/">Wildfly13 Final Released</a></h4>
+          <h4><a href="/wildflysite/news/2019/11/11/WildFly-s2i-openshift-Datasource-configuration/">Configuring WildFly S2I image Datasources on OpenShift</a></h4>
         </div>
-        <p class="byline">By Jason Greene | May 31, 2018</p>
+        <p class="byline">By Yeray Borges | November 11, 2019</p>
         
-          <p>WildFly 13 "Baker&#8217;s Dozen" is released! jgreene 2018-05-30 WildFly 13 Final is now available for download! EE8 Capabilities &amp; New Release Model This is our second release following our new quarterly delivery model. A central theme of this plan, is to deliver EE8 functionality in fully completed incremental chunks, as opposed to waiting for everything to finish in a big bang relase. WildFly 13 largely accomplishes this goal, by achieving EE8 feature completeness. WildFly 14...</p>
+          <p>Introduction In this guide, we will show you how we can containerize a JAX-RS PostgreSQL demo application to run on WildFly in a local OpenShift cluster. We will explore the different options we have to configure the data source subsystem in a cloud-based infrastructure. First of all, we will use the WildFly Datasources Galleon Pack to bring in the PostgreSQL data source and driver configuration to our WildFly server. Later, we will show you how...</p>
         
-        <a href="/wildflysite/blog/2018/05/31/WildFly13-Final-Released/">Read More ></a>
+        <a href="/wildflysite/news/2019/11/11/WildFly-s2i-openshift-Datasource-configuration/">Read More ></a>
       </div>
     
   
     
     
-      <div class="blog-block-item grid__item width-3-12 width-6-12-m">
+      <div class="news-block-item grid__item width-3-12 width-6-12-m">
         <div class="post-title grid__item">
-          <h4><a href="/wildflysite/blog/2018/03/01/WildFly12-Final-Released/">WildFly 12 Final is now available!</a></h4>
+          <h4><a href="/wildflysite/news/2019/10/07/WildFly-s2i-18-released/">WildFly 18 S2I image has been released on quay.io</a></h4>
         </div>
-        <p class="byline">By Jason Greene | March 01, 2018</p>
+        <p class="byline">By Jean-François Denise | October 07, 2019</p>
         
-          <p>WildFly 12 Final is now available! jgreene 2018-02-28 WildFly 12 Final is now available for download! EE8 Capabilities &amp; New Release Model This is our first release following our new quarterly delivery model. As part of this plan, we are delivering EE8 functionality in fully completed incremental chunks, as opposed to waiting for everything to finish in a big bang reelase. WildFly 12 makes significant progress on this front, adding support for the majority of...</p>
+          <p>WildFly 18 S2I docker images WildFly s2i builder and runtime Docker images for WildFly 18 have been released on quay.io/wildfly Changes since last release: New env variable GALLEON_PROVISION_LAYERS=&lt;layers list&gt; that you can use during s2i to provision a custom WildFly server. It does replace the GALLEON_PROVISION_SERVER that was only offering a subset of Galleon layers. You can now provision WildFly server by directly providing Galleon layers. This offers a lot of flexibility when composing a...</p>
         
-        <a href="/wildflysite/blog/2018/03/01/WildFly12-Final-Released/">Read More ></a>
+        <a href="/wildflysite/news/2019/10/07/WildFly-s2i-18-released/">Read More ></a>
       </div>
+    
+  
+    
+    
+  
+    
+    
+  
+    
+    
+  
+    
+    
+  
+    
+    
+  
+    
+    
+  
+    
+    
+  
+    
+    
+  
+    
+    
+  
+    
+    
+  
+    
+    
+  
+    
+    
+  
+    
+    
+  
+    
+    
+  
+    
+    
+  
+    
     
   
     
@@ -384,7 +432,7 @@ build amazing applications.</h2>
           
             <li><a href="https://issues.jboss.org/browse/WFLY">Submit a bug</a></li>
           
-            <li><a href="https://community.jboss.org/en/wildfly?view=discussion">Join the forum</a></li>
+            <li><a href="https://groups.google.com/forum/#!forum/wildfly">Join the forum</a></li>
           
             <li><a href="https://github.com/wildfly/wildfly/fork">Fork WildFly</a></li>
           
@@ -397,9 +445,9 @@ build amazing applications.</h2>
         <strong>Get Help</strong>
         <ul class="footer-links width-1-12">
           
-            <li><a href="https://community.jboss.org/en/wildfly?view=discussion">Join the forum</a></li>
+            <li><a href="https://groups.google.com/forum/#!forum/wildfly">Join the forum</a></li>
           
-            <li><a href="https://www.hipchat.com/gFOhnVQke">Join HipChat</a></li>
+            <li><a href="https://wildfly.zulipchat.com/">Join Zulip Chat</a></li>
           
         </ul>
       </div>
@@ -436,7 +484,7 @@ build amazing applications.</h2>
           
             <li><a href="http://www.infinispan.org/">Infinispan</a></li>
           
-            <li><a href="https://devstudio.jboss.com/">JBoss DevStudio</a></li>
+            <li><a href="https://developers.redhat.com/products/codeready-studio/overview">CodeReady Studio</a></li>
           
             <li><a href="http://forge.jboss.org/">JBoss Forge</a></li>
           
@@ -456,8 +504,6 @@ build amazing applications.</h2>
           
             <li><a href="https://www.optaplanner.org/">OptaPlanner</a></li>
           
-            <li><a href="https://picketbox.jboss.org/">Picketbox</a></li>
-          
             <li><a href="https://quarkus.io/">Quarkus</a></li>
           
             <li><a href="http://resteasy.jboss.org/">RESTEasy</a></li>
@@ -466,7 +512,7 @@ build amazing applications.</h2>
           
             <li><a href="http://savara.jboss.org/">Savara</a></li>
           
-            <li><a href="http://seamframework.org/">Seam</a></li>
+            <li><a href="https://weld.cdi-spec.org/">Weld</a></li>
           
             <li><a href="http://arquillian.org/">Shrinkwrap</a></li>
           
@@ -480,7 +526,7 @@ build amazing applications.</h2>
           
             <li><a href="https://wildfly-security.github.io/wildfly-elytron/">WildFly Elytron</a></li>
           
-            <li><a href="http://wildfly-swarm.io/">WildFly Swarm</a></li>
+            <li><a href="https://thorntail.io/">Thorntail</a></li>
           
             <li><a href="http://wise.jboss.org/">Wise</a></li>
           
